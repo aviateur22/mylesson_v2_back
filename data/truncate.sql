@@ -1,0 +1,1 @@
+TRUNCATE TABLE "lesson_has_tag", "lesson", "user", "tag", "image", "role" RESTART IDENTITY;

@@ -1,0 +1,3 @@
+node_modules/
+sqitch.conf
+.env

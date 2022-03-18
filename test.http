@@ -1,0 +1,36 @@
+# uribase
+@uri = http://localhost:{{$dotenv PORT}}
+
+### Recuperation all lesson
+GET {{uri}}/lessons/
+
+### Recuperation leçon par id
+GET {{uri}}/lessons/auth/10
+
+### mise a jour de 1 lecon
+PATCH  {{uri}}/lessons/auth/1
+
+@Cookie: ident=cddddddd
+
+content-type: application/json
+
+{
+    "tagId": "1/4/10",
+    "title": "",
+    "content": "",
+    "userId": "{\"content\":\"JRtLnVgl/8peWd+7yc+d0Q==\"}"
+
+
+}
+
+### suppresion de 1 lecon
+DELETE {{uri}}/lessons/auth/id
+
+### Recuperation lecon par utilisateur
+POST {{uri}}/lessons/auth/user/user-lesson
+content-type: application/json
+
+{
+    "userId": "{\"content\":\"JRtLnVgl/8peWd+7yc+d0Q==\"}"
+}
+

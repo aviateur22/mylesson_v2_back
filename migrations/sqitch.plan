@@ -1,0 +1,4 @@
+%syntax-version=1.0.0
+%project=mylesson
+
+initdb 2022-01-23T14:58:45Z cyrille cadé <aviateur22@hotmail.fr> # init tables
