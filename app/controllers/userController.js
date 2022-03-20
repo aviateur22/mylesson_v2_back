@@ -1,12 +1,8 @@
 const bcrypt = require('bcrypt');
-const urlRedirect = require('../enums/urlRedirection');
 const { User } = require('../models/index');
 
-/**Security */
-const CRYPTO_AES = require('../helpers/security/aes');
-const tokenGenerator = require('../helpers/security/tokenGenerator');
-
-
+/**  */
+const jwtToken = require('../helpers/security/jwt');
 
 const userController={
     /**
@@ -18,7 +14,7 @@ const userController={
      */
     loginAction: () => async(req, res, _)=>{
         if(!req.body.email || !req.body.password) {
-            throw ({message: 'email et mot de passe obligatoire', statusCode:'422', resetAuth: true , redirect :'/', error: true});
+            throw ({message: 'email et mot de passe obligatoire', statusCode:'422'});
         }    
 
         const user = await User.findOne({
@@ -26,50 +22,34 @@ const userController={
                 email:req.body.email 
             }
         });       
-
+        
+        /** pas d'utilisateur de trouvé */
         if(!user){
-            throw ({message: 'erreur dans l\'email ou le mot de passe', statusCode:'422', resetAuth: true , redirect :'/', error: true});
+            throw ({message: 'email ou mot de passe invalide', statusCode:'422'});
         }
 
         const comparePassword = await bcrypt.compare(req.body.password , user.password);
 
+        /** echec comparaiosn mot de passe */
         if(!comparePassword){
-            throw ({message: 'erreur dans l\'email ou le mot de passe', statusCode:'422', resetAuth: true , redirect :'/', error: true}); 
+            throw ({message: 'email ou mot de passe invalide', statusCode:'422'}); 
         }
 
-        const { id, role_id, login } = user;    
+        const { id, role_id, login } = user;        
+       
+        /** génération token */
+        const token = await jwtToken({user: id, role: role_id});
         
-        /**generation d'un token aléatoire */
-        const userToken = await tokenGenerator(16);
-        
-        /** Mise en session des information de connection */            
-        req.session.user = {
-            'id': id,
-            'role_id': role_id,
-            'token': userToken
-        };
+        /** Renvoie d'un JWT pour gestion des authorization */
+        res.cookie('authorization', token, {sameSite:'lax', httpOnly: true });       
 
-        /**initialisation chiffrement AES */
-        const aes = new CRYPTO_AES();
-        /** chiffrement de id et du token */
-        const identTokenEncrypt = await aes.encrypt(`${id}/${userToken}`);     
-               
+        // /** Renvoie un cookie avec ID hashé de l'utilisateur des infos utilisateurs */
+        //res.cookie('ident', identTokenEncrypt, {sameSite:'lax', path: '/',expires: new Date(Date.now() + 24 * 60 * 60 *1000), httpOnly: true });       
 
-        /** chiffrement du login et  id utilisateur*/       
-        const idEncrypt =await aes.encrypt(`userid:${id}`);
-        const loginEncrypt = await aes.encrypt(login);
-
-        /**
-         * Renvoie un cookie avec ID hashé de l'utilisateur des infos utilisateurs
-         */
-        res.cookie('ident', identTokenEncrypt, {sameSite:'lax', path: '/',expires: new Date(Date.now() + 24 * 60 * 60 *1000), httpOnly: true });
         //res.cookie('nom','cyrille',{path: '/',expires: new Date(Date.now() + 24 * 60 * 60 *1000), httpOnly: true })
         res.status(200).json({
-            'succes':true,
-            'message':`Bienvenu sur votre compte ${login}`,
-            'redirect':urlRedirect.myAccount,
-            'user' : loginEncrypt,
-            'id': idEncrypt,
+            'message':`Bienvenu sur votre compte ${login}`,            
+            'user' : login,
             'role' : role_id
         });        
     },
@@ -81,40 +61,41 @@ const userController={
      * @param {Object} next 
      * @returns  {Object} - API JSON response status
      */
-    signupAction :() => async(req, res ,_)=> {       
-        const {login, email, password} = req.body;
-        if(!login || !email || !password) {    
-            throw ({message: 'email, mot de passe et confirmation du mot de passe obligatoire', statusCode:'422', resetAuth: false , redirect :'/', error: true});
+    registerAction :() => async(req, res ,_)=> {       
+        const {login, email, password, confirmPassword} = req.body;
+
+        if(!login || !email || !password || !confirmPassword) {    
+            throw ({message: 'email, mot de passe et confirmation du mot de passe obligatoire', statusCode:'422'});
         }    
 
+        /** Mot de passe et confirmation mot de passe pas identique */
+        if(password !== confirmPassword){
+            throw ({message: 'les mots de passe ne sont pas identique', statusCode:'422'});
+        }
         const user = await User.findOne({
             where: {
                 email:email 
             }
-        });       
-
+        });
         if(user) {      
-            throw ({message: 'cet email est déjà existant', statusCode:'422', resetAuth: false , redirect :'/', error: true});
+            throw ({message: 'cet email est déjà existant', statusCode:'409'});
         }
         
         const passwordHash =await bcrypt.hash(password,10);
 
         await User.create({
-            login: login,
-            email : email,
-            password : passwordHash,
-            token : 'fhdfkhdkdfkdflkddfh'
+            login,
+            email,
+            password : passwordHash
         });            
         
         return res.status(200).json({ 
-            'succes':true,           
-            'redirect':urlRedirect.login,
             'message':'Felication votre inscription est réussi'
         });
     },
 
     /**
-     * Déconnecxion
+     * Déconnexion
      * @param {Object} req 
      * @param {Object} res 
      * @param {Object} next 
@@ -127,31 +108,39 @@ const userController={
         
         //const comparePassword = await bcrypt.compare(req.session.user);
         return res.status(200).json({
-            'succes':true,
-            'message':'A bientot',
-            'redirect':urlRedirect.home,
+            'message':'A bientot'
         });            
     },
 
     /**
      * récupération de un user 
      */
-    getOne : async(req, res, next)=>{
+    getUserById : async(req, res, next)=>{
 
     },
 
     /**
      * Update de un utilisateur
      */
-    update: async(req, res, next)=>{
+    updateUserById: async(req, res, next)=>{
 
     },
 
     /**
      * Suppresion de un utilisateur
      */
-    delete : async(req ,res, next)=>{
+    deleteUserById : async(req ,res, next)=>{
+    },
+
+    /**
+     * récupration de tous les utilisateurs
+     * @param {*} req 
+     * @param {*} res 
+     * @param {*} next 
+     */
+    getAllUser: async(req ,res, next)=>{
     }
+
 };
 
 module.exports = userController;

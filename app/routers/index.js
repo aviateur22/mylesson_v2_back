@@ -1,25 +1,28 @@
 const express = require('express');
-const resHeaderMiddleware = require('../middlewares/resHeaderMiddleware');
 const router = express.Router();
-const lessonRouter = require('./lessonRouter');
+
+/** router api */
+const apiRouter = require('./api');
+
+/** test markdown */
 const markdownRouter = require('./markdownRouter');
-const userRouter = require('./userRouter');
-const notFound = require('../helpers/notFoundController');
-const error = require('../errors');
 
-/**Gestion requete client */
-router.use('/users',resHeaderMiddleware, userRouter);
+/** router 404 */
+const notFound = require('../controllers/notFoundController');
 
-/**Gestion lessons */
-router.use('/lessons',resHeaderMiddleware, lessonRouter);
+/** router error */
+const error = require('../controllers/errorController');
+
+/** api */
+router.use('/api', apiRouter);
 
 //markdown
 router.use('/markdown',markdownRouter);
 
-/**middleware pour une chemin inconnu*/
+/** 404*/
 router.use(notFound);
 
-/**Middleware pour envoyer une erreur*/
+/** error*/
 router.use(error);
 
 module.exports = router;

@@ -1,5 +1,5 @@
 /**
- * récuperation des cookies
+ * récuperation des cookies de la requete
  * @param {*} cookieSchemaError - traitement des erreurs sur les cookies
  * @returns {Object} req.cookie - renvoie un objet cookie
  */
@@ -7,28 +7,33 @@ module.exports = (req,res,next)=>{
     /**object pour stocker les cookies */
     const list = {};
 
-    /**recuperation des cookies */
-    const cookieHeader = req.headers?.cookie;  
-
-    /**pas de presence de cookie */
-    if(!cookieHeader){
-        throw ({message: 'absence autorisation cookie', statusCode:'401', resetAuth: true , redirect :'/', error: true});
+    /** pas de header dans la requete */
+    if(!req.headers){
+        return next();
     }
 
+    /** pas de cookie présent dans les headers de la requete */
+    if(!req.headers.cookie){
+        return next();
+    }
+
+    /**recuperation des cookies */
+    const cookieHeader = req.headers.cookie;  
+    
+    //console.log(cookieHeader);
     /**mise des cookies dans l'objet */
     cookieHeader.split(';').forEach(function(cookie) {
         let [ name, ...rest] = cookie.split('=');
         name = name?.trim();
         if(!name) {
-            throw ({message: 'erreur format autorisation cookie', statusCode:'401', resetAuth: true , redirect :'/', error: true});
+            throw ({message: 'erreur format autorisation cookie', statusCode:'400'});
         }
         const value = rest.join('=').trim();
         if(!value){
-            throw ({message: 'erreur format autorisation cookie', statusCode:'401', resetAuth: true , redirect :'/', error: true});
+            throw ({message: 'erreur format autorisation cookie', statusCode:'400'});
         }
         list[name] = decodeURIComponent(value);
     });
-    res.cookie = list;
-    console.log(list)
+    req.cookie = list;    
     next();
 };

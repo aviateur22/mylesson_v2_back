@@ -1,4 +1,4 @@
-const resHeader = (req,res,next)=>{    
+const resHeader = (req, res, next)=>{    
     res.header('Access-Control-Allow-Credentials', 'true');
     next();
 };

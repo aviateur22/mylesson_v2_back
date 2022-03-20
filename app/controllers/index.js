@@ -1,7 +1,7 @@
-const database = require('./databaseController');
 const lesson = require('./lessonController');
 const markdown = require('./markdownController');
 const user = require('./userController');
-const error = require('./errorController');
+const tag  = require('./tagController');
+const admin = require('./adminController');
 
-module.exports = {database, lesson, markdown, user, error};
+module.exports = { lesson, markdown, user, tag, admin};

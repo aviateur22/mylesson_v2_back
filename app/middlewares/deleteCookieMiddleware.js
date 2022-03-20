@@ -1,11 +1,10 @@
 /**
- * middleware pour suppression de cookie
+ * middleware pour la suppression des cookies lors de la deconnexion
  * @param {Object} res 
  * @param {Object} next 
  */
 const deleteCookieMiddleware = (_, res, next)=>{
-    res.clearCookie('connect.sid', {path: '/'}).
-        clearCookie('ident', {path: '/'});
+    res.clearCookie('authorization');
     next();
 };
 module.exports = deleteCookieMiddleware;

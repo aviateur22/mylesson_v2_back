@@ -3,7 +3,7 @@ const app = express();
 const cors = require('cors');
 const path = require('path');
 const router = require('./routers');
-const session = require('./middlewares/sessionMiddleware');
+//const session = require('./middlewares/sessionMiddleware');
 
 //Inclu pour fectionner les cookie sur le navigateur
 app.set('trust proxy', 1);
@@ -27,7 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 //Session middleware
-app.use(session());
+//app.use(session());
 
 //Router middleware
 app.use(router);

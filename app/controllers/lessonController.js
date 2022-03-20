@@ -4,6 +4,7 @@ const sanitizer = require('sanitizer');
 const {Lesson, Tag, lessonTag} = require('../models/index');
 const CRYPTO_AES = require('../helpers/security/aes');
 const aes = new CRYPTO_AES();
+const userRole = require('../helpers/userRole');
 
 const lessonController = {
 
@@ -17,18 +18,18 @@ const lessonController = {
     /**
      * Création d'une nouvelle leçon
      */
-    create:(createLessonSchemaError) => async(req, res, next) => {
+    create: async(req, res, next) => {
         //recuperation tagId, title, content
         const {tagId, title, content} = req.body;
 
         /**titre et content manquant */
         if(!title, !content){
-            throw ({message: 'titre et contenu ne peuvent pas être vide', statusCode:'422', resetAuth: false , redirect :'/', error: true});
+            throw ({ message: 'le titre et contenu de la leçon ne peuvent pas être vide', statusCode:'422' });
         }
 
         /**id tag manquant */
         if(!tagId){
-            throw ({message: 'tags id absent', statusCode:'500', resetAuth: false , redirect :'/', error: true});
+            throw ({ message: 'tags id absent', statusCode:'422' });
         }
 
         /**Nettoyage des données utilisateur */
@@ -41,7 +42,7 @@ const lessonController = {
         //vérification des ids de tag
         tags.forEach(tag => {
             if(isNaN(tag)){
-                return;
+                throw ({ message:  'le format des tags n\'est pas valide', statusCode:'422' });
             }            
         });
 
@@ -52,7 +53,7 @@ const lessonController = {
         let createLesson = await Lesson.create({
             title: titleEscape,
             content : contentEscape,
-            user_id: req.session.user.id ,
+            user_id: req.payload.id ,
             slug: slug    
         });
 
@@ -60,6 +61,7 @@ const lessonController = {
         
         /**Generation des tags */
         await (async()=>{
+            /** stocks les promesses */
             const promises = [];
             tags.forEach((tag)=>{   
                 const query =  lessonTag.create({                    
@@ -68,6 +70,7 @@ const lessonController = {
                 });         
                 promises.push(query);
             });
+            /** résolution des promesses */
             const outputs = await Promise.all(promises);
         })();
 
@@ -119,20 +122,39 @@ const lessonController = {
     /**
      * update d'une leçon
      */
-    update: () => async(req, res, next)=>{
+    updateById: async(req, res, next)=>{
         //recuperation id de la lesson
-        const id = parseInt(req.params.id, 10);
+        const lessonId = parseInt(req.params.id, 10);
 
         //id pas au format numeric
-        if(isNaN(id)){
-            throw ({message: 'format id leçon incorrect', statusCode:'422', resetAuth: false , redirect :'/', error: true});
+        if(isNaN(lessonId)){
+            throw ({message: 'le format de l\'identifiant de la leçon est incorrect', statusCode:'422'});
         }
 
-        //recuperation tagId
-        const {tagId, title, content} = req.body;
+        /** id lecon manquant */
+        if(!lessonId){
+            throw ({message: 'l\'identifiant de la leçon est manquant', statusCode:'422'});
+        }
 
+        //recuperation des données du formulaire
+        const { tagId, title, content } = req.body;
+
+        //récupération de l'utilisateur
+        const userId = parseInt(req.body.userId, 10);
+
+        //id pas au format numeric
+        if(isNaN(userId)){
+            throw ({message: 'le format de l\'identifiant utilisateur est incorrect', statusCode:'422'});
+        }
+
+        /** données lecon manquantes */
         if(!tagId || !title || !content){
-            throw ({message: 'le titre et contenu ne peuvent pas être vide', statusCode:'422', resetAuth: false , redirect :'/', error: true});
+            throw ({message: 'le titre, tag et contenu de la leçon sont obligatoire', statusCode:'422'});
+        }
+
+        /** données utilisateur absent */
+        if(!userId){
+            throw ({message: 'l\'identifiant utilisateur est manuqant', statusCode:'422'});
         }
 
         /**Nettoyage des données utilisateur */
@@ -145,20 +167,20 @@ const lessonController = {
         //vérification des ids de tag
         tags.forEach(tag => {
             if(isNaN(tag)){
-                throw ({message: 'erreur dans le format des tags id', statusCode:'422', resetAuth: false , redirect :'/', error: true});
+                throw ({ message:  'le format des tags n\'est pas valide', statusCode:'422' });
             }            
         });
 
-        const lesson = await Lesson.findByPk(id);
+        const lesson = await Lesson.findByPk(lessonId);
 
         /** aucun id correspondant  */
         if(!lesson){
-            throw ({message: 'la leçon n\'est pas présente en base de données', statusCode:'422', resetAuth: false , redirect :'/', error: true});
+            throw ({message: 'la leçon n\'est pas présente en base de données', statusCode:'422'});
         }
 
-        /**Verification concordence des user_id */
-        if(parseInt(req.session.user.id, 10) !== parseInt(lesson.user_id, 10)){
-            throw ({message: 'cette leçon ne vous appartient pas', statusCode:'401', resetAuth: false , redirect :'/', error: true});
+        /** Seule un admin ou le propriétaire de la lecon peut executer cette action */
+        if(userId !== parseInt(lesson.user_id, 10) && req.payload.role < userRole.admin){
+            throw ({message: 'vous n\'est pas autorisé a executer cette action', statusCode:'403'});
         }
 
         let updateLesson = await lesson.update({                
@@ -166,21 +188,19 @@ const lessonController = {
             content : contentEscape
         });
 
-        /**
-         * Gestion relation tag et lesson
-         */
-        //destruction des anciens tags
+        /** suppression des anciens tags */
         await lessonTag.destroy({
             where:{                   
-                lesson_id: id
+                lesson_id: lessonId
             }                                   
         });
 
+        /** ajout des tags*/
         await (async()=>{
             const promises = [];           
             tags.forEach((tag)=>{   
                 const query =  lessonTag.create({                    
-                    lesson_id: id,
+                    lesson_id: lessonId,
                     tag_id: tag                    
                 });         
                 promises.push(query);
@@ -189,80 +209,123 @@ const lessonController = {
         })();
 
         /**Recuperation de la leçon */
-        updateLesson = await Lesson.findByPk(id,{
+        updateLesson = await Lesson.findByPk(lessonId,{
             include:{
                 model: Tag, as: 'tags'
             }
         });
-        return res.json(updateLesson);
+        return res.status(200).json(updateLesson);
     },
-
    
     /**
      * Recuperation leçon par son id
      * @returns {Object} lesson 
      */
-    getById: () => async(req, res, next)=>{
+    getById: async(req, res, next)=>{        
         /**Vérification id */
-        const id =parseInt(req.params.id, 10);
-        if(isNaN(id)){
-            throw ({message: 'erreur dans le format de l\'id', statusCode:'422', resetAuth: false , redirect :'/', error: true});
-        }            
-        const lesson =await Lesson.findByPk(id, {
+        const lessonId =parseInt(req.params.id, 10);
+        
+        /** mauvais format de lecon id */
+        if(isNaN(lessonId)){
+            throw ({message: 'le format de l\'identifiant de la leçon est incorrect', statusCode:'422'});
+        }      
+        
+        /** lecon id manquant */
+        if(!lessonId){
+            throw ({message: 'l\'identifiant de la leçon est manquant', statusCode:'422'});
+        }
+
+        const lesson =await Lesson.findByPk(lessonId, {
             include:['tags','user']
-        });           
+        });
 
-        console.log(lesson);
-
-       
+        /** pas de lecon */
+        if(!lesson){
+            return res.status(204).json({});
+        }
+        
         /**Renvoide la leçon */
-        res.json({
+        return res.status(200).json({
             title: lesson.title,
             content: lesson.content,
             tags: lesson.tags,
             autor: lesson.user.login,
             created: lesson.formatedCreationDate,
             updated: lesson.formatedUpdateDate            
-        });
+        });        
     },
 
     /**
      * Suppression de une leçon
      */
-    delete: (req, res, next)=>{
+    deleteById: async(req, res, next)=>{
+        //récupération id de la lesson
+        const lessonId = parseInt(req.params.id, 10);
 
+        //id pas au format numeric
+        if(isNaN(lessonId)){
+            throw ({message: 'le format de l\'identifiant de la leçon est incorrect', statusCode:'422'});
+        }
+
+        /** id lecon manquant */
+        if(!lessonId){
+            throw ({message: 'l\'identifiant de la leçon est manquant', statusCode:'422'});
+        }
+
+        //récupération de l'utilisateur
+        const userId = parseInt(req.body.userId, 10);
+
+        //id pas au format numeric
+        if(isNaN(userId)){
+            throw ({message: 'le format de l\'identifiant utilisateur est incorrect', statusCode:'422'});
+        }
+
+        const lesson = await Lesson.findByPk(lessonId);
+
+        /** aucun id correspondant  */
+        if(!lesson){
+            throw ({message: 'la leçon n\'est pas présente en base de données', statusCode:'422'});
+        }
+
+        /** Seule un admin ou le propriétaire de la lecon peut executer cette action */
+        if(userId !== parseInt(lesson.user_id, 10) && req.payload.role < userRole.admin){
+            throw ({message: 'vous n\'est pas autorisé a executer cette action', statusCode:'403'});
+        }
+
+        const deleteLesson = await Lesson.destroy({
+            where:{                   
+                id: lessonId
+            }                                   
+        });
+
+        return res.status(200).json({
+            lessonId: lesson.id,
+            title: lesson.title
+        });
     },
    
     /**
      * Récuperation de toutes les lecons d'un user
      * @returns {object} lessons - Leçons créées par l'utilisateur
      */
-    getByUserId:() => async(req, res, next)=>{       
-        const userId = req.headers['user-ident'];
+    getByUserId: async(req, res, next)=>{       
+        //récupération de l'utilisateur
+        const userId = parseInt(req.params.id, 10);
 
+        //id pas au format numeric
+        if(isNaN(userId)){
+            throw ({message: 'le format de l\'identifiant utilisateur est incorrect', statusCode:'422'});
+        }
+
+        /** données utilisateur absent */
         if(!userId){
-            throw ({message: 'id utilisateur absent', statusCode:'422', resetAuth: false , redirect :'/', error: true});
+            throw ({message: 'l\'identifiant utilisateur est manquant', statusCode:'422'});
         }
-        /**recuperation id utilisateur */
-        const decryptUserId = aes.decrypt(userId);
-        /**Verification longueur tableau */
-        if(decryptUserId?.split(':').length !== 2){
-            throw ({message: 'erreur dechiffrement userId', statusCode:'422', resetAuth: false , redirect :'/', error: true});
-        }
-        const id = decryptUserId.split(':')[1];
-
-        /**verification de l'id et session.id */
-        const sessionId = `userid:${req.session.user?.id}`;        
-        const idCompare = decryptUserId === sessionId ? true : false;
-        if(!idCompare){
-            console.log('id pas identique');
-            throw ({message: 'erreur dechiffrement userId', statusCode:'422', resetAuth: false , redirect :'/', error: true});
-        } 
-
+        
         /**requete sur les leçon utilisateurs */
         const resultsLessons = await Lesson.findAll({
             where:{
-                user_id :id 
+                user_id :userId 
             },                
             include:{
                 model: Tag, as: 'tags', attributes:['name']

@@ -6,7 +6,7 @@ const userRole = {
     user : '1',
 
     //utilisateur pouvant poster
-    teacher :'2',
+    writer :'2',
 
     //utilisateur pouvant modifier les droits utilisateurs
     admin :'3',

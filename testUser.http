@@ -1,0 +1,54 @@
+# uribase
+@uri = http://localhost:{{$dotenv PORT}}
+
+### inscription
+POST {{uri}}/api/users/register
+Content-Type: application/json
+
+{
+    "login":"aaa",
+    "email":"aaa@gmail.com",
+    "password":"Affirmer2011@",
+    "confirmPassword":"Affirmer2011@"
+}
+
+### connexion
+POST {{uri}}/api/users/login
+Content-Type: application/json
+
+{
+    "email":"aaa@gmail.com",
+    "password":"Affirmer2011@"
+}
+
+### modification d'utilisateur par son id
+PATCH {{uri}}/users/id
+Content-Type: application/json
+
+{
+
+}
+
+### suppression d'utilisateur par son id
+DELETE {{uri}}/users/id
+Content-Type: application/json
+
+{
+    
+}
+
+### récupération d'utilisateur par son id
+GET  {{uri}}/users/id
+Content-Type: application/json
+
+{
+    
+}
+
+### récuperation de tous les utilisateurs
+GET  {{uri}}/users
+Content-Type: application/json
+
+{
+
+}
