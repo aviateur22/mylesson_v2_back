@@ -12,7 +12,7 @@ Content-Type: application/json
     "confirmPassword":"Affirmer2011@"
 }
 
-### connexion
+### connexion user avec droit en lecture
 POST {{uri}}/api/users/login
 Content-Type: application/json
 
@@ -21,16 +21,42 @@ Content-Type: application/json
     "password":"Affirmer2011@"
 }
 
-### modification d'utilisateur par son id
-PATCH {{uri}}/users/id
+### connexion user avec droit en écriture
+POST {{uri}}/api/users/login
 Content-Type: application/json
 
 {
+    "email":"aviateur22@hotmail.fr",
+    "password":"aaaa"
+}
+
+### connexion user avec droit admin
+POST {{uri}}/api/users/login
+Content-Type: application/json
+
+{
+    "email":"aviateur22@gmail.com",
+    "password":"aaaa"
+}
+
+### token pour requete
+@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Nywicm9sZSI6MSwiaWF0IjoxNjQ3ODE4Njg1LCJleHAiOjE2NDc4MjA0ODUsImlzcyI6ImJhY2stYXV0aC1teUxlc3NvbiIsInN1YiI6ImF1dGhvcml6YXRpb24iLCJqdGkiOiIxMjVjMzkxNC1hOWE4LTRiM2UtYmU2NC1mMTI2YWIwOTI2NzUifQ.xTkCOgTfeHU5QhlVxdVOrRWH--kvO-rlA4fa5DAhqNo
+
+
+### modification d'utilisateur par son id
+PATCH {{uri}}/api/users/5
+Cookie: {{jwtToken}}
+Content-Type: application/json
+
+{
+    "email" : "dfddcsddf@hdhd.com",
+    "login" : "fdddF"
 
 }
 
 ### suppression d'utilisateur par son id
-DELETE {{uri}}/users/id
+DELETE {{uri}}/api/users/6
+Cookie: {{jwtToken}}
 Content-Type: application/json
 
 {
@@ -38,11 +64,23 @@ Content-Type: application/json
 }
 
 ### récupération d'utilisateur par son id
-GET  {{uri}}/users/id
+GET  {{uri}}/api/users/8
+Cookie: {{jwtToken}}
 Content-Type: application/json
 
 {
     
+}
+
+### modification mot de passe
+PATCH   {{uri}}/api/users/password/7
+Cookie: {{jwtToken}}
+Content-Type: application/json
+
+{
+    "password" : "Affirmer2010@",
+    "newPassword" : "Affirmer2010@",
+    "confirmNewPassword" : "Affirmer2010@"     
 }
 
 ### récuperation de tous les utilisateurs

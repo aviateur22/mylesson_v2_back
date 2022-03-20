@@ -4,6 +4,14 @@
 const express = require('express');
 const router = express.Router();
 
+/** role */
+const roleMiddleware = require('../../middlewares/roleMiddleware');
+/** récupération des cookies */
+const cookieMiddleware = require('../../middlewares/cookieMiddleware');
+/** authorisation  */
+const authorization = require('../../middlewares/authorizationMiddleware');
+
+
 /**controller user */
 const userController = require('../../controllers/userController');
 const controllerHandler = require('../../helpers/controllerHelper/controllerHandler');
@@ -18,12 +26,12 @@ const userSchemaValidation = require('../../validations/schemas/user');
 /** inscription client*/
 router.post('/register',
     joiValidation(userSchemaValidation.registerUserSchema),
-    controllerHandler(userController.registerAction()));
+    controllerHandler(userController.registerAction));
 
 /** connection client */
 router.post('/login',
     joiValidation(userSchemaValidation.loginUserSchema), 
-    controllerHandler(userController.loginAction()));
+    controllerHandler(userController.loginAction));
 
 /** deconnexion client */
 router.get('/logout',
@@ -35,12 +43,33 @@ router.get('/', controllerHandler(userController.getAllUser));
 
 /** gestion information client */
 router.route('/:id')
-    .get(controllerHandler(userController.getUserById))
-    .patch(controllerHandler(userController.updateUserById))
-    .delete(controllerHandler(userController.deleteUserById));
+    /** récupération info utilisateur*/
+    .get(
+        controllerHandler(cookieMiddleware),
+        controllerHandler(authorization),
+        controllerHandler(roleMiddleware.user),
+        controllerHandler(userController.getUserById))
+
+    /** update info utilisateur */
+    .patch(
+        controllerHandler(cookieMiddleware),
+        controllerHandler(authorization),
+        controllerHandler(roleMiddleware.user),
+        joiValidation(userSchemaValidation.updateUserSchema),
+        controllerHandler(userController.updateUserById))
+
+    /** suppression utilisateur */
+    .delete(
+        controllerHandler(cookieMiddleware),
+        controllerHandler(authorization),
+        controllerHandler(roleMiddleware.user),
+        controllerHandler(userController.deleteUserById));
 
 /** modification mot de passe */
 router.patch('/password/:id',
+    controllerHandler(cookieMiddleware),
+    controllerHandler(authorization),
+    controllerHandler(roleMiddleware.user),
     joiValidation(userSchemaValidation.updatePasswordSchema),
     controllerHandler(userController.updatePassword));
 

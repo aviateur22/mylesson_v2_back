@@ -9,6 +9,7 @@ module.exports = Joi.object({
             .required()            
             .messages({
                 'string.empty': 'le mot de passe est obligatoire',
+                'any.required': 'le mot de passe est obligatoire'
             }),
 
     /* password: 8 charac, uppercase, number,pas d'espace et liste de special char */
@@ -22,7 +23,7 @@ module.exports = Joi.object({
             1 majiscule minimum\n
             1 chiffre minimum\n
             1 charactere parmis #?!@$%^&*-`,
-            'any.required': 'l\'email est obligatoire'
+            'any.required':  'le nouveau mot de passe est obligatoire'
         }),           
 
     confirmNewPassword: Joi.string()
@@ -30,6 +31,7 @@ module.exports = Joi.object({
         .valid(Joi.ref('newPassword'))
         .messages({
             'string.empty': 'la confirmation du nouveau mot de passe est obligatoire',
-            'any.ref': 'la confirmation du mot de passe, ne correspond pas au nouveau mot de passe '
+            'any.required': 'la confirmation du nouveau mot de passe est obligatoire',
+            'any.only': 'la confirmation du mot de passe, ne correspond pas au nouveau mot de passe '
         })
 });
