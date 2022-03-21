@@ -6,15 +6,20 @@ const {Tag} = require('../models/index');
 const tagController = {
 
     /**
-     * Recherche d'un tag 
+     * Recherche des tags
      * @param {Object} req
      * @param {Object} res 
      * @param {Object} next 
      */
-    findTag:async(req,res,next) => {
-        const tag =sanitizer.escape(req.body.tag);
+    findTagByName:async(req, res, next) => {
+        const tag =sanitizer.escape(req.params.name);
+
+        if(!tag){
+            throw ({ message: 'le nom du tag ne peut pas être vide', statusCode:'422' });
+        }
+        
         //recherche limité a 10 caractères
-        if(tag.length<10){
+        if(tag.length < 10){
             const findTag =await Tag.findAll({
                 where:{
                     name:{
