@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 const sanitizer = require('sanitizer');
-const {Lesson, Tag, lessonTag} = require('../models/index');
+const {Lesson, Tag, User, lessonTag} = require('../models/index');
 const CRYPTO_AES = require('../helpers/security/aes');
 const aes = new CRYPTO_AES();
 const userRole = require('../helpers/userRole');
@@ -83,30 +83,7 @@ const lessonController = {
 
         res.status(201).json(createLesson);
     },
-
-    /**
-     * Recherche d'un tag 
-     * @param {Object} req
-     * @param {Object} res 
-     * @param {Object} next 
-     */
-    findTag:async(req,res,next) => {
-        const tag =sanitizer.escape(req.body.tag);
-        //recherche limité a 10 caractères
-        if(tag.length<10){
-            const findTag =await Tag.findAll({
-                where:{
-                    name:{
-                        [Op.like]:'%'+tag.toLowerCase()+'%'
-                    }
-                }
-            });
-            if(findTag){
-                res.status(200).json(findTag); 
-            }
-        }
-    },
-
+    
     /**
      * Récupération de toute les lessons
      */
@@ -289,7 +266,7 @@ const lessonController = {
 
         /** Seule un admin ou le propriétaire de la lecon peut executer cette action */
         if(userId !== parseInt(lesson.user_id, 10) && req.payload.role < userRole.admin){
-            throw ({message: 'vous n\'est pas autorisé a executer cette action', statusCode:'403'});
+            throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
         }
 
         const deleteLesson = await Lesson.destroy({
@@ -322,14 +299,18 @@ const lessonController = {
             throw ({message: 'l\'identifiant utilisateur est manquant', statusCode:'422'});
         }
         
+        /** Seule un admin ou le propriétaire de la lecon peut executer cette action */
+        if(userId !== parseInt(req.payload.id, 10) && req.payload.role < userRole.admin){
+            throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
+        }
+
         /**requete sur les leçon utilisateurs */
         const resultsLessons = await Lesson.findAll({
             where:{
                 user_id :userId 
-            },                
-            include:{
-                model: Tag, as: 'tags', attributes:['name']
-            }
+            }, 
+            returning: true,               
+            include:{ model: Tag, as: 'tags', attributes:['name'] }
         });
         
         /**

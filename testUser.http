@@ -7,7 +7,7 @@ Content-Type: application/json
 
 {
     "login":"aaa",
-    "email":"asaa@gmail.com",
+    "email":"aaa@gmail.com",
     "password":"Affirmer2011@",
     "confirmPassword":"Affirmer2011@"
 }
@@ -18,7 +18,7 @@ Content-Type: application/json
 
 {
     "email":"aaa@gmail.com",
-    "password":"Affirmer2011@"
+    "password":"Affirmer2010@"
 }
 
 ### connexion user avec droit en écriture
@@ -40,7 +40,7 @@ Content-Type: application/json
 }
 
 ### token pour requete
-@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6MywiaWF0IjoxNjQ3ODY5NzYzLCJleHAiOjE2NDc4NzE1NjMsImlzcyI6ImJhY2stYXV0aC1teUxlc3NvbiIsInN1YiI6ImF1dGhvcml6YXRpb24iLCJqdGkiOiI2ZDQ0MDI0OS1lNTgyLTQzOTMtYTJmZS1iOTdlOTA1YjMyYjUifQ.A-ok5LB2G5xiZsf5Un-9RzWPOw88qIPwatfpzi1hEsU
+@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6MywiaWF0IjoxNjQ3ODc2NzI1LCJleHAiOjE2NDc4Nzg1MjUsImlzcyI6ImJhY2stYXV0aC1teUxlc3NvbiIsInN1YiI6ImF1dGhvcml6YXRpb24iLCJqdGkiOiIzOTQzOWNkNS05MjAxLTQxZGQtYWU3OS1kOTAzMmU3YmJiN2QifQ.pp3UOkmwCNRYuZ497mzyUXWibV_fofG8RY0R7baY3-8
 
 
 ### modification d'utilisateur par son id

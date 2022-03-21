@@ -10,6 +10,6 @@ const controllerHandler = require('../../helpers/controllerHelper/controllerHand
 const tagController = require('../../controllers').tag;
 
 /** récuperarion des tags disponibles */
-router.get('/', controllerHandler(tagController.findTag));
+router.get('/:name', controllerHandler(tagController.findTagByName));
 
 module.exports = router;

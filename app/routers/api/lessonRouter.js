@@ -56,11 +56,8 @@ router.get('/user/:id',
     controllerHandler(roleMiddleware.writer),
     controllerHandler(lessonController.getByUserId));
 
-/**upload de 1 lesson */
+/** upload de 1 lesson */
 router.post('/file/upload',controllerHandler(lessonController.upload));
-
-/**recuperarion des tags disponibles */
-router.post('/auth/tags',controllerHandler(lessonController.findTag));
 
 module.exports = router;
 
