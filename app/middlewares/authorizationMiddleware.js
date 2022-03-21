@@ -25,8 +25,7 @@ module.exports = (req, res, next)=>{
 
     jsonwebtoken.verify(authorizationToken, KEY, function(err, payload) {        
         if(err){
-            console.log('faux token');
-            throw ({message: 'le token utilisé n\'est plus valide', statusCode:'401'});
+            throw ({message: 'votre session a expirée', statusCode:'401'});
         }
         req.payload = payload;
         return next();

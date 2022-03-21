@@ -2,12 +2,12 @@
 @uri = http://localhost:{{$dotenv PORT}}
 
 ### inscription
-POST {{uri}}/api/users/register
+POST {{uri}}/api/users
 Content-Type: application/json
 
 {
     "login":"aaa",
-    "email":"aaa@gmail.com",
+    "email":"asaa@gmail.com",
     "password":"Affirmer2011@",
     "confirmPassword":"Affirmer2011@"
 }
@@ -40,7 +40,7 @@ Content-Type: application/json
 }
 
 ### token pour requete
-@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Nywicm9sZSI6MSwiaWF0IjoxNjQ3ODE4Njg1LCJleHAiOjE2NDc4MjA0ODUsImlzcyI6ImJhY2stYXV0aC1teUxlc3NvbiIsInN1YiI6ImF1dGhvcml6YXRpb24iLCJqdGkiOiIxMjVjMzkxNC1hOWE4LTRiM2UtYmU2NC1mMTI2YWIwOTI2NzUifQ.xTkCOgTfeHU5QhlVxdVOrRWH--kvO-rlA4fa5DAhqNo
+@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6MywiaWF0IjoxNjQ3ODY5NzYzLCJleHAiOjE2NDc4NzE1NjMsImlzcyI6ImJhY2stYXV0aC1teUxlc3NvbiIsInN1YiI6ImF1dGhvcml6YXRpb24iLCJqdGkiOiI2ZDQ0MDI0OS1lNTgyLTQzOTMtYTJmZS1iOTdlOTA1YjMyYjUifQ.A-ok5LB2G5xiZsf5Un-9RzWPOw88qIPwatfpzi1hEsU
 
 
 ### modification d'utilisateur par son id
@@ -84,7 +84,16 @@ Content-Type: application/json
 }
 
 ### récuperation de tous les utilisateurs
-GET  {{uri}}/users
+GET  {{uri}}/api/users
+Cookie: {{jwtToken}}
+Content-Type: application/json
+
+{
+
+}
+
+### logout utilisateur
+POST {{uri}}/api/users/logout
 Content-Type: application/json
 
 {

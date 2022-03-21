@@ -15,7 +15,7 @@ const userController={
      * @param {Object} next 
      * @returns {Object} -API JSON response status
      */
-    loginAction: async(req, res, _)=>{
+    login: async(req, res, _)=>{
         if(!req.body.email || !req.body.password) {
             throw ({message: 'email et mot de passe obligatoire', statusCode:'422'});
         }    
@@ -64,7 +64,7 @@ const userController={
      * @param {Object} next 
      * @returns  {Object} - API JSON response status
      */
-    registerAction: async(req, res ,_)=> {       
+    register: async(req, res ,_)=> {       
         const {login, email, password, confirmPassword} = req.body;
 
         if(!login || !email || !password || !confirmPassword) {    
@@ -106,7 +106,7 @@ const userController={
      * @param {Object} next 
      * @returns {Object} - API JSON response status
      */
-    logoutAction:  async(req, res ,_)=> {        
+    logout:  async(req, res ,_)=> {        
         //const comparePassword = await bcrypt.compare(req.session.user);
         return res.status(200).json({
             'message':'A bientot'
@@ -213,8 +213,6 @@ const userController={
             email: updateUser.email
         });
     },
-
-
 
     /**
      * Suppresion de un utilisateur
@@ -330,7 +328,29 @@ const userController={
      * @param {*} res 
      * @param {*} next 
      */
-    getAllUser: async(req ,res, next)=>{
+    getAllUser: async(req ,res, next)=>{        
+        /** Seule un admin ou l'utilisateur peut effectuer cette action */
+        if( req.payload.role < userRole.admin){
+            throw ({message: 'vous n\'êtes pas autorisé à exécuter cette action', statusCode:'403'});
+        }
+
+        const resultUsers = await User.findAll({
+            include:['role']
+        });
+        
+        /**
+         * Filtrage des informations 
+         */
+        const users = resultUsers.map(element => {
+            const mapUsers = {};
+            mapUsers.id = element.id;                        
+            mapUsers.login = element.login;
+            mapUsers.email = element.email;
+            mapUsers.role_id = element.role_id;
+            mapUsers.roleName = element.role.name;
+            return mapUsers;
+        });
+        return res.json(users);  
     }
 
 };

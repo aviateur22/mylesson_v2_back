@@ -23,23 +23,30 @@ const deleteCookieMiddleware = require('../../middlewares/deleteCookieMiddleware
 const joiValidation = require('../../validations');
 const userSchemaValidation = require('../../validations/schemas/user');
 
-/** inscription client*/
-router.post('/register',
-    joiValidation(userSchemaValidation.registerUserSchema),
-    controllerHandler(userController.registerAction));
+router.route('/')
+    /** récupération de tous les utilisateurs */
+    .get(
+        controllerHandler(cookieMiddleware),
+        controllerHandler(authorization),
+        controllerHandler(roleMiddleware.admin),
+        controllerHandler(userController.getAllUser)
+    )
+
+    /**creation d'un nouvel utilisateur */
+    .post(
+        joiValidation(userSchemaValidation.registerUserSchema),
+        controllerHandler(userController.register)
+    );
 
 /** connection client */
 router.post('/login',
     joiValidation(userSchemaValidation.loginUserSchema), 
-    controllerHandler(userController.loginAction));
+    controllerHandler(userController.login));
 
 /** deconnexion client */
-router.get('/logout',
+router.post('/logout',
     controllerHandler(deleteCookieMiddleware),
-    controllerHandler(userController.logoutAction));
-
-/** récupertion de tous les utilisateurs */
-router.get('/', controllerHandler(userController.getAllUser));
+    controllerHandler(userController.logout));
 
 /** gestion information client */
 router.route('/:id')
