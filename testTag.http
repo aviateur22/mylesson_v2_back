@@ -1,0 +1,51 @@
+# uri base
+@uri = http://localhost:{{$dotenv PORT}}
+
+## connexion user avec droit en lecture
+POST {{uri}}/api/users/login
+Content-Type: application/json
+
+{
+    "email":"aviateur22@msn.com",
+    "password":"aaaa"
+}
+
+### connexion user avec droit en écriture
+POST {{uri}}/api/users/login
+Content-Type: application/json
+
+{
+    "email":"aviateur22@hotmail.fr",
+    "password":"aaaa"
+}
+
+### connexion user avec droit admin
+POST {{uri}}/api/users/login
+Content-Type: application/json
+
+{
+    "email":"aviateur22@gmail.com",
+    "password":"aaaa"
+}
+
+### token pour requete
+@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6MywiaWF0IjoxNjQ3ODg1OTQxLCJleHAiOjE2NDc4ODc3NDEsImlzcyI6ImJhY2stYXV0aC1teUxlc3NvbiIsInN1YiI6ImF1dGhvcml6YXRpb24iLCJqdGkiOiJkODAwMjA2NS01N2Q1LTQyOWItYTI4NS01NmE4OTU2YWVkYTUifQ.6ikXFzKjiUU81AL00FNAU0FCp1OzOD5w1bMvq7BTwJA
+
+### creation d'un tag
+POST {{uri}}/api/tags
+Cookie: {{jwtToken}}
+Content-Type: application/json
+
+{
+    "name":"helldddddoBoudm"
+}
+
+### suppression d'un tag
+DELETE  {{uri}}/api/tags/19
+Cookie: {{jwtToken}}
+Content-Type: application/json
+
+{
+    "name":"helldddddoBoudm"
+}
+

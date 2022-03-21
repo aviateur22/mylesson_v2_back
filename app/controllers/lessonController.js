@@ -157,7 +157,7 @@ const lessonController = {
 
         /** Seule un admin ou le propriétaire de la lecon peut executer cette action */
         if(userId !== parseInt(lesson.user_id, 10) && req.payload.role < userRole.admin){
-            throw ({message: 'vous n\'est pas autorisé a executer cette action', statusCode:'403'});
+            throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
         }
 
         let updateLesson = await lesson.update({                

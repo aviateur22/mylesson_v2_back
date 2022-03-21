@@ -158,12 +158,12 @@ const userController={
 
         //id pas au format numeric
         if(isNaN(userId)){
-            throw ({message: 'le format de l\'identifiant utilisateur est incorrect', statusCode:'422'});
+            throw ({message: 'le format de l\'identifiant utilisateur est incorrect', statusCode:'400'});
         }
 
         /** données utilisateur absent */
         if(!userId){
-            throw ({message: 'l\'identifiant utilisateur est manuqant', statusCode:'422'});
+            throw ({message: 'l\'identifiant utilisateur est manquant', statusCode:'400'});
         }
 
         /** Seule un admin ou l'utilisateur peut effectuer cette action */
@@ -180,7 +180,7 @@ const userController={
 
         /** pas d'utilisateur */
         if(!userData){
-            throw ({message: 'aucun compte associé à cet identifiant ', statusCode:'400'});
+            throw ({message: 'aucun compte associé à cet identifiant', statusCode:'400'});
         }
 
         const { email, login } = req.body;
