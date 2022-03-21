@@ -29,23 +29,36 @@ Content-Type: application/json
 }
 
 ### token pour requete
-@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6MywiaWF0IjoxNjQ3ODg1OTQxLCJleHAiOjE2NDc4ODc3NDEsImlzcyI6ImJhY2stYXV0aC1teUxlc3NvbiIsInN1YiI6ImF1dGhvcml6YXRpb24iLCJqdGkiOiJkODAwMjA2NS01N2Q1LTQyOWItYTI4NS01NmE4OTU2YWVkYTUifQ.6ikXFzKjiUU81AL00FNAU0FCp1OzOD5w1bMvq7BTwJA
+@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6MywiaWF0IjoxNjQ3ODk5MTM5LCJleHAiOjE2NDc5MDA5MzksImlzcyI6ImJhY2stYXV0aC1teUxlc3NvbiIsInN1YiI6ImF1dGhvcml6YXRpb24iLCJqdGkiOiIwZjVjZDlmNy05ZTNiLTQyOGEtYTVlYy03ZDdkMmQyMDA0ZTYifQ.71Bj5TxSCoENs9QcPHlGgd03eZlGaSdMN5MHNTfXEJY
 
 ### creation d'un tag
-POST {{uri}}/api/tags
+POST  {{uri}}/api/tags
 Cookie: {{jwtToken}}
 Content-Type: application/json
 
 {
-    "name":"helldddddoBoudm"
+    "name":"fff"
 }
 
 ### suppression d'un tag
-DELETE  {{uri}}/api/tags/19
+DELETE  {{uri}}/api/tags/21
+Cookie: {{jwtToken}}
+
+###  récupération tag byId
+GET {{uri}}/api/tags/16
+Cookie: {{jwtToken}}
+
+###  récupération de tous les tags
+GET {{uri}}/api/tags
+Cookie: {{jwtToken}}
+
+### update d'un tag byid
+PATCH   {{uri}}/api/tags/20
 Cookie: {{jwtToken}}
 Content-Type: application/json
 
 {
-    "name":"helldddddoBoudm"
+    "name":"fff"
 }
+
 

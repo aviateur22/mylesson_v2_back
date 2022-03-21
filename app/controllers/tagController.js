@@ -41,8 +41,10 @@ const tagController = {
             throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
         }
 
+        /** nom du tag */
         const { name } =req.body;
 
+        /** tag absent */
         if(!name){
             throw ({message: 'le nom du tag est obligatoire', statusCode:'400'});
         }
@@ -73,12 +75,89 @@ const tagController = {
 
     /** récupération d'un tag par id */
     getTagById: async(req, res, next)=>{
+        /** seul un admin peut executer cette action */
+        if(req.payload.role < userRole.admin){
+            throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
+        }
+      
+        const tagId = parseInt(req.params.id, 10);
+        
+        /** id du tag manquant */
+        if(!tagId){
+            throw ({message: 'l\'identifiant du tag est manquant', statusCode:'400'});
+        }
+        
+        /** id au mauvais format */
+        if(isNaN(tagId)){
+            throw ({message: 'le format de l\'identifiant du tag est incorrect', statusCode:'400'});
+        }
 
+        const findTag = await Tag.findByPk(tagId);
+
+        /** pas de données */
+        if(!findTag){
+            return res.status(204).json();
+        }
+
+        return res.status(200).json(findTag);
     },
 
     /** modification d'un tag */
     updateTagById: async(req, res, next)=>{
+        /** seul un admin peut executer cette action */
+        if(req.payload.role < userRole.admin){
+            throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
+        }
 
+        /** id tag  */
+        const tagId = parseInt(req.params.id, 10);
+
+        /** id du tag manuqant */
+        if(!tagId){
+            throw ({message: 'l\'identifiant du tag est manquant', statusCode:'400'});
+        }
+        
+        /** format id du tag manquant */
+        if(isNaN(tagId)){
+            throw ({message: 'le format de l\'identifiant du tag est incorrect', statusCode:'400'});
+        }              
+
+        /** nouveau nom du tag */
+        const name = sanitizer.escape(req.body.name);
+
+        /** nom du tag manuqant */
+        if(!name){
+            throw ({message: 'le nom du tag est obligatoire', statusCode:'400'});
+        }
+
+        /** vérification tag pas existant */
+        let findTag = await Tag.findByPk(tagId);
+
+        /** tag déja présent */
+        if(!findTag){
+            throw ({message: 'aucun tag associé associé à cet identifiant', statusCode:'400'});
+        }
+
+        /** vérification existence du nouveau name */
+        findTag = await Tag.findOne({
+            where:{
+                name: name
+            }
+        });
+
+        /**tag déja présent */
+        if(findTag){
+            throw ({message: 'ce nom de tag existe déjà', statusCode:'409'});
+        }
+
+        const newData = {...findTag, name};
+        const updateTag = await findTag.update({
+            ...newData
+        }, {
+            returning: true
+        });
+
+        return res.status(200).json(updateTag);
     },
 
     /** suppression d'un tag */
@@ -89,11 +168,12 @@ const tagController = {
         }
       
         const tagId = parseInt(req.params.id, 10);
-        
+        /** id du tag manuqant */
         if(!tagId){
             throw ({message: 'l\'identifiant du tag est manquant', statusCode:'400'});
         }
         
+        /** format id du tag manquant */
         if(isNaN(tagId)){
             throw ({message: 'le format de l\'identifiant du tag est incorrect', statusCode:'400'});
         }
@@ -113,6 +193,14 @@ const tagController = {
 
     /** suppression d'un tag */
     getAllTag: async(req, res, next)=>{
+        /** seul un admin peut executer cette action */
+        if(req.payload.role < userRole.admin){
+            throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
+        }
+
+        const tags = await Tag.findAll();
+
+        return res.status(200).json(tags);
     }
 };
 module.exports = tagController;
