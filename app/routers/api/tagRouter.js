@@ -17,7 +17,7 @@ const authorization = require('../../middlewares/authorizationMiddleware');
 const controllerHandler = require('../../helpers/controllerHelper/controllerHandler');
 const tagController = require('../../controllers').tag;
 
-/** récuperarion des tags disponibles */
+/** récuperarion des tags par nom */
 router.get('/name/:name', controllerHandler(tagController.findTagByName));
 
 /** récuperarion des tags disponibles */

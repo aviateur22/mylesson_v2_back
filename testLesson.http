@@ -29,7 +29,7 @@ Content-Type: application/json
 }
 
 ### token pour requete
-@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Nywicm9sZSI6MSwiaWF0IjoxNjQ3ODgwOTIzLCJleHAiOjE2NDc4ODI3MjMsImlzcyI6ImJhY2stYXV0aC1teUxlc3NvbiIsInN1YiI6ImF1dGhvcml6YXRpb24iLCJqdGkiOiJjMzZlNjllMy0xNmE3LTQyYTAtYTMyYy0xNTU2ZDgxYWZmZGUifQ.OARTjczulla2dsRPg1CSBp2bVPxj-JKVg8IUvBbvKx4; Path=/
+@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6MiwiaWF0IjoxNjQ3OTcxNzg4LCJleHAiOjE2NDc5NzM1ODgsImlzcyI6ImJhY2stYXV0aC1teUxlc3NvbiIsInN1YiI6ImF1dGhvcml6YXRpb24iLCJqdGkiOiI4NzEwOTI3MS05YTU4LTQ0YTUtODA4OS1hMjkxMmM0NmIyZGUifQ.UTa1-g9LwWgZqLIzQskXNORqfHZrA8ixYaBWKHwwyBY
 
 ### creation d'une lecon
 POST {{uri}}/api/lessons
@@ -72,7 +72,7 @@ Content-Type: application/json
 }
 
 ### Recuperation all lesson
-GET {{uri}}/api/lessons/user/2
+GET {{uri}}/api/lessons
 Cookie: {{jwtToken}}
 
 

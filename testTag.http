@@ -40,12 +40,26 @@ Content-Type: application/json
     "name":"fff"
 }
 
+### creation d'un tag
+POST  {{uri}}/api/tags
+Cookie: {{jwtToken}}
+Content-Type: application/json
+
+{
+    "name":"fff"
+}
+
+
 ### suppression d'un tag
 DELETE  {{uri}}/api/tags/21
 Cookie: {{jwtToken}}
 
 ###  récupération tag byId
 GET {{uri}}/api/tags/16
+Cookie: {{jwtToken}}
+
+###  récupération tag byId
+GET {{uri}}/api/tags/name/b
 Cookie: {{jwtToken}}
 
 ###  récupération de tous les tags

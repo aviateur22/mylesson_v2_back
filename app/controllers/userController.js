@@ -37,11 +37,9 @@ const userController={
         if(!comparePassword){
             throw ({message: 'email ou mot de passe invalide', statusCode:'422'}); 
         }
-
-        const { id, role_id, login } = user;        
        
         /** génération token */
-        const token = await jwtToken({user: id, role: role_id});
+        const token = await jwtToken({user: user.id, role: user.role_id});
         
         /** Renvoie d'un JWT pour gestion des authorization */
         res.cookie('authorization', token, {sameSite:'lax', httpOnly: true });       
@@ -51,9 +49,10 @@ const userController={
 
         //res.cookie('nom','cyrille',{path: '/',expires: new Date(Date.now() + 24 * 60 * 60 *1000), httpOnly: true })
         res.status(200).json({
-            'message':`Bienvenu sur votre compte ${login}`,            
-            'user' : login,
-            'role' : role_id
+            'message':`Bienvenu sur votre compte ${user.login}`,            
+            'user' : user.login,
+            'role' : user.role_id,
+            'id' : user.id
         });        
     },
     
@@ -189,12 +188,12 @@ const userController={
         if(email){
             const user = await User.findOne({
                 where: {
-                    email:email 
+                    email: email 
                 }
             });
 
-            /** email déja utilisé */
-            if(user) {      
+            /** email déja utilisé si id utilisateur different */
+            if(user && Number(user.id) !== Number(userId)) {      
                 throw ({message: 'cet email est déjà existant', statusCode:'409'});
             }
         }
