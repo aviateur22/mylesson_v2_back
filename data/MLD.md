@@ -1,8 +1,10 @@
-User(id,email, login, password, #token_id, #role_id)
-Role(id,name)
-Token(id,value)
-Lesson(id, title, content, #user_id)
-Tag(id, name,  #image_id)
-Image(id, path, name)
-LessonHasTag(id, #lesson_id, #tag_id)
+user(id, email, login, password, avatar_url, token, #role_id)
+role(id, name)
+link(id, logo_url)
+lesson(id, title, content, #user_id)
+tag(id, name, #image_id)
+image(id, path, name)
+lesson_has_tag(id, #lesson_id, #tag_id)
+user_has_link(id, link_url, #link_id, #user_id)
+
 

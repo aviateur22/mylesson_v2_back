@@ -17,7 +17,7 @@ const userController={
      */
     login: async(req, res, _)=>{
         if(!req.body.email || !req.body.password) {
-            throw ({message: 'email et mot de passe obligatoire', statusCode:'422'});
+            throw ({message: 'email et mot de passe obligatoire', statusCode:'400'});
         }    
 
         const user = await User.findOne({
@@ -28,14 +28,14 @@ const userController={
         
         /** pas d'utilisateur de trouvé */
         if(!user){
-            throw ({message: 'email ou mot de passe invalide', statusCode:'422'});
+            throw ({message: 'email ou mot de passe invalide', statusCode:'400'});
         }
 
         const comparePassword = await bcrypt.compare(req.body.password , user.password);
 
         /** echec comparaiosn mot de passe */
         if(!comparePassword){
-            throw ({message: 'email ou mot de passe invalide', statusCode:'422'}); 
+            throw ({message: 'email ou mot de passe invalide', statusCode:'400'}); 
         }
        
         /** génération token */
@@ -182,6 +182,9 @@ const userController={
             throw ({message: 'aucun compte associé à cet identifiant', statusCode:'400'});
         }
 
+        /** Données du fichier via multer */
+        const uploadFile = req.file;
+        
         const { email, login } = req.body;
 
         /** modification de l'email*/

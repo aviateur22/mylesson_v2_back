@@ -19,5 +19,9 @@ module.exports = Joi.object({
             'string.empty': 'l\'email est obligatoire',
             'string.pattern.base': 'erreur dans le format de l\'email',
             'any.required': 'l\'email est obligatoire'
-        })
+        }),
+    
+    sex: Joi.any(),
+
+    image: Joi.any()
 });
