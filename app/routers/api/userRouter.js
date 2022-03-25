@@ -88,4 +88,11 @@ router.patch('/password/:id',
     joiValidation(userSchemaValidation.updatePasswordSchema),
     controllerHandler(userController.updatePassword));
 
+/** recuperation de l'avatar d'un user*/
+router.get('/image/:key',
+    controllerHandler(cookieMiddleware),
+    controllerHandler(authorization),
+    controllerHandler(roleMiddleware.user),
+    controllerHandler(userController.getAvatarByKey));
+
 module.exports=router;

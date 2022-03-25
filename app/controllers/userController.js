@@ -1,11 +1,16 @@
 const bcrypt = require('bcrypt');
 const { User } = require('../models/index');
 const sanitizer = require('sanitizer');
+
 /**role utilisateur */
 const userRole = require('../helpers/userRole');
 
-/**  */
+/**token JWT */
 const jwtToken = require('../helpers/security/jwt');
+
+/** aws file */
+const awsManager = require('../helpers/aws');
+const { string } = require('joi');
 
 const userController={
     /**
@@ -67,12 +72,12 @@ const userController={
         const {login, email, password, confirmPassword} = req.body;
 
         if(!login || !email || !password || !confirmPassword) {    
-            throw ({message: 'email, mot de passe et confirmation du mot de passe obligatoire', statusCode:'422'});
+            throw ({message: 'email, mot de passe et confirmation du mot de passe obligatoire', statusCode:'400'});
         }    
 
         /** Mot de passe et confirmation mot de passe pas identique */
         if(password !== confirmPassword){
-            throw ({message: 'les mots de passe ne sont pas identique', statusCode:'422'});
+            throw ({message: 'les mots de passe ne sont pas identique', statusCode:'400'});
         }
 
         const user = await User.findOne({
@@ -121,12 +126,12 @@ const userController={
 
         //id pas au format numeric
         if(isNaN(userId)){
-            throw ({message: 'le format de l\'identifiant utilisateur est incorrect', statusCode:'422'});
+            throw ({message: 'le format de l\'identifiant utilisateur est incorrect', statusCode:'400'});
         }
 
         /** données utilisateur absent */
         if(!userId){
-            throw ({message: 'l\'identifiant utilisateur est manuqant', statusCode:'422'});
+            throw ({message: 'l\'identifiant utilisateur est manuqant', statusCode:'400'});
         }
 
         /** Seule un admin ou l'utilisateur peut effectuer cette action */
@@ -140,12 +145,36 @@ const userController={
         if(!user){
             return res.status(204).json({});
         }
-
+       
         return res.status(200).json({
             id: user.id,
             login: user.login,
-            email: user.email
+            email: user.email,
+            sex: user.sex,
+            avatarKey: user.avatar_key
         });
+    },
+
+    /**
+     * Récuperation de l'image avatar dans un flux de données
+     * @param {*} req 
+     * @param {*} res 
+     * @param {*} next 
+     * @returns 
+     */
+    getAvatarByKey: async(req, res, next)=>{
+        //récupération de l'utilisateur
+        const avatarKey = req.params.key;       
+
+        /** données utilisateur absent */
+        if(!avatarKey){
+            throw ({message: 'identififiant de l\'image manquant', statusCode:'400'});
+        }
+
+        /** flux de données de l'image */
+        const readStream = awsManager.BucketDownloadFile(avatarKey);        
+        
+        (await readStream).pipe(res);
     },
 
     /**
@@ -182,10 +211,12 @@ const userController={
             throw ({message: 'aucun compte associé à cet identifiant', statusCode:'400'});
         }
 
-        /** Données du fichier via multer */
-        const uploadFile = req.file;
-        
-        const { email, login } = req.body;
+        const { email, login, sex } = req.body;
+
+        /** verification du sex */
+        if(sex !=='homme' && sex !== 'femme'){
+            throw ({message: 'le format du sex n\'est pas valide', statusCode:'400'});
+        }
 
         /** modification de l'email*/
         if(email){
@@ -201,8 +232,22 @@ const userController={
             }
         }
 
+        /** Données du fichier via multer */
+        const uploadFile = req.file;
+        let upload;
+
+        if(uploadFile){
+            upload = await awsManager.BucketUploadFile(uploadFile);
+            console.log(upload);
+
+            /** renvoi d'un message d'erreur */
+            if(upload.errorMessage){
+                throw ({message: 'Echec dans l\'upload de votre avatr', statusCode:'400'});
+            }
+        }
+
         /** nouvelles données utilisateur */
-        const newUserData = { ...userData, ...{ email: sanitizer.escape(email), login: sanitizer.escape(login)}};
+        const newUserData = { ...userData, ...{ email: sanitizer.escape(email), login: sanitizer.escape(login), sex: sex ? sanitizer.escape(sex): null, avatar_key: uploadFile ? upload.key : 'image-b9cbc21d-b018-43f3-a065-6fa9c401e3f9'}};
        
         /** mise a jour de l'utilisateur */
         const updateUser = await userData.update({

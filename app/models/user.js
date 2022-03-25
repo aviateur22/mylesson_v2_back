@@ -7,7 +7,9 @@ User.init({
     login : DataTypes.STRING,
     email :  DataTypes.STRING,
     password : DataTypes.STRING,
-    token: DataTypes.STRING
+    token: DataTypes.STRING,
+    sex: DataTypes.STRING,
+    avatar_key: DataTypes.STRING
 },{
     sequelize,
     tableName:'user'

@@ -1,1 +1,1 @@
-TRUNCATE TABLE "lesson_has_tag", "lesson", "user", "tag", "image", "role" RESTART IDENTITY;
+TRUNCATE TABLE "lesson_has_tag", "user_has_link", "link", "lesson", "user", "tag", "image", "role" RESTART IDENTITY;

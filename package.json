@@ -13,6 +13,7 @@
   "author": "cyrille cade",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.1100.0",
     "bcrypt": "^5.0.1",
     "bunyan": "^1.8.15",
     "cookie-parser": "^1.4.6",
