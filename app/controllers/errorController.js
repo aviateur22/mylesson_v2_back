@@ -16,7 +16,7 @@ module.exports = (err, req, res, next)=>{
             return res.status(403)
                 .json({      
                     'error' : true,
-                    'message':'Erreur AWS'
+                    'message':err.awsError
                 });       
         } else if(!err.message || !err.statusCode){            
             /**erreur non managé*/

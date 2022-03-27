@@ -227,6 +227,7 @@ const lessonController = {
             content: lesson.content,
             tags: lesson.tags,
             autor: lesson.user.login,
+            avatarKey: lesson.user.avatar_key,
             slug: lesson.slug,
             created: lesson.formatedCreationDate,
             updated: lesson.formatedUpdateDate            

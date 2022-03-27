@@ -1,4 +1,9 @@
 const awsManager = require('../../helpers/aws');
+
+const fs = require('fs');
+const util = require('util');
+const unlinkFile = util.promisify(fs.unlink);
+
 module.exports = {
 
     /**Upload de fichier dans AWS S3 bucket */
@@ -13,9 +18,15 @@ module.exports = {
                 const upload = await awsManager.BucketUploadFile(file);
                 
                 /** renvoi d'un message d'erreur */
-                if(upload.awsError){                    
-                    throw ({awsError: upload.awsError});
-                }                
+                if(upload.awsError){         
+                    /** suppression du thumbnail */
+                    await unlinkFile(req.thumbnail.path);            
+                    throw ({awsError: 'oupssss echec de sauvegarde de vos données'});
+                }       
+                
+                /** suppression du thumbnail */
+                await unlinkFile(req.thumbnail.path); 
+               
                 /** saubegarde de la clef de l'image */
                 req.AWSUploadKey = upload.key;
             }

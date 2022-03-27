@@ -18,7 +18,7 @@ module.exports = async(req, res, next)=>{
         const uploadPath = process.env.UPLOAD_PATH + imageName;
 
         /** creation d'un thumnail */
-        const t = await sharp(req.file.path).resize(100).toFile(uploadPath);
+        const t = await sharp(req.file.path).resize(50).toFile(uploadPath);
 
         /** creation de l'object a renvoyer */
         const thumbnail = {

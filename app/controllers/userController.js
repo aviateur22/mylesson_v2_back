@@ -11,11 +11,6 @@ const jwtToken = require('../helpers/security/jwt');
 /** aws pour le download */
 const awsManager = require('../helpers/aws');
 
-const fs = require('fs');
-const util = require('util');
-const { Console } = require('console');
-const unlinkFile = util.promisify(fs.unlink);
-
 const userController={
     /**
      * Connexion
@@ -161,7 +156,7 @@ const userController={
     },
 
     /**
-     * Récuperation de l'image avatar dans un flux de données
+     * Récuperation de l'image avatar 
      * @param {*} req 
      * @param {*} res 
      * @param {*} next 
@@ -180,7 +175,7 @@ const userController={
         const downloadImage = await awsManager.BucketDownloadFile(avatarKey);         
         /** erreur dans la réponse */
         if(downloadImage.awsError){                       
-            throw {awsError: downloadImage.awsError};
+            throw {awsError: 'echec de récupération de votre avatar'};
         }
         res.send(downloadImage);            
     },
@@ -272,13 +267,7 @@ const userController={
         /** mise a jour de l'utilisateur */
         const updateUser = await userData.update({
             ...newUserData            
-        });
-
-        /** suppression du thumbnail */
-        if(req.thumbnail){
-            /** suppression de l'image original */
-            await unlinkFile(req.thumbnail.path);  
-        }
+        });       
 
         return res.status(200).json({
             id: updateUser.id,

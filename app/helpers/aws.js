@@ -46,17 +46,3 @@ exports.BucketDownloadFile = async(fileKey) =>{
         return { awsError: err};
     }    
 };
-
-// /** download de fichier */
-// exports.BucketDownloadFile = async(fileKey) =>{
-//     try {        
-//         const  params = {
-//             Key: fileKey, 
-//             Bucket: process.env.AWS_BUCKET_NAME        
-//         };      
-//         return s3.getObject(params).createReadStream();        
-//     } catch (err) {       
-//         console.log(err);
-//         return { errorMessage: err};        
-//     }    
-// };

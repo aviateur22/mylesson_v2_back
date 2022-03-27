@@ -96,4 +96,7 @@ router.get('/image/:key',
     controllerHandler(roleMiddleware.user),
     controllerHandler(userController.getAvatarByKey));
 
+router.get('/image/autor/:key',
+    controllerHandler(userController.getAvatarByKey));
+
 module.exports=router;
