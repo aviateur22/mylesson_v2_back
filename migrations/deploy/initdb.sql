@@ -31,7 +31,7 @@ CREATE TABLE "user"(
     "login" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "token" TEXT NOT NULL DEFAULT '-',
-    "avatar_key" TEXT NOT NULL DEFAULT 'static\images\defaultAvatar.png',
+    "avatar_key" TEXT NOT NULL DEFAULT 'thumbnail-DEFAULT_AVATAR.png',
     "sex" TEXT,
     "role_id" INTEGER NOT NULL DEFAULT 1 REFERENCES "role"("id"),
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),

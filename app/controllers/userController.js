@@ -8,9 +8,13 @@ const userRole = require('../helpers/userRole');
 /**token JWT */
 const jwtToken = require('../helpers/security/jwt');
 
-/** aws file */
+/** aws pour le download */
 const awsManager = require('../helpers/aws');
-const { string } = require('joi');
+
+const fs = require('fs');
+const util = require('util');
+const { Console } = require('console');
+const unlinkFile = util.promisify(fs.unlink);
 
 const userController={
     /**
@@ -95,7 +99,8 @@ const userController={
         await User.create({
             login,
             email,
-            password : passwordHash
+            password : passwordHash,
+            avatar_key: process.env.DEFAULT_AVATAR
         });            
         
         return res.status(200).json({ 
@@ -164,17 +169,20 @@ const userController={
      */
     getAvatarByKey: async(req, res, next)=>{
         //récupération de l'utilisateur
-        const avatarKey = req.params.key;       
-
+        const avatarKey = req.params.key;    
+       
         /** données utilisateur absent */
         if(!avatarKey){
             throw ({message: 'identififiant de l\'image manquant', statusCode:'400'});
         }
-
-        /** flux de données de l'image */
-        const readStream = awsManager.BucketDownloadFile(avatarKey);        
         
-        (await readStream).pipe(res);
+        /** données binaire de l'image */
+        const downloadImage = await awsManager.BucketDownloadFile(avatarKey);         
+        /** erreur dans la réponse */
+        if(downloadImage.awsError){                       
+            throw {awsError: downloadImage.awsError};
+        }
+        res.send(downloadImage);            
     },
 
     /**
@@ -232,32 +240,52 @@ const userController={
             }
         }
 
-        /** Données du fichier via multer */
-        const uploadFile = req.file;
-        let upload;
+        /** parametre de image du profil */
+        let avatarKey;
+        if(!req.AWSUploadKey){
+            /** pas de nouvelle image de défini */
 
-        if(uploadFile){
-            upload = await awsManager.BucketUploadFile(uploadFile);
-            console.log(upload);
-
-            /** renvoi d'un message d'erreur */
-            if(upload.errorMessage){
-                throw ({message: 'Echec dans l\'upload de votre avatr', statusCode:'400'});
+            /** Si pas d'image personnelle d'enregistrée */
+            if( userData.avatar_key !== process.env.DEFAULT_AVATAR_MEN &&  userData.avatar_key !== process.env.DEFAULT_AVATAR_WOMEN && userData.avatar_key !== process.env.DEFAULT_AVATAR){
+                if(sex === 'homme'){
+                    avatarKey = process.env.DEFAULT_AVATAR_MEN;
+                }
+                else if(sex === 'femme') {
+                    avatarKey = process.env.DEFAULT_AVATAR_WOMEN;
+                }
+                else {
+                    avatarKey = process.env.DEFAULT_AVATAR;
+                }
             }
+            else {
+                avatarKey = userData.avatar_key;
+            }            
+        }
+        else {
+            /**  nouvelle image */
+            avatarKey = req.AWSUploadKey;
         }
 
         /** nouvelles données utilisateur */
-        const newUserData = { ...userData, ...{ email: sanitizer.escape(email), login: sanitizer.escape(login), sex: sex ? sanitizer.escape(sex): null, avatar_key: uploadFile ? upload.key : 'image-b9cbc21d-b018-43f3-a065-6fa9c401e3f9'}};
+        const newUserData = { ...userData, ...{ email: sanitizer.escape(email), login: sanitizer.escape(login), sex: sex ? sanitizer.escape(sex): null, avatar_key: avatarKey }};
        
         /** mise a jour de l'utilisateur */
         const updateUser = await userData.update({
             ...newUserData            
         });
 
+        /** suppression du thumbnail */
+        if(req.thumbnail){
+            /** suppression de l'image original */
+            await unlinkFile(req.thumbnail.path);  
+        }
+
         return res.status(200).json({
             id: updateUser.id,
             login: updateUser.login,
-            email: updateUser.email
+            email: updateUser.email,
+            sex: updateUser.sex,
+            avatarKey: updateUser.avatar_key,
         });
     },
 

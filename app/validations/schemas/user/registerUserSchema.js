@@ -39,6 +39,7 @@ module.exports = Joi.object({
         .equal(Joi.ref('password'))
         .messages({
             'string.empty': 'la confirmation du mot de passe est obligatoire',
+            'any.required' : 'la confirmation du mot de passe est obligatoire',
             'any.only': 'le mot de passe et confirmation de mot de passe ne corresponde pas'
         })      
         

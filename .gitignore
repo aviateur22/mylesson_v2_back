@@ -1,3 +1,5 @@
 node_modules/
 sqitch.conf
 .env
+uploads/
+log/

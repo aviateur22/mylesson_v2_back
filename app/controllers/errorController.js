@@ -8,16 +8,24 @@
  */
 const logger = require('../helpers/logger');
 module.exports = (err, req, res, next)=>{
-    try {
-        /**erreur dans les données de l'erreur */
-        if(!err.message || !err.statusCode){            
-            logger.error(err);
+    try {        
+        if(err.awsError){         
+            /** erreur avec AWS */
+            /** la methode pour une recupération d'image depuis AWS  ne renvoit pas le text d'erreur. Seul le status est present  */
+            /** j apelle la meme méthode depuis la fonction elle meme qui me recupere et affiche le text de l'erreur */
+            return res.status(403)
+                .json({      
+                    'error' : true,
+                    'message':'Erreur AWS'
+                });       
+        } else if(!err.message || !err.statusCode){            
             /**erreur non managé*/
+            logger.error(err);            
             return res.status(500)
                 .json({      
                     'error' : true,
                     'message':'erreur interne au serveur'
-                });    
+                });
         } else {
             /**Renvoie de l'erreur */
             return res.status(err.statusCode)
@@ -25,8 +33,15 @@ module.exports = (err, req, res, next)=>{
                     'error' : true,
                     'message':err.message
                 });
-        }
+        }        
     } catch (error) {
-        console.log(error);        
+        /**erreur non managé*/
+        logger.error(error);  
+        console.log('dans le catch de errorController');        
+        return res.status(500)
+            .json({      
+                'error' : true,
+                'message':'erreur interne au serveur'
+            });       
     }    
 };

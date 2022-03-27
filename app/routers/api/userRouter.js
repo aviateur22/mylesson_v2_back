@@ -10,19 +10,18 @@ const roleMiddleware = require('../../middlewares/roleMiddleware');
 /** récupération des cookies */
 const cookieMiddleware = require('../../middlewares/cookieMiddleware');
 /** authorisation  */
-const authorization = require('../../middlewares/authorizationMiddleware');
-
+const authorizationMiddleware = require('../../middlewares/authorizationMiddleware');
+/** middleware telechargement de fichier */
+const upload = require('../../middlewares/fileMiddleware/uploadsFileMiddleware');
+const uploadImageMiddleware = multer({ storage: upload.uploadImage });
+const thumbnailMiddleware = require('../../middlewares/fileMiddleware/thumbnailMiddleware');
+const awsMiddleware = require('../../middlewares/fileMiddleware/awsMiddleware');
+/** suppression des cookies */
+const deleteCookieMiddleware = require('../../middlewares/deleteCookieMiddleware');
 
 /**controller user */
 const userController = require('../../controllers/userController');
 const controllerHandler = require('../../helpers/controllerHelper/controllerHandler');
-
-/**middleware */
-const deleteCookieMiddleware = require('../../middlewares/deleteCookieMiddleware');
-
-/** middleware telechargement de fichier */
-const upload = require('../../middlewares/uploadsFileMiddleware');
-const uploadImage = multer({ storage: upload.uploadImage });
 
 /**Schéma de validation JOI */
 const joiValidation = require('../../validations');
@@ -34,7 +33,7 @@ router.route('/')
     /** récupération de tous les utilisateurs */
     .get(
         controllerHandler(cookieMiddleware),
-        controllerHandler(authorization),
+        controllerHandler(authorizationMiddleware),
         controllerHandler(roleMiddleware.admin),
         controllerHandler(userController.getAllUser)
     )
@@ -60,38 +59,40 @@ router.route('/:id')
     /** récupération info utilisateur*/
     .get(
         controllerHandler(cookieMiddleware),
-        controllerHandler(authorization),
+        controllerHandler(authorizationMiddleware),
         controllerHandler(roleMiddleware.user),
         controllerHandler(userController.getUserById))
 
     /** update info utilisateur */
     .patch(
         controllerHandler(cookieMiddleware),
-        controllerHandler(authorization),
+        controllerHandler(authorizationMiddleware),
         controllerHandler(roleMiddleware.user),
-        uploadImage.single('image'),                
+        uploadImageMiddleware.single('image'),                
+        controllerHandler(thumbnailMiddleware),
+        controllerHandler(awsMiddleware.uploadAWSBucket),  
         joiValidation(userSchemaValidation.updateUserSchema),        
         controllerHandler(userController.updateUserById))
 
     /** suppression utilisateur */
     .delete(
         controllerHandler(cookieMiddleware),
-        controllerHandler(authorization),
+        controllerHandler(authorizationMiddleware),
         controllerHandler(roleMiddleware.user),
         controllerHandler(userController.deleteUserById));
 
 /** modification mot de passe */
 router.patch('/password/:id',
     controllerHandler(cookieMiddleware),
-    controllerHandler(authorization),
+    controllerHandler(authorizationMiddleware),
     controllerHandler(roleMiddleware.user),
     joiValidation(userSchemaValidation.updatePasswordSchema),
     controllerHandler(userController.updatePassword));
 
-/** recuperation de l'avatar d'un user*/
+/** recuperation d'une image d'un user*/
 router.get('/image/:key',
     controllerHandler(cookieMiddleware),
-    controllerHandler(authorization),
+    controllerHandler(authorizationMiddleware),
     controllerHandler(roleMiddleware.user),
     controllerHandler(userController.getAvatarByKey));
 

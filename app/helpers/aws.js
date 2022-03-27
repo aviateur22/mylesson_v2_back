@@ -21,22 +21,42 @@ exports.BucketUploadFile = async(file)=>{
             Body:fileStream,
             Key:file.filename
         };
-        return  s3.upload(param).promise();
+        return  (await s3.upload(param).promise());
     }
     catch (err){
-        console.log(err);
-        return { errorMessage: err};
+        return { awsError: err};
     }
 };
 
+/** suppression d'un fichier */
 exports.BucketDeleteFile = async()=>{
 
 },
 
+/** download de fichier */
 exports.BucketDownloadFile = async(fileKey) =>{
-    const  params = {
-        Key: fileKey, 
-        Bucket: process.env.AWS_BUCKET_NAME        
-    };
-    return s3.getObject(params).createReadStream();
+    try {        
+        const  params = {
+            Key: fileKey, 
+            Bucket: process.env.AWS_BUCKET_NAME   
+        };
+        
+        return (await s3.getObject(params).promise()).Body;
+    } catch (err) {         
+        return { awsError: err};
+    }    
 };
+
+// /** download de fichier */
+// exports.BucketDownloadFile = async(fileKey) =>{
+//     try {        
+//         const  params = {
+//             Key: fileKey, 
+//             Bucket: process.env.AWS_BUCKET_NAME        
+//         };      
+//         return s3.getObject(params).createReadStream();        
+//     } catch (err) {       
+//         console.log(err);
+//         return { errorMessage: err};        
+//     }    
+// };
