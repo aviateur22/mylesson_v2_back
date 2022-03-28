@@ -5,19 +5,23 @@ const express = require('express');
 const router = express.Router();
 const multer =  require('multer');
 
-/** role */
+/** récuperation du role utilisateur */
 const roleMiddleware = require('../../middlewares/roleMiddleware');
-/** récupération des cookies */
+/** récupération et mise en forme des cookies present dans la requete */
 const cookieMiddleware = require('../../middlewares/cookieMiddleware');
-/** authorisation  */
+/** suppression des cookies */
+const deleteCookieMiddleware = require('../../middlewares/deleteCookieMiddleware');
+/** vérification de token JWT  */
 const authorizationMiddleware = require('../../middlewares/authorizationMiddleware');
+/** vérification si l'action est éxecuté par le proprietaire ou un admin */
+const belongToMiddleware = require('../../middlewares/belongToMiddleware');
 /** middleware telechargement de fichier */
 const upload = require('../../middlewares/fileMiddleware/uploadsFileMiddleware');
 const uploadImageMiddleware = multer({ storage: upload.uploadImage });
+/** convertie l'image client en thumbnail */
 const thumbnailMiddleware = require('../../middlewares/fileMiddleware/thumbnailMiddleware');
+/** gestion stockage image dans AWS S3 bucket */
 const awsMiddleware = require('../../middlewares/fileMiddleware/awsMiddleware');
-/** suppression des cookies */
-const deleteCookieMiddleware = require('../../middlewares/deleteCookieMiddleware');
 
 /**controller user */
 const userController = require('../../controllers/userController');

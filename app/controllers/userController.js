@@ -122,21 +122,9 @@ const userController={
      */
     getUserById: async(req, res, next)=>{
         //récupération de l'utilisateur
-        const userId = parseInt(req.params.id, 10);
-
-        //id pas au format numeric
-        if(isNaN(userId)){
-            throw ({message: 'le format de l\'identifiant utilisateur est incorrect', statusCode:'400'});
-        }
-
-        /** données utilisateur absent */
+        const userId = req.userId;
         if(!userId){
-            throw ({message: 'l\'identifiant utilisateur est manuqant', statusCode:'400'});
-        }
-
-        /** Seule un admin ou l'utilisateur peut effectuer cette action */
-        if( userId !== parseInt(req.payload.id, 10) && req.payload.role < userRole.admin){
-            throw ({message: 'vous n\'est pas autorisé a executer cette action', statusCode:'403'});
+            throw ({message: '', statusCode:'400'});
         }
 
         const user = await User.findByPk(userId);
