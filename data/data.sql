@@ -39,4 +39,7 @@ INSERT INTO "tag" ("name","image_id") VALUES
 ('react',1),
 ('css',6);
 
+INSERT INTO "link" ("compagnie_name","picture_name") VALUES
+('github', 'github.png'),
+('linkedin','linkedin.png');
 COMMIT;

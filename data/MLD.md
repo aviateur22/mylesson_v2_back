@@ -1,6 +1,6 @@
 user(id, email, login, password, avatar_url, token, #role_id)
 role(id, name)
-link(id, logo_url)
+link(id, compagnie_name, picture_name,)
 lesson(id, title, content, #user_id)
 tag(id, name, #image_id)
 image(id, path, name)

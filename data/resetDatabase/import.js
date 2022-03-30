@@ -6,7 +6,7 @@ const pg = require('pg');
  * Reset du de la base de données
  */
 module.exports = (async() => {  
-    const client = new pg.Client(process.env.PGURL);
+    const client = new pg.Client(process.env.DATABASE_URL);
     try {        
         client.connect((err)=>{
             if(err){

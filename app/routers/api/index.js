@@ -4,12 +4,16 @@ const resHeaderMiddleware = require('../../middlewares/resHeaderMiddleware');
 const tagRouter = require('./tagRouter');
 const lessonRouter = require('./lessonRouter');
 const userRouter = require('./userRouter');
+const linkRouter = require('./linkRouter');
 
 /**Gestion requete client */
 router.use('/users',resHeaderMiddleware, userRouter);
 
 /**Gestion lessons */
 router.use('/lessons',resHeaderMiddleware, lessonRouter);
+
+/** gestion des links utilisateurs */
+router.use('/link', linkRouter);
 
 /** tags d'une lecon */
 router.use('/tags', tagRouter);
