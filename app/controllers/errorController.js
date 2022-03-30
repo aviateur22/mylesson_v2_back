@@ -9,18 +9,40 @@
 const logger = require('../helpers/logger');
 module.exports = (err, req, res, next)=>{
     try {        
-        if(err.awsError){         
-            /** erreur avec AWS */
-            /** la methode pour une recupération d'image depuis AWS  ne renvoit pas le text d'erreur. Seul le status est present  */
-            /** j apelle la meme méthode depuis la fonction elle meme qui me recupere et affiche le text de l'erreur */
-            return res.status(403)
+        if(err.awsError){                
+            /** 
+             * erreur avec AWS
+             */
+            
+            /** Enregistrement de l'erreur */
+            logger.error(err); 
+
+            return res.status(500)
                 .json({      
                     'error' : true,
                     'message':err.awsError
                 });       
-        } else if(!err.message || !err.statusCode){            
-            /**erreur non managé*/
+        } 
+        else if(!err.message || !err.statusCode){            
+            /**
+             * erreur non managé
+             */
+
+            /** Enregistrement de l'erreur */
             logger.error(err);            
+            return res.status(500)
+                .json({      
+                    'error' : true,
+                    'message':'erreur interne au serveur'
+                });
+        } else if(Number(err.statusCode) === 500){
+            /**
+             * Erreur prévu dans le code
+             * ne devant normalement pas se prodiure
+             */
+
+            /** mise a jour du log d'erreur */
+            logger.error(err);   
             return res.status(500)
                 .json({      
                     'error' : true,
@@ -36,8 +58,7 @@ module.exports = (err, req, res, next)=>{
         }        
     } catch (error) {
         /**erreur non managé*/
-        logger.error(error);  
-        console.log('dans le catch de errorController');        
+        logger.error(error);          
         return res.status(500)
             .json({      
                 'error' : true,

@@ -24,7 +24,7 @@ exports.BucketUploadFile = async(file)=>{
         return  (await s3.upload(param).promise());
     }
     catch (err){
-        return { awsError: err};
+        throw  { awsError: err};  
     }
 };
 
@@ -42,7 +42,8 @@ exports.BucketDownloadFile = async(fileKey) =>{
         };
         
         return (await s3.getObject(params).promise()).Body;
-    } catch (err) {         
-        return { awsError: err};
+    } catch (err) { 
+        throw  { awsError: err};      
+        //return { awsError: err};
     }    
 };

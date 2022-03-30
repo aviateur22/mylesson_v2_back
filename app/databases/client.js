@@ -1,6 +1,6 @@
 const { Sequelize }  = require('sequelize');
 
-const sequilize = new Sequelize(process.env.PGURL,{
+const sequilize = new Sequelize(process.env.DATABASE_URL,{
     define:{
         underscored:true,
         updatedAt: 'updated_at',

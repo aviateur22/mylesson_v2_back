@@ -15,9 +15,10 @@ const deleteCookieMiddleware = require('../../middlewares/deleteCookieMiddleware
 const authorizationMiddleware = require('../../middlewares/authorizationMiddleware');
 /** vérification si l'action est éxecuté par le proprietaire ou un admin */
 const belongToMiddleware = require('../../middlewares/belongToMiddleware');
-/** middleware telechargement de fichier */
+/** middleware upload de fichier de fichier */
 const upload = require('../../middlewares/fileMiddleware/uploadsFileMiddleware');
 const uploadImageMiddleware = multer({ storage: upload.uploadImage });
+const folderExistMiddleware = require('../../middlewares/fileMiddleware/folderExistMiddleware');
 /** convertie l'image client en thumbnail */
 const thumbnailMiddleware = require('../../middlewares/fileMiddleware/thumbnailMiddleware');
 /** gestion stockage image dans AWS S3 bucket */
@@ -59,12 +60,13 @@ router.post('/logout',
     controllerHandler(userController.logout));
 
 /** gestion information client */
-router.route('/:id')
+router.route('/:userId')
     /** récupération info utilisateur*/
     .get(
         controllerHandler(cookieMiddleware),
         controllerHandler(authorizationMiddleware),
         controllerHandler(roleMiddleware.user),
+        controllerHandler(belongToMiddleware),
         controllerHandler(userController.getUserById))
 
     /** update info utilisateur */
@@ -72,6 +74,8 @@ router.route('/:id')
         controllerHandler(cookieMiddleware),
         controllerHandler(authorizationMiddleware),
         controllerHandler(roleMiddleware.user),
+        controllerHandler(belongToMiddleware),
+        controllerHandler(folderExistMiddleware.uploadFolder),
         uploadImageMiddleware.single('image'),                
         controllerHandler(thumbnailMiddleware),
         controllerHandler(awsMiddleware.uploadAWSBucket),  
@@ -83,23 +87,26 @@ router.route('/:id')
         controllerHandler(cookieMiddleware),
         controllerHandler(authorizationMiddleware),
         controllerHandler(roleMiddleware.user),
+        controllerHandler(belongToMiddleware),
         controllerHandler(userController.deleteUserById));
 
 /** modification mot de passe */
-router.patch('/password/:id',
+router.patch('/password/:userId',
     controllerHandler(cookieMiddleware),
     controllerHandler(authorizationMiddleware),
     controllerHandler(roleMiddleware.user),
+    controllerHandler(belongToMiddleware),
     joiValidation(userSchemaValidation.updatePasswordSchema),
     controllerHandler(userController.updatePassword));
 
-/** recuperation d'une image d'un user*/
+/** recuperation d'une image d'un user authentifié*/
 router.get('/image/:key',
     controllerHandler(cookieMiddleware),
     controllerHandler(authorizationMiddleware),
     controllerHandler(roleMiddleware.user),
     controllerHandler(userController.getAvatarByKey));
 
+/** récupération d'un image sans être authentifié */
 router.get('/image/autor/:key',
     controllerHandler(userController.getAvatarByKey));
 

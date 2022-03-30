@@ -1,10 +1,10 @@
 const Sequelize = require('sequelize');
-const Op = Sequelize.Op;
 const sanitizer = require('sanitizer');
 const {Lesson, Tag, User, lessonTag} = require('../models/index');
 const CRYPTO_AES = require('../helpers/security/aes');
 const aes = new CRYPTO_AES();
 const userRole = require('../helpers/userRole');
+const LessonTag = require('../models/lessonTag');
 
 const lessonController = {
 
@@ -19,6 +19,14 @@ const lessonController = {
      * Création d'une nouvelle leçon
      */
     create: async(req, res, next) => {
+        //récupération de l'utilisateur
+        const userId = req.userId;
+
+        /** si pas de userId */
+        if(!userId){
+            throw ({message: 'votre identifiant utilisateur est manquant', statusCode:'400'});
+        }
+
         //recuperation tagId, title, content
         const {tagId, title, content} = req.body;
 
@@ -53,7 +61,7 @@ const lessonController = {
         let createLesson = await Lesson.create({
             title: titleEscape,
             content : contentEscape,
-            user_id: req.payload.id ,
+            user_id: userId ,
             slug: slug    
         });
 
@@ -77,7 +85,7 @@ const lessonController = {
         /**Recuperation de la leçon */
         createLesson = await Lesson.findByPk(id,{
             include:{
-                model: Tag, as: 'tags'
+                model: Tag, as: 'lessonsTags'
             }
         }); 
 
@@ -90,7 +98,7 @@ const lessonController = {
     getAll: async(req, res, next)=>{
         const lessons = await Lesson.findAll({
             include:{
-                model: Tag, as: 'tags'
+                model: Tag, as: 'lessonsTags'
             }
         });
         return res.json(lessons);
@@ -100,38 +108,34 @@ const lessonController = {
      * update d'une leçon
      */
     updateById: async(req, res, next)=>{
+        //récupération de l'utilisateur
+        const userId = req.userId;
+
+        /** si pas de userId */
+        if(!userId){
+            throw ({message: 'votre identifiant utilisateur est manquant', statusCode:'400'});
+        }
+
         //recuperation id de la lesson
-        const lessonId = parseInt(req.params.id, 10);
+        const lessonId = parseInt(req.params.lessonId, 10);
 
         //id pas au format numeric
         if(isNaN(lessonId)){
-            throw ({message: 'le format de l\'identifiant de la leçon est incorrect', statusCode:'422'});
+            throw ({message: 'le format de l\'identifiant de la leçon est incorrect', statusCode:'400'});
         }
 
         /** id lecon manquant */
         if(!lessonId){
-            throw ({message: 'l\'identifiant de la leçon est manquant', statusCode:'422'});
+            throw ({message: 'l\'identifiant de la leçon est manquant', statusCode:'400'});
         }
 
         //recuperation des données du formulaire
         const { tagId, title, content } = req.body;
-
-        //récupération de l'utilisateur
-        const userId = parseInt(req.body.userId, 10);
-
-        //id pas au format numeric
-        if(isNaN(userId)){
-            throw ({message: 'le format de l\'identifiant utilisateur est incorrect', statusCode:'422'});
-        }
+        
 
         /** données lecon manquantes */
         if(!tagId || !title || !content){
-            throw ({message: 'le titre, tag et contenu de la leçon sont obligatoire', statusCode:'422'});
-        }
-
-        /** données utilisateur absent */
-        if(!userId){
-            throw ({message: 'l\'identifiant utilisateur est manuqant', statusCode:'422'});
+            throw ({message: 'le titre, tag et contenu de la leçon sont obligatoire', statusCode:'400'});
         }
 
         /**Nettoyage des données utilisateur */
@@ -144,15 +148,15 @@ const lessonController = {
         //vérification des ids de tag
         tags.forEach(tag => {
             if(isNaN(tag)){
-                throw ({ message:  'le format des tags n\'est pas valide', statusCode:'422' });
+                throw ({ message:  'le format des tags n\'est pas valide', statusCode:'400' });
             }            
         });
 
         const lesson = await Lesson.findByPk(lessonId);
 
-        /** aucun id correspondant  */
+        /** aucun id de la leçon n'est trouvé  */
         if(!lesson){
-            throw ({message: 'la leçon n\'est pas présente en base de données', statusCode:'422'});
+            throw ({message: 'la leçon n\'est pas présente en base de données', statusCode:'400'});
         }
 
         /** Seule un admin ou le propriétaire de la lecon peut executer cette action */
@@ -160,9 +164,11 @@ const lessonController = {
             throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
         }
 
-        let updateLesson = await lesson.update({                
-            title: titleEscape,
-            content : contentEscape
+        /** mise a jour des données */
+        const newLessonData = { ...lesson, ...{ title: titleEscape, content: contentEscape } };
+
+        let updateLesson = await lesson.update({
+            ...newLessonData
         });
 
         /** suppression des anciens tags */
@@ -188,7 +194,7 @@ const lessonController = {
         /**Recuperation de la leçon */
         updateLesson = await Lesson.findByPk(lessonId,{
             include:{
-                model: Tag, as: 'tags'
+                model: Tag, as: 'lessonsTags'
             }
         });
         return res.status(200).json(updateLesson);
@@ -200,20 +206,20 @@ const lessonController = {
      */
     getById: async(req, res, next)=>{        
         /**Vérification id */
-        const lessonId =parseInt(req.params.id, 10);
+        const lessonId =parseInt(req.params.lessonId, 10);
         
         /** mauvais format de lecon id */
         if(isNaN(lessonId)){
-            throw ({message: 'le format de l\'identifiant de la leçon est incorrect', statusCode:'422'});
+            throw ({message: 'le format de l\'identifiant de la leçon est incorrect', statusCode:'400'});
         }      
-        
+
         /** lecon id manquant */
         if(!lessonId){
-            throw ({message: 'l\'identifiant de la leçon est manquant', statusCode:'422'});
+            throw ({message: 'l\'identifiant de la leçon est manquant', statusCode:'400'});
         }
 
         const lesson =await Lesson.findByPk(lessonId, {
-            include:['tags','user']
+            include:['lessonsTags', 'user']
         });
 
         /** pas de lecon */
@@ -225,7 +231,7 @@ const lessonController = {
         return res.status(200).json({
             title: lesson.title,
             content: lesson.content,
-            tags: lesson.tags,
+            tags: lesson.lessonsTags,
             autor: lesson.user.login,
             avatarKey: lesson.user.avatar_key,
             slug: lesson.slug,
@@ -238,8 +244,16 @@ const lessonController = {
      * Suppression de une leçon
      */
     deleteById: async(req, res, next)=>{
+        /** récuperation userId */
+        const userId = req.userId;
+
+        /** si pas de userId */
+        if(!userId){
+            throw ({message: 'votre identifiant utilisateur est manquant', statusCode:'400'});
+        }
+
         //récupération id de la lesson
-        const lessonId = parseInt(req.params.id, 10);
+        const lessonId = parseInt(req.params.lessonId, 10);
 
         //id pas au format numeric
         if(isNaN(lessonId)){
@@ -249,14 +263,6 @@ const lessonController = {
         /** id lecon manquant */
         if(!lessonId){
             throw ({message: 'l\'identifiant de la leçon est manquant', statusCode:'422'});
-        }
-
-        //récupération de l'utilisateur
-        const userId = parseInt(req.body.userId, 10);
-
-        //id pas au format numeric
-        if(isNaN(userId)){
-            throw ({message: 'le format de l\'identifiant utilisateur est incorrect', statusCode:'422'});
         }
 
         const lesson = await Lesson.findByPk(lessonId);
@@ -274,7 +280,7 @@ const lessonController = {
         const deleteLesson = await Lesson.destroy({
             where:{                   
                 id: lessonId
-            }                                   
+            }                                               
         });
 
         return res.status(200).json({
@@ -289,30 +295,19 @@ const lessonController = {
      */
     getByUserId: async(req, res, next)=>{       
         //récupération de l'utilisateur
-        const userId = parseInt(req.params.id, 10);
-
-        //id pas au format numeric
-        if(isNaN(userId)){
-            throw ({message: 'le format de l\'identifiant utilisateur est incorrect', statusCode:'422'});
-        }
-
+        const userId = req.userId;
+      
         /** données utilisateur absent */
         if(!userId){
-            throw ({message: 'l\'identifiant utilisateur est manquant', statusCode:'422'});
+            throw ({message: 'votre identifiant utilisateur est manquant', statusCode:'400'});
         }
-        
-        /** Seule un admin ou le propriétaire de la lecon peut executer cette action */
-        if(userId !== parseInt(req.payload.id, 10) && req.payload.role < userRole.admin){
-            throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
-        }
-
+      
         /**requete sur les leçon utilisateurs */
         const resultsLessons = await Lesson.findAll({
             where:{
-                user_id :userId 
-            }, 
-            returning: true,               
-            include:{ model: Tag, as: 'tags', attributes:['name'] }
+                user_id: userId 
+            },
+            include: ['lessonsTags', 'user']
         });
         
         /**
@@ -322,12 +317,52 @@ const lessonController = {
             const lesson = {};
             lesson.id = element.id;                        
             lesson.title = element.title;
-            lesson.tags = element.tags;
+            lesson.lessonsTags = element.lessonsTags;
             lesson.slug = element.slug;
+            lesson.content = element.content,
             lesson.created_at =  element.formatedCreationDate;  
             return lesson;
         });
         return res.json(lessons);  
-    }
+    },
+
+    /**
+     * Renvoie les lecons filtrer par Tag
+     */
+    getLessonByTag: async(req, res, next)=>{ 
+        /** récuperation de la liste de tags */        
+        const tags =req.body.tags;  
+
+        /** si pas de tags alors on renvoies toutes les lecons */
+        if(tags.length === 0){
+            const lessonByTag = await Lesson.findAll({
+                include:['lessonsTags']
+            });
+
+            return res.status(200).json(lessonByTag);
+        }
+
+        /** récuoerations des id de lecons associés au tags */
+        const lessonIdByTag = await LessonTag.findAll({
+            where:{
+                tag_id: tags
+            },
+            attributes:['lesson_id']
+        });        
+      
+        /** formate les ids des lecons */
+        const lessonsId = lessonIdByTag.map(element => element.lesson_id);
+
+        /** recuperation de toutes les lecons */
+        const lessonByTag = await Lesson.findAll({            
+            where:{
+                id: lessonsId
+            },
+            include:['lessonsTags']
+        });  
+        
+        return res.status(200).json(lessonByTag);
+    },
+
 };
 module.exports = lessonController;

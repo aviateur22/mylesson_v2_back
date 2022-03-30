@@ -5,11 +5,13 @@ const multer = require('multer');
 const uuidGenerator = require('../../helpers/security/uuidGenerator');
 
 /** gestion multer pour stocker une image sur le server */
-const upload = {
+const upload = {  
+
     uploadImage : multer.diskStorage({
-        destination: function(req, file, cb) {         
+        /** verification du format du document et parametrage de uploads path */
+        destination: async function(req, file, cb) {
             if(file.mimetype === 'image/png' || file.mimetype === 'image/jpeg'){
-                cb(null, process.env.UPLOAD_PATH);
+                cb(null, process.env.UPLOAD_PATH);                
             } else {
                 /** le format de l'image n'est pas correcte */
                 cb({message: 'seules les images au format JPEG et PNG sont acceptées', statusCode:'400'});

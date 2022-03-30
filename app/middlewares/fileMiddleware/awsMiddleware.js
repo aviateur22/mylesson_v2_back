@@ -8,20 +8,20 @@ module.exports = {
 
     /**Upload de fichier dans AWS S3 bucket */
     uploadAWSBucket: async(req, res, next)=>{
-        /**si fichier thumbnail de recu */
+        /**si fichier thumbnail de recu */        
         if(req.thumbnail){            
             const file = req.thumbnail;
 
             /** si image thumbnail */
             if(file){
-                /** creatio d'un thumbnail */
+                /** création d'un thumbnail */
                 const upload = await awsManager.BucketUploadFile(file);
                 
                 /** renvoi d'un message d'erreur */
                 if(upload.awsError){         
                     /** suppression du thumbnail */
                     await unlinkFile(req.thumbnail.path);            
-                    throw ({awsError: 'oupssss echec de sauvegarde de vos données'});
+                    throw ({awsError: upload.awsError});
                 }       
                 
                 /** suppression du thumbnail */

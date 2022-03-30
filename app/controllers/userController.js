@@ -123,8 +123,10 @@ const userController={
     getUserById: async(req, res, next)=>{
         //récupération de l'utilisateur
         const userId = req.userId;
+
+        /** si pas de id */
         if(!userId){
-            throw ({message: '', statusCode:'400'});
+            throw ({message: 'votre identifiant utilisateur est manquant', statusCode:'400'});
         }
 
         const user = await User.findByPk(userId);
@@ -160,10 +162,11 @@ const userController={
         }
         
         /** données binaire de l'image */
-        const downloadImage = await awsManager.BucketDownloadFile(avatarKey);         
+        const downloadImage = await awsManager.BucketDownloadFile(avatarKey);      
+
         /** erreur dans la réponse */
         if(downloadImage.awsError){                       
-            throw {awsError: 'echec de récupération de votre avatar'};
+            throw {awsError: downloadImage.awsError };
         }
         res.send(downloadImage);            
     },
@@ -173,21 +176,11 @@ const userController={
      */
     updateUserById: async(req, res, next)=>{
         //récupération de l'utilisateur
-        const userId = parseInt(req.params.id, 10);
+        const userId = req.userId;
 
-        //id pas au format numeric
-        if(isNaN(userId)){
-            throw ({message: 'le format de l\'identifiant utilisateur est incorrect', statusCode:'400'});
-        }
-
-        /** données utilisateur absent */
+        /** si pas de id */
         if(!userId){
-            throw ({message: 'l\'identifiant utilisateur est manquant', statusCode:'400'});
-        }
-
-        /** Seule un admin ou l'utilisateur peut effectuer cette action */
-        if( userId !== parseInt(req.payload.id, 10) && req.payload.role < userRole.admin){
-            throw ({message: 'vous n\'est pas autorisé a executer cette action', statusCode:'403'});
+            throw ({message: 'votre identifiant utilisateur est manquant', statusCode:'400'});
         }
 
         /** récupération des données */
@@ -224,30 +217,7 @@ const userController={
         }
 
         /** parametre de image du profil */
-        let avatarKey;
-        if(!req.AWSUploadKey){
-            /** pas de nouvelle image de défini */
-
-            /** Si pas d'image personnelle d'enregistrée */
-            if( userData.avatar_key !== process.env.DEFAULT_AVATAR_MEN &&  userData.avatar_key !== process.env.DEFAULT_AVATAR_WOMEN && userData.avatar_key !== process.env.DEFAULT_AVATAR){
-                if(sex === 'homme'){
-                    avatarKey = process.env.DEFAULT_AVATAR_MEN;
-                }
-                else if(sex === 'femme') {
-                    avatarKey = process.env.DEFAULT_AVATAR_WOMEN;
-                }
-                else {
-                    avatarKey = process.env.DEFAULT_AVATAR;
-                }
-            }
-            else {
-                avatarKey = userData.avatar_key;
-            }            
-        }
-        else {
-            /**  nouvelle image */
-            avatarKey = req.AWSUploadKey;
-        }
+        let avatarKey = req.AWSUploadKey ? req.AWSUploadKey : userData.avatar_key;
 
         /** nouvelles données utilisateur */
         const newUserData = { ...userData, ...{ email: sanitizer.escape(email), login: sanitizer.escape(login), sex: sex ? sanitizer.escape(sex): null, avatar_key: avatarKey }};
@@ -271,21 +241,11 @@ const userController={
      */
     deleteUserById: async(req ,res, next)=>{
         //récupération de l'utilisateur
-        const userId = parseInt(req.params.id, 10);
+        const userId = req.userId;
 
-        //id pas au format numeric
-        if(isNaN(userId)){
-            throw ({message: 'le format de l\'identifiant utilisateur est incorrect', statusCode:'422'});
-        }
-
-        /** données utilisateur absent */
+        /** si pas de id */
         if(!userId){
-            throw ({message: 'l\'identifiant utilisateur est manquant', statusCode:'422'});
-        }
-
-        /** Seule un admin ou l'utilisateur peut effectuer cette action */
-        if( userId !== parseInt(req.payload.id, 10) && req.payload.role < userRole.admin){
-            throw ({message: 'vous n\'est pas autorisé a executer cette action', statusCode:'403'});
+            throw ({message: 'votre identifiant utilisateur est manquant', statusCode:'400'});
         }
 
         /** utilisateur a supprimer */
@@ -307,23 +267,13 @@ const userController={
      */
     updatePassword: async(req, res, next)=>{
         //récupération de l'utilisateur
-        const userId = parseInt(req.params.id, 10);
+        const userId = req.userId;
 
-        //id pas au format numeric
-        if(isNaN(userId)){
-            throw ({message: 'le format de l\'identifiant utilisateur est incorrect', statusCode:'422'});
-        }
-
-        /** données utilisateur absent */
+        /** si pas de id */
         if(!userId){
-            throw ({message: 'l\'identifiant utilisateur est manquant', statusCode:'422'});
+            throw ({message: 'votre identifiant utilisateur est manquant', statusCode:'400'});
         }
-
-        /** Seule un admin ou l'utilisateur peut effectuer cette action */
-        if( userId !== parseInt(req.payload.id, 10) && req.payload.role < userRole.admin){
-            throw ({message: 'vous n\'est pas autorisé a executer cette action', statusCode:'403'});
-        }
-
+        
         /** */
         const { password, newPassword, confirmNewPassword }= req.body;
 
@@ -355,18 +305,14 @@ const userController={
         }
 
         /** hash du nouveau mot de passe */
-        const passwordHash =await bcrypt.hash(sanitizer.escape(newPassword),10);
-
-        /** nouvelles données utilisateur */
-        const newUserPassword = { ...user, ...{ password: passwordHash}};
+        const passwordHash =await bcrypt.hash(sanitizer.escape(newPassword),10);       
        
 
         /** mise a jour du mot de passe */
         const updateUser = await user.update({
             password: passwordHash        
         });
-
-        console.log(updateUser);
+       
         return res.status(200).json({
             id: updateUser.id,
             login: updateUser.login,

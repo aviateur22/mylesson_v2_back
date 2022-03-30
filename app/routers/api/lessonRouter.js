@@ -13,6 +13,8 @@ const cookieMiddleware = require('../../middlewares/cookieMiddleware');
 /** authorisation  */
 const authorization = require('../../middlewares/authorizationMiddleware');
 
+/** vérification si l'action est éxecuté par le proprietaire ou un admin */
+const belongToMiddleware =  require('../../middlewares/belongToMiddleware');
 /**controller lesson */
 const controllerHandler = require('../../helpers/controllerHelper/controllerHandler');
 const lessonController = require('../../controllers/lessonController');
@@ -25,11 +27,12 @@ router.post('/',
     controllerHandler(cookieMiddleware),
     controllerHandler(authorization),
     controllerHandler(roleMiddleware.writer),
+    controllerHandler(belongToMiddleware),
     joiValidation(lessonSchemaValidation.lessonSaveSchema),    
     controllerHandler(lessonController.create));
 
 /** gestion lesson par id */
-router.route('/:id')
+router.route('/:lessonId')
     /** Récuperation d'une leçon */
     .get(controllerHandler(lessonController.getById))
 
@@ -38,6 +41,7 @@ router.route('/:id')
         controllerHandler(cookieMiddleware),
         controllerHandler(authorization),    
         controllerHandler(roleMiddleware.writer),
+        controllerHandler(belongToMiddleware),
         joiValidation(lessonSchemaValidation.lessonDeleteSchema),
         controllerHandler(lessonController.deleteById))
 
@@ -45,19 +49,26 @@ router.route('/:id')
     .patch(        
         controllerHandler(cookieMiddleware),
         controllerHandler(authorization),
-        controllerHandler(roleMiddleware.writer),        
+        controllerHandler(roleMiddleware.writer),  
+        controllerHandler(belongToMiddleware),      
         joiValidation(lessonSchemaValidation.lessonSaveSchema),  
         controllerHandler(lessonController.updateById));
 
 /** récupération des lessons d'un utilisateur*/
-router.get('/user/:id',
+router.get('/user/:userId',
     controllerHandler(cookieMiddleware),
     controllerHandler(authorization),
     controllerHandler(roleMiddleware.writer),
+    controllerHandler(belongToMiddleware),
     controllerHandler(lessonController.getByUserId));
 
 /** upload de 1 lesson */
 router.post('/file/upload',controllerHandler(lessonController.upload));
+
+/** filtre les lecons par tags */
+router.post('/filter/tags',
+    joiValidation(lessonSchemaValidation.lessonFilterByTagShema),
+    controllerHandler(lessonController.getLessonByTag));
 
 module.exports = router;
 

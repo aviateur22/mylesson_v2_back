@@ -35,7 +35,7 @@ module.exports = async(data)=>{
     /** génération token pour un utilisateur*/
     if(data.user){
         jwtToken = jsonWebtoken.sign({
-            id: data.user,
+            userId: data.user,
             role: data.role
         }, KEY, {
             algorithm: 'HS256',
