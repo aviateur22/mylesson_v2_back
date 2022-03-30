@@ -18,7 +18,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 //Gestion pour les fichiers a inclure(image...)
-app.use(express.static(path.join(__dirname,'static')));
+app.use(express.static(__dirname + '/static'));
 
 //Permet de gerer les formulaire (pas les formData)
 app.use(express.urlencoded({ extended: true }));

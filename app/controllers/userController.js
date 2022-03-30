@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const { User } = require('../models/index');
+const { User, Link } = require('../models/index');
 const sanitizer = require('sanitizer');
 
 /**role utilisateur */
@@ -10,6 +10,7 @@ const jwtToken = require('../helpers/security/jwt');
 
 /** aws pour le download */
 const awsManager = require('../helpers/aws');
+const { link } = require('joi');
 
 const userController={
     /**
@@ -129,7 +130,7 @@ const userController={
             throw ({message: 'votre identifiant utilisateur est manquant', statusCode:'400'});
         }
 
-        const user = await User.findByPk(userId);
+        const user = await User.findByPk(userId);        
 
         /** Pas de données */
         if(!user){
@@ -158,7 +159,7 @@ const userController={
        
         /** données utilisateur absent */
         if(!avatarKey){
-            throw ({message: 'identififiant de l\'image manquant', statusCode:'400'});
+            throw ({message: 'l\'identififiant de l\'image est manquant', statusCode:'400'});
         }
         
         /** données binaire de l'image */
@@ -170,7 +171,7 @@ const userController={
         }
         res.send(downloadImage);            
     },
-
+    
     /**
      * Update des données d'un utilisateur
      */

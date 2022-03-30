@@ -1,0 +1,62 @@
+# uribase
+@uri = http://localhost:{{$dotenv PORT}}
+
+### inscription
+POST {{uri}}/api/users
+Content-Type: application/json
+
+{
+    "login":"aaa",
+    "email":"aaa@gmail.com",
+    "password":"Affirmer2011@",
+    "confirmPassword":"Affirmer2011@"
+}
+
+### connexion user avec droit en lecture
+POST {{uri}}/api/users/login
+Content-Type: application/json
+
+{
+    "email":"aaa@gmail.com",
+    "password":"Affirmer2010@"
+}
+
+### connexion user avec droit en écriture
+POST {{uri}}/api/users/login
+Content-Type: application/json
+
+{
+    "email":"aviateur22@hotmail.fr",
+    "password":"aaaa"
+}
+
+### connexion user avec droit admin
+POST {{uri}}/api/users/login
+Content-Type: application/json
+
+{
+    "email":"aviateur22@gmail.com",
+    "password":"aaaa"
+}
+
+### token pour requete
+@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOjIsImlhdCI6MTY0ODY0ODQ2NiwiZXhwIjoxNjQ4NjUwMjY2LCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiZmIwZGFiN2QtNmZlNy00MWQxLWExZDEtZmJlOGU5ZTQzM2ZkIn0.yeN7npZUHlZ8y7kDTFSvFhSnkbi03O3VfNzqw0sU-dk
+
+### ajout d'un link utilisateur
+POST {{uri}}/api/links/user/2
+Cookie: {{jwtToken}}
+Content-Type: application/json
+
+{
+    "linkUrl": "dd",
+    "compagnyId": "2"
+}
+
+### récuperation de tous les link d'un utilisateur
+GET  {{uri}}/api/links/user/2
+Cookie: {{jwtToken}}
+Content-Type: application/json
+
+{
+    
+}

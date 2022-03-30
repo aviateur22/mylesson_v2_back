@@ -22,7 +22,6 @@ const joiValidation = require('../../validations');
 const linkSchemaValidation = require('../../validations/schemas/link');
 
 
-
 router.route('/:linkId')
     /** récupération des links pour un utilisateur */
     .get(
@@ -49,10 +48,16 @@ router.route('/:linkId')
         controllerHandler(authorizationMiddleware),
         controllerHandler(roleMiddleware.writer),
         controllerHandler(belongToMiddleware),
-        controllerHandler(linkController.deleteLinkById)
-    );
+        controllerHandler(linkController.deleteLinkById));
 
-router.route('/:userId')
+/** recuperation d'un link par son nom */
+router.get('/name/:media', 
+    controllerHandler(cookieMiddleware),
+    controllerHandler(authorizationMiddleware),
+    controllerHandler(roleMiddleware.user),
+    controllerHandler(linkController.getLinkByName));
+
+router.route('/user/:userId')
     /** ajout d'un nouveau link pour 1 utilsateur */
     .post(
         controllerHandler(cookieMiddleware),
@@ -60,7 +65,7 @@ router.route('/:userId')
         controllerHandler(roleMiddleware.writer),
         controllerHandler(belongToMiddleware),
         joiValidation(linkSchemaValidation.addUserLinkSchema),        
-        controllerHandler(linkController.addLinkByUserId)   
+        controllerHandler(linkController.saveLinkByUserId)   
     )
 
     /** récuperation de tous les links d'un utilisateur */
@@ -68,8 +73,7 @@ router.route('/:userId')
         controllerHandler(cookieMiddleware),
         controllerHandler(authorizationMiddleware),
         controllerHandler(roleMiddleware.writer),
-        controllerHandler(belongToMiddleware),
-        joiValidation(linkSchemaValidation.addUserLinkSchema),        
-        controllerHandler(linkController.getLinkByUserId)  
-    );
+        controllerHandler(belongToMiddleware),        
+        controllerHandler(linkController.getLinkByUserId));
+
 module.exports=router;

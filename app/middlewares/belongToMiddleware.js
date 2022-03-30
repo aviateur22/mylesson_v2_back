@@ -30,7 +30,7 @@ module.exports = (req, res, next)=>{
 
     /** Seule un admin ou l'utilisateur peut effectuer cette action */
     if( userId !== parseInt(req.payload.userId, 10) && req.payload.role < userRole.admin){
-        throw ({message: 'vous n\'est pas autorisé a executer cette action', statusCode:'403'});
+        throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
     }
     /** transfert de l'id utilisateur */
     req.userId = userId;

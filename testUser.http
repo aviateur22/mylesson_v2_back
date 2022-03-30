@@ -99,3 +99,11 @@ Content-Type: application/json
 {
 
 }
+
+### recuperer image media
+POST {{uri}}/api/users/logout
+Content-Type: application/json
+
+{
+
+}

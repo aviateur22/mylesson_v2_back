@@ -13,7 +13,7 @@ router.use('/users',resHeaderMiddleware, userRouter);
 router.use('/lessons',resHeaderMiddleware, lessonRouter);
 
 /** gestion des links utilisateurs */
-router.use('/link', linkRouter);
+router.use('/links', linkRouter);
 
 /** tags d'une lecon */
 router.use('/tags', tagRouter);
