@@ -74,11 +74,7 @@ router.route('/:userId')
         controllerHandler(cookieMiddleware),
         controllerHandler(authorizationMiddleware),
         controllerHandler(roleMiddleware.user),
-        controllerHandler(belongToMiddleware),
-        controllerHandler(folderExistMiddleware.uploadFolder),
-        uploadImageMiddleware.single('image'),                
-        controllerHandler(thumbnailMiddleware),
-        controllerHandler(awsMiddleware.uploadAWSBucket),  
+        controllerHandler(belongToMiddleware),        
         joiValidation(userSchemaValidation.updateUserSchema),        
         controllerHandler(userController.updateUserById))
 
@@ -99,12 +95,24 @@ router.patch('/password/:userId',
     joiValidation(userSchemaValidation.updatePasswordSchema),
     controllerHandler(userController.updatePassword));
 
-/** recuperation d'une image d'un user authentifié*/
+/** recuperation d'une image d'un user authentifié */
 router.get('/image/:key',
     controllerHandler(cookieMiddleware),
     controllerHandler(authorizationMiddleware),
     controllerHandler(roleMiddleware.user),
     controllerHandler(userController.getAvatarByKey));
+
+/** mise a jour d'une image */
+router.patch('/image/:userId', 
+    controllerHandler(cookieMiddleware),
+    controllerHandler(authorizationMiddleware),
+    controllerHandler(roleMiddleware.user),
+    controllerHandler(belongToMiddleware),
+    controllerHandler(folderExistMiddleware.uploadFolder),
+    uploadImageMiddleware.single('image'),                
+    controllerHandler(thumbnailMiddleware),
+    controllerHandler(awsMiddleware.uploadAWSBucket),  
+    controllerHandler(userController.updateImageByUserId));
 
 /** récupération d'un image sans être authentifié */
 router.get('/image/autor/:key',

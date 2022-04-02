@@ -1,5 +1,5 @@
 const { Link, UserLink, User } = require('../models/index');
-const { findOne } = require('../models/user');
+
 
 const linkController = {
     /**
@@ -7,14 +7,14 @@ const linkController = {
      */
     saveLinkByUserId: async(req, res, next)=>{
         const userId = req.userId;
-
+      
         /** si pas de userId */
         if(!userId){
             throw ({message: 'votre identifiant utilisateur est manquant', statusCode:'400'});
         }
 
         /** récuperation des liens urls  */
-        const {linkUrl, mediaId} = req.body;
+        const  mediaId = parseInt(req.body.mediaId, 10);
 
         /** si compagnyId de manquant */
         if(!mediaId){
@@ -26,39 +26,88 @@ const linkController = {
             throw ({message: 'l\'identifiant du média n\'est pas correct', statusCode:'400'});            
         }
 
-        /** vérification si le média es réferencé */
+        const linkUrl = req.body.linkUrl;
+
+        if(!linkUrl){
+            throw ({message: 'le lien http est obligatoire pour l\'ajout du link', statusCode:'400'}); 
+        }      
+
+        const user = await User.findByPk(userId, {
+            include: ['links']
+        });
+      
+        /** l'utilisateur n'existe pas */
+        if(!user){
+            return null;
+        }
+        
+        /** vérification existence du média */
         const findMedia = await Link.findByPk(mediaId);
 
+        /** le média n'est pas repertirioé */
         if(!findMedia){
             throw ({message: 'ce média n\'est pas référencé', statusCode:'400'}); 
-        }
+        }       
 
         /** recherche du link media */
-        const userLinkMedia =  await UserLink.findOne({
+        const userLinkMedia = await UserLink.findOne({
             where:{
                 user_id: userId,
                 link_id: mediaId
             }
         });
 
-        /** si media trouvé */
+        /** reposne code
+         * create 201
+         * update 200
+         */
+        let statusCode;
+        
         if(userLinkMedia){
-            const userUpdate = await userLinkMedia.update({
-                link_id: mediaId,
+            /** mise a jour des données links utilisateur */
+            const updateLink = await userLinkMedia.update({
                 user_id: userId,
-                link_url: linkUrl
-            });
+                link_id: mediaId,
+                link_url: linkUrl,
+            });  
 
-            return res.status(201).json(userUpdate);
+            /** echec update */
+            if(!updateLink){
+                throw ({message: 'la mise à jour de votre lien à échoué', statusCode:'400'});
+            }
+
+            /** defini le code a renvoyer */
+            statusCode = 200;
         } else {
-            /** ajout dr'un nouveau compte */                  
-            const userAddLink = await UserLink.create({
-                link_id: mediaId,
-                user_id: userId,
-                link_url: linkUrl
-            });
-            return res.status(201).json(userAddLink);
+            /** création d'un nouveau lien media */
+            const addLink = await user.addLinks(mediaId, {
+                through: {
+                    link_url: linkUrl
+                }
+            }); 
+            
+            /**echec de creation */
+            if(!addLink){
+                throw ({message: 'l\'ajout de votre lien à échoué', statusCode:'400'});
+            }
+
+            /** defini le code a renvoyer */
+            statusCode = 201;
         }
+        
+        /** récupération des informations à jour */
+        const updateUser = await User.findByPk(userId, {
+            include: ['links']
+        });
+
+        return res.status(statusCode).json({
+            id: updateUser.id,
+            login: updateUser.login,
+            email: updateUser.email,
+            sex: updateUser.sex,
+            avatarKey: updateUser.avatar_key,
+            links: updateUser.links
+        });  
     },
 
     /**
@@ -137,6 +186,15 @@ const linkController = {
             mediaRequest,
             pathUrl: process.env.FOLDER_IMAGE
         });
+    },
+
+    /**
+     * récuperation de tous les links disponible
+     */
+    getAllLinks: async(req, res, next)=>{
+        const links = await Link.findAll();
+        res.status(200).json(links);
     }
+ 
 };
 module.exports = linkController;

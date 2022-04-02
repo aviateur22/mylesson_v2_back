@@ -38,6 +38,11 @@ INSERT INTO "tag" ("name","image_id") VALUES
 ('mysql',1),
 ('react',1),
 ('css',6);
+('ejs',6);
+('VSC',6);
+('visual studi code',6);
+('atom',6);
+('bracket',6);
 
 INSERT INTO "link" ("compagny_name","picture_name") VALUES
 ('github', 'github.png'),

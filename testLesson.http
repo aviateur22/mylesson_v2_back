@@ -55,7 +55,7 @@ Content-Type: application/json
 }
 
 ### Récuperation leçon par son id
-GET {{uri}}/api/lessons/9
+GET {{uri}}/api/lessons/1
 Content-Type: application/json
 
 {

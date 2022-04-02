@@ -8,7 +8,7 @@ UserLink.init({
     link_id: DataTypes.NUMBER,
     link_url: DataTypes.STRING
 }, {
-    sequelize,
+    sequelize,   
     tableName:'user_has_link'
 });
 module.exports = UserLink;

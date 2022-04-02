@@ -40,20 +40,29 @@ Content-Type: application/json
 }
 
 ### token pour requete
-@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOjIsImlhdCI6MTY0ODY0ODQ2NiwiZXhwIjoxNjQ4NjUwMjY2LCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiZmIwZGFiN2QtNmZlNy00MWQxLWExZDEtZmJlOGU5ZTQzM2ZkIn0.yeN7npZUHlZ8y7kDTFSvFhSnkbi03O3VfNzqw0sU-dk
+@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOjMsImlhdCI6MTY0ODg5NjE0MSwiZXhwIjoxNjQ4ODk3OTQxLCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiYWQ5YjZhYTctNjdlOC00ZjU5LWE1OGUtODViODQ0MWVlYWU5In0.Bi4HpyD3cJkDRPklW4i7rTgfNFIfYED7641pNd0qKQs
 
 ### ajout d'un link utilisateur
-POST {{uri}}/api/links/user/2
+POST {{uri}}/api/links/user/1
 Cookie: {{jwtToken}}
 Content-Type: application/json
 
 {
-    "linkUrl": "dd",
-    "compagnyId": "2"
+    "linkUrl": "https://github.com/sssgg",
+    "mediaId": "1"
 }
 
 ### récuperation de tous les link d'un utilisateur
-GET  {{uri}}/api/links/user/2
+GET  {{uri}}/api/links/user/1
+Cookie: {{jwtToken}}
+Content-Type: application/json
+
+{
+    
+}
+
+### récuperation de tous les link disponible
+GET  {{uri}}/api/links/
 Cookie: {{jwtToken}}
 Content-Type: application/json
 

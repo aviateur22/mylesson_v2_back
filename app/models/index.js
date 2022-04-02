@@ -20,20 +20,19 @@ Lesson.belongsToMany(Tag,{
     as:'lessonsTags',
     through:'lesson_has_tag'
 });
-
 Tag.belongsToMany(Lesson,{
     as:'tagsLessons',
     through:'lesson_has_tag'
 });
 
-User.belongsToMany(Link,{
-    as: 'usersLinks',
-    through: 'user_has_link'
+User.belongsToMany(Link,{    
+    as: 'links',
+    through: UserLink
 });
 
 Link.belongsToMany(User,{
-    as: 'linksUsers',
-    through: 'user_has_link'
+    as: 'users',
+    through: UserLink
 });
 
 module.exports = { User, Role, Tag, Lesson, lessonTag, Link, UserLink};

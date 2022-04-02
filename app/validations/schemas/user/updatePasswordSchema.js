@@ -5,11 +5,11 @@ const Joi = require('joi');
 module.exports = Joi.object({
     /* password: 8 charac, uppercase, number,pas d'espace et liste de special char */
     password: 
-        Joi.any()
+        Joi.string()
             .required()            
             .messages({
-                'string.empty': 'le mot de passe est obligatoire',
-                'any.required': 'le mot de passe est obligatoire'
+                'string.empty': 'votre ancien mot de passe est obligatoire',
+                'any.required': 'votre ancien mot de passe est obligatoire'
             }),
 
     /* password: 8 charac, uppercase, number,pas d'espace et liste de special char */

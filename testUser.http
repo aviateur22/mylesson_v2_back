@@ -40,7 +40,7 @@ Content-Type: application/json
 }
 
 ### token pour requete
-@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6MywiaWF0IjoxNjQ3ODc2NzI1LCJleHAiOjE2NDc4Nzg1MjUsImlzcyI6ImJhY2stYXV0aC1teUxlc3NvbiIsInN1YiI6ImF1dGhvcml6YXRpb24iLCJqdGkiOiIzOTQzOWNkNS05MjAxLTQxZGQtYWU3OS1kOTAzMmU3YmJiN2QifQ.pp3UOkmwCNRYuZ497mzyUXWibV_fofG8RY0R7baY3-8
+@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOjMsImlhdCI6MTY0ODg4MjM4NCwiZXhwIjoxNjQ4ODg0MTg0LCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiN2YzMzMxZDAtNDVjYS00OGJiLThmYjAtMDY3ZWIyOTFjYWVhIn0.xy6DFxLnl3Xq1C1r2xo_WqpqS6K5xJFCcQJSNNAEZoM
 
 
 ### modification d'utilisateur par son id
@@ -64,7 +64,7 @@ Content-Type: application/json
 }
 
 ### récupération d'utilisateur par son id
-GET  {{uri}}/api/users/8
+GET  {{uri}}/api/users/2
 Cookie: {{jwtToken}}
 Content-Type: application/json
 

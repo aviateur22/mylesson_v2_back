@@ -10,7 +10,7 @@ class Lesson extends Model{
 
     /**date de derniere modification */
     get formatedUpdateDate(){
-        return ('dernière mise a jour le : '+ dayjs(this.getDataValue('updated_at')).format('DD/MM/YYYY'));
+        return ('mise à jour le : '+ dayjs(this.getDataValue('updated_at')).format('DD/MM/YYYY'));
     }
 }
 

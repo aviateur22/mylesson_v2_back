@@ -219,7 +219,12 @@ const lessonController = {
         }
 
         const lesson =await Lesson.findByPk(lessonId, {
-            include:['lessonsTags', 'user']
+            include:['lessonsTags', 
+                {
+                    association: 'user',
+                    include:['links']        
+                }
+            ]
         });
 
         /** pas de lecon */
@@ -233,6 +238,7 @@ const lessonController = {
             content: lesson.content,
             tags: lesson.lessonsTags,
             autor: lesson.user.login,
+            links: lesson.user.links,
             avatarKey: lesson.user.avatar_key,
             slug: lesson.slug,
             created: lesson.formatedCreationDate,

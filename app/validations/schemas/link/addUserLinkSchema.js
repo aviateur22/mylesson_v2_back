@@ -7,9 +7,9 @@ module.exports = Joi.object({
         // eslint-disable-next-line no-useless-escape
         .pattern(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/)
         .messages({   
-            'string.pattern.base': 'le format de votre url de linkedin est incorrecte',           
-            'string.empty': 'le lien http est obligatoire pour l\'ajout du link',
-            'any.required': 'le lien http est obligatoire pour l\'ajout du link',
+            'string.pattern.base': 'le format de votre url est incorrecte',           
+            'string.empty': 'votre url est obligatoire pour l\'ajout du link',
+            'any.required': 'votre url est obligatoire pour l\'ajout du link',
         }),    
     mediaId: Joi.number()
         .required()

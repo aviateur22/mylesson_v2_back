@@ -21,9 +21,15 @@ const controllerHandler = require('../../helpers/controllerHelper/controllerHand
 const joiValidation = require('../../validations');
 const linkSchemaValidation = require('../../validations/schemas/link');
 
+/**recuperation de tous les links */
+router.get('/', 
+    controllerHandler(cookieMiddleware),
+    controllerHandler(authorizationMiddleware),
+    controllerHandler(roleMiddleware.writer),
+    controllerHandler(linkController.getAllLinks));
 
 router.route('/:linkId')
-    /** récupération des links pour un utilisateur */
+    /** récupération d'un link pour un utilisateur */
     .get(
         controllerHandler(cookieMiddleware),
         controllerHandler(authorizationMiddleware),
@@ -51,10 +57,7 @@ router.route('/:linkId')
         controllerHandler(linkController.deleteLinkById));
 
 /** recuperation d'un link par son nom */
-router.get('/name/:media', 
-    controllerHandler(cookieMiddleware),
-    controllerHandler(authorizationMiddleware),
-    controllerHandler(roleMiddleware.user),
+router.get('/name/:media',   
     controllerHandler(linkController.getLinkByName));
 
 router.route('/user/:userId')
