@@ -1,4 +1,5 @@
 const { Link, UserLink, User } = require('../models/index');
+const sanitize = require('sanitizer');
 
 
 const linkController = {
@@ -57,18 +58,20 @@ const linkController = {
             }
         });
 
-        /** reposne code
+        /** reponse code
          * create 201
          * update 200
          */
         let statusCode;
+        /**nettoyage de l'entrée utilisateur */
+        const sanitizeUrlLink = sanitize.escape(linkUrl);
         
         if(userLinkMedia){
             /** mise a jour des données links utilisateur */
             const updateLink = await userLinkMedia.update({
                 user_id: userId,
                 link_id: mediaId,
-                link_url: linkUrl,
+                link_url: sanitizeUrlLink,
             });  
 
             /** echec update */
@@ -82,7 +85,7 @@ const linkController = {
             /** création d'un nouveau lien media */
             const addLink = await user.addLinks(mediaId, {
                 through: {
-                    link_url: linkUrl
+                    link_url: sanitizeUrlLink
                 }
             }); 
             
