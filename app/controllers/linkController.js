@@ -1,5 +1,6 @@
 const { Link, UserLink, User } = require('../models/index');
 const sanitize = require('sanitizer');
+const userRole = require('../helpers/userRole');
 
 
 const linkController = {
@@ -109,7 +110,8 @@ const linkController = {
             email: updateUser.email,
             sex: updateUser.sex,
             avatarKey: updateUser.avatar_key,
-            links: updateUser.links
+            links: updateUser.links,
+            token: req.body.formToken
         });  
     },
 
@@ -121,18 +123,72 @@ const linkController = {
     },
 
     /**
-     * modification d'un link utilisateur par son id
-     */
-    updateLinkById: (req, res, next)=>{
-
-    },
-
-
-    /**
      * Suppression d'un link utilisateur par son id
      */
-    deleteLinkById: (req, res, next)=>{
+    deleteLinkByUserId: async(req, res, next)=>{
+        /** userId */
+        const userId = req.userId;
 
+        /** si pas de userId */
+        if(!userId){
+            throw ({message: 'votre identifiant utilisateur est manquant', statusCode:'400'});
+        }
+
+        /** link id */
+        const mediaLinkId = parseInt(req.body.mediaLinkId, 10);
+
+        if(!mediaLinkId){
+            throw ({message: 'l\'identifiant du média à supprimer est manquant', statusCode:'400'});
+        }
+
+        if(isNaN(mediaLinkId)){
+            throw ({message: 'le format de l\'identifiant du média à supprimer est érroné', statusCode:'400'});
+        }
+
+        /** vériication existence du link */
+        const link = await UserLink.findOne({
+            where:{
+                link_id: mediaLinkId,
+                user_id: userId
+            }
+        });
+
+        if(!link){
+            throw ({ message: 'le lien n\'est pas trouvé en base de données', statusCode: 404});
+        }
+
+        /** Seule un admin ou le propriétaire de la lecon peut executer cette action */
+        if(userId !== parseInt(link.user_id, 10) && req.payload.role < userRole.admin){
+            throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
+        }
+
+        /** suppression du link */
+        const linkDelete = await UserLink.destroy({
+            where:{
+                user_id: userId,
+                link_id: mediaLinkId
+            }         
+        });
+
+        /** lecon pas trouvée */
+        if(!linkDelete){
+            throw ({ message: 'le lien n\'est pas trouvé en base de données', statusCode: 404});
+        }
+
+        /** récupération des informations à jour */
+        const updateUser = await User.findByPk(userId, {
+            include: ['links']
+        });
+
+        return res.status(200).json({
+            id: updateUser.id,
+            login: updateUser.login,
+            email: updateUser.email,
+            sex: updateUser.sex,
+            avatarKey: updateUser.avatar_key,
+            links: updateUser.links,
+            token: req.body.formToken
+        });  
     },
 
     /**

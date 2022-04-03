@@ -21,7 +21,14 @@ module.exports = Joi.object({
             'any.required': 'l\'email est obligatoire'
         }),
     
+    
     sex: Joi.any(),
 
-    image: Joi.any()
+    formToken: Joi
+        .string()
+        .required()
+        .messages({    
+            'string.empty': 'token du formulaire invalide',
+            'any.required': 'token du formulaire invalide'  
+        }),
 });

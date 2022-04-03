@@ -1,4 +1,5 @@
-const addUserLinkSchema = require('./addUserLinkSchema');
+const saveUserLinkSchema = require('./saveUserLinkSchema');
 const updateUserLinkSchema = require('./updateUserLinkSchema');
+const deleteLinkSchema = require('./deleteLinkSchema');
 
-module.exports = { addUserLinkSchema, updateUserLinkSchema};
+module.exports = { saveUserLinkSchema, updateUserLinkSchema, deleteLinkSchema};

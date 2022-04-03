@@ -33,5 +33,13 @@ module.exports = Joi.object({
             'string.empty': 'la confirmation du nouveau mot de passe est obligatoire',
             'any.required': 'la confirmation du nouveau mot de passe est obligatoire',
             'any.only': 'la confirmation du mot de passe, ne correspond pas au nouveau mot de passe '
-        })
+        }),
+
+    formToken: Joi
+        .string()
+        .required()
+        .messages({    
+            'string.empty': 'token du formulaire invalide',
+            'any.required': 'token du formulaire invalide'  
+        }),
 });

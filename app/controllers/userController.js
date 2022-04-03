@@ -14,10 +14,6 @@ const awsManager = require('../helpers/aws');
 const userController={
     /**
      * Connexion
-     * @param {Object} req 
-     * @param {Object} res 
-     * @param {Object} next 
-     * @returns {Object} -API JSON response status
      */
     login: async(req, res, _)=>{
         if(!req.body.email || !req.body.password) {
@@ -62,10 +58,6 @@ const userController={
     
     /**
      * Inscription
-     * @param {Object} req 
-     * @param {Object} res 
-     * @param {Object} next 
-     * @returns  {Object} - API JSON response status
      */
     register: async(req, res ,_)=> {       
         const {login, email, password, confirmPassword} = req.body;
@@ -105,10 +97,6 @@ const userController={
 
     /**
      * Déconnexion
-     * @param {Object} req 
-     * @param {Object} res 
-     * @param {Object} next 
-     * @returns {Object} - API JSON response status
      */
     logout:  async(req, res ,_)=> {        
         //const comparePassword = await bcrypt.compare(req.session.user);
@@ -139,6 +127,8 @@ const userController={
         if(!user){
             return res.status(204).json({});
         }
+
+        const token = res.formToken;
        
         return res.status(200).json({
             id: user.id,
@@ -146,16 +136,13 @@ const userController={
             email: user.email,
             sex: user.sex,
             avatarKey: user.avatar_key,
-            links: user.links
+            links: user.links,
+            token
         });
     },
 
     /**
      * Récuperation de l'image avatar 
-     * @param {*} req 
-     * @param {*} res 
-     * @param {*} next 
-     * @returns 
      */
     getAvatarByKey: async(req, res, next)=>{
         //récupération de l'utilisateur
@@ -231,13 +218,14 @@ const userController={
             ...newUserData
         });      
 
-        return res.status(200).json({
+        return res.status(200).json({            
             id: userData.id,
             login: userData.login,
             email: userData.email,
             avatarKey: userData.avatar_key,
             sex: userData.sex,
-            usersLinks: userData.usersLinks
+            usersLinks: userData.usersLinks,
+            token: req.body.formToken
         });
     },
 
@@ -283,7 +271,8 @@ const userController={
             email: updateUser.email,
             avatarKey: updateUser.avatar_key,
             sex: updateUser.sex,
-            usersLinks: updateUser.usersLinks
+            usersLinks: updateUser.usersLinks,
+            token: req.body.formToken
         });
     },
     /**
@@ -370,15 +359,13 @@ const userController={
             email: updateUser.email,
             avatarKey: updateUser.avatar_key,
             sex: updateUser.sex,
-            usersLinks: updateUser.usersLinks
+            usersLinks: updateUser.usersLinks,
+            token: req.body.formToken
         });
     },
 
     /**
      * récupration de tous les utilisateurs
-     * @param {*} req 
-     * @param {*} res 
-     * @param {*} next 
      */
     getAllUser: async(req ,res, next)=>{        
         /** Seule un admin ou l'utilisateur peut effectuer cette action */

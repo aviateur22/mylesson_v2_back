@@ -15,6 +15,10 @@ const authorization = require('../../middlewares/authorizationMiddleware');
 
 /** vérification si l'action est éxecuté par le proprietaire ou un admin */
 const belongToMiddleware =  require('../../middlewares/belongToMiddleware');
+
+/**middleware pour token formulaire */
+const formTokenMiddleware = require('../../middlewares/tokenFormMiddleware');
+
 /**controller lesson */
 const controllerHandler = require('../../helpers/controllerHelper/controllerHandler');
 const lessonController = require('../../controllers/lessonController');
@@ -29,12 +33,25 @@ router.post('/',
     controllerHandler(roleMiddleware.writer),
     controllerHandler(belongToMiddleware),
     joiValidation(lessonSchemaValidation.lessonSaveSchema),    
+    controllerHandler(formTokenMiddleware.getFormToken),
+
     controllerHandler(lessonController.create));
+
+/** generation token formulaire */
+router.get('/token/:userId', 
+    controllerHandler(cookieMiddleware),
+    controllerHandler(authorization),
+    controllerHandler(roleMiddleware.writer),
+    controllerHandler(belongToMiddleware),
+    controllerHandler(formTokenMiddleware.setFormToken),
+    controllerHandler(lessonController.getTokenByUserId));
 
 /** gestion lesson par id */
 router.route('/:lessonId')
     /** Récuperation d'une leçon */
-    .get(controllerHandler(lessonController.getById))
+    .get(
+        controllerHandler(formTokenMiddleware.setFormToken),
+        controllerHandler(lessonController.getById))
 
     /** Suppression d'une leçon */
     .delete(
@@ -51,7 +68,10 @@ router.route('/:lessonId')
         controllerHandler(authorization),
         controllerHandler(roleMiddleware.writer),  
         controllerHandler(belongToMiddleware),      
-        joiValidation(lessonSchemaValidation.lessonSaveSchema),  
+        joiValidation(lessonSchemaValidation.lessonSaveSchema), 
+        controllerHandler(formTokenMiddleware.getFormToken), 
+        /** generation d'un nouveau token  */       
+        controllerHandler(formTokenMiddleware.setFormToken), 
         controllerHandler(lessonController.updateById));
 
 /** récupération des lessons d'un utilisateur*/

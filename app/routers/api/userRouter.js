@@ -24,6 +24,8 @@ const thumbnailMiddleware = require('../../middlewares/fileMiddleware/thumbnailM
 /** gestion stockage image dans AWS S3 bucket */
 const awsMiddleware = require('../../middlewares/fileMiddleware/awsMiddleware');
 
+/**middleware pour token formulaire */
+const formTokenMiddleware = require('../../middlewares/tokenFormMiddleware');
 /**controller user */
 const userController = require('../../controllers/userController');
 const controllerHandler = require('../../helpers/controllerHelper/controllerHandler');
@@ -67,6 +69,7 @@ router.route('/:userId')
         controllerHandler(authorizationMiddleware),
         controllerHandler(roleMiddleware.user),
         controllerHandler(belongToMiddleware),
+        controllerHandler(formTokenMiddleware.setFormToken),
         controllerHandler(userController.getUserById))
 
     /** update info utilisateur */
@@ -75,7 +78,8 @@ router.route('/:userId')
         controllerHandler(authorizationMiddleware),
         controllerHandler(roleMiddleware.user),
         controllerHandler(belongToMiddleware),        
-        joiValidation(userSchemaValidation.updateUserSchema),        
+        joiValidation(userSchemaValidation.updateUserSchema), 
+        controllerHandler(formTokenMiddleware.getFormToken),       
         controllerHandler(userController.updateUserById))
 
     /** suppression utilisateur */
@@ -93,6 +97,7 @@ router.patch('/password/:userId',
     controllerHandler(roleMiddleware.user),
     controllerHandler(belongToMiddleware),
     joiValidation(userSchemaValidation.updatePasswordSchema),
+    controllerHandler(formTokenMiddleware.getFormToken),
     controllerHandler(userController.updatePassword));
 
 /** recuperation d'une image d'un user authentifié */
@@ -106,10 +111,11 @@ router.get('/image/:key',
 router.patch('/image/:userId', 
     controllerHandler(cookieMiddleware),
     controllerHandler(authorizationMiddleware),
-    controllerHandler(roleMiddleware.user),
+    controllerHandler(roleMiddleware.user),    
     controllerHandler(belongToMiddleware),
     controllerHandler(folderExistMiddleware.uploadFolder),
-    uploadImageMiddleware.single('image'),                
+    uploadImageMiddleware.single('image'), 
+    controllerHandler(formTokenMiddleware.getFormToken),                 
     controllerHandler(thumbnailMiddleware),
     controllerHandler(awsMiddleware.uploadAWSBucket),  
     controllerHandler(userController.updateImageByUserId));

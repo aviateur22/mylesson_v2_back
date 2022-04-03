@@ -48,16 +48,21 @@ module.exports = async(data)=>{
     } 
     /** génération token pour un formulaire*/
     else if(data.form){
+        /** generztion d'un unique uuid */
+        const formTokenGenerator = uuidv4();
+        
+
+        /** generzation du token JWT */
         jwtToken = jsonWebtoken.sign({
-            token: tokenGenerator(25)
+            formToken: formTokenGenerator
         }, KEY, {
             algorithm: 'HS256',
             issuer: issuer,
             subject: subject,
             jwtid: jwtid,
-            expiresIn: expTime
+            expiresIn: '900s'
         });
-        return jwtToken;
+        return {token: jwtToken, formToken: formTokenGenerator };
     } else {
         throw ({message: 'les données envoyées ne permettent pas la génération d\'un token', statusCode:'400', resetAuth: true , redirect :'/', error: true});
     }

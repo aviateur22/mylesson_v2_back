@@ -13,6 +13,9 @@ const authorizationMiddleware = require('../../middlewares/authorizationMiddlewa
 /** vérification si l'action est éxecuté par le proprietaire ou un admin */
 const belongToMiddleware = require('../../middlewares/belongToMiddleware');
 
+/** middleware pour le token formulaire */
+const formTokenMiddleware = require('../../middlewares/tokenFormMiddleware');
+
 /**controller user */
 const linkController = require('../../controllers/linkController');
 const controllerHandler = require('../../helpers/controllerHelper/controllerHandler');
@@ -28,49 +31,34 @@ router.get('/',
     controllerHandler(roleMiddleware.writer),
     controllerHandler(linkController.getAllLinks));
 
-router.route('/:linkId')
-    /** récupération d'un link pour un utilisateur */
-    .get(
-        controllerHandler(cookieMiddleware),
-        controllerHandler(authorizationMiddleware),
-        controllerHandler(roleMiddleware.writer),
-        controllerHandler(belongToMiddleware),
-        controllerHandler(linkController.getLinkById)
-    )
-
-    /** mise a jour d'un link pour un utilisateur */
-    .patch(
-        controllerHandler(cookieMiddleware),
-        controllerHandler(authorizationMiddleware),
-        controllerHandler(roleMiddleware.writer),
-        controllerHandler(belongToMiddleware),
-        joiValidation(linkSchemaValidation.updateUserLinkSchema),
-        controllerHandler(linkController.updateLinkById)
-    )
-
-    /** suppression d'un link */
+/** récupération d'un link pour un utilisateur */
+router.get('/:linkId',
+    controllerHandler(cookieMiddleware),
+    controllerHandler(authorizationMiddleware),
+    controllerHandler(roleMiddleware.writer),
+    controllerHandler(belongToMiddleware),
+    controllerHandler(linkController.getLinkById));
+    
+/** suppression d'un link */
+router.route('/user/:userId')
+    /** suppression d'un link par id utilisateu */
     .delete(
         controllerHandler(cookieMiddleware),
         controllerHandler(authorizationMiddleware),
         controllerHandler(roleMiddleware.writer),
         controllerHandler(belongToMiddleware),
-        controllerHandler(linkController.deleteLinkById));
-
-/** recuperation d'un link par son nom */
-router.get('/name/:media',   
-    controllerHandler(linkController.getLinkByName));
-
-router.route('/user/:userId')
+        joiValidation(linkSchemaValidation.deleteLinkSchema),
+        controllerHandler(formTokenMiddleware.getFormToken),  
+        controllerHandler(linkController.deleteLinkByUserId))
     /** ajout d'un nouveau link pour 1 utilsateur */
     .post(
         controllerHandler(cookieMiddleware),
         controllerHandler(authorizationMiddleware),
         controllerHandler(roleMiddleware.writer),
         controllerHandler(belongToMiddleware),
-        joiValidation(linkSchemaValidation.addUserLinkSchema),        
-        controllerHandler(linkController.saveLinkByUserId)   
-    )
-
+        joiValidation(linkSchemaValidation.saveUserLinkSchema),
+        controllerHandler(formTokenMiddleware.getFormToken),    
+        controllerHandler(linkController.saveLinkByUserId))
     /** récuperation de tous les links d'un utilisateur */
     .get(
         controllerHandler(cookieMiddleware),
@@ -78,5 +66,9 @@ router.route('/user/:userId')
         controllerHandler(roleMiddleware.writer),
         controllerHandler(belongToMiddleware),        
         controllerHandler(linkController.getLinkByUserId));
+
+/** recuperation d'un link par son nom */
+router.get('/name/:media',   
+    controllerHandler(linkController.getLinkByName));    
 
 module.exports=router;

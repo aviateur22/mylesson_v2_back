@@ -10,6 +10,7 @@ const upload = {
     uploadImage : multer.diskStorage({
         /** verification du format du document et parametrage de uploads path */
         destination: async function(req, file, cb) {
+            console.log('token jjjjjj', req.body.formToken);
             if(file.mimetype === 'image/png' || file.mimetype === 'image/jpeg'){
                 cb(null, process.env.UPLOAD_PATH);                
             } else {

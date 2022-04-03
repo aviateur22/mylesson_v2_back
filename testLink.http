@@ -40,7 +40,7 @@ Content-Type: application/json
 }
 
 ### token pour requete
-@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOjMsImlhdCI6MTY0ODg5NjE0MSwiZXhwIjoxNjQ4ODk3OTQxLCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiYWQ5YjZhYTctNjdlOC00ZjU5LWE1OGUtODViODQ0MWVlYWU5In0.Bi4HpyD3cJkDRPklW4i7rTgfNFIfYED7641pNd0qKQs
+@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOjIsImlhdCI6MTY0OTAxOTI0MywiZXhwIjoxNjQ5MDIxMDQzLCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiYzliYWI0YmUtYzhkZi00YzIxLWFkYTQtMDZiYTc0YjMxMTlhIn0.RmI-MJau0ixBgFuJyGZ3Cc-mDivrvcG20Z5ifFfPAv8
 
 ### ajout d'un link utilisateur
 POST {{uri}}/api/links/user/1
@@ -69,3 +69,13 @@ Content-Type: application/json
 {
     
 }
+
+### suppression d'un link par son id
+DELETE {{uri}}/api/links/1
+Cookie: {{jwtToken}}
+Content-Type: application/json
+
+{
+    "userId": "2"    
+}
+

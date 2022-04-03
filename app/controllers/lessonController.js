@@ -16,6 +16,19 @@ const lessonController = {
     },
 
     /**
+     * envoie d'un token de formulaire pour une nouvelle lecon
+     */
+    getTokenByUserId: (req, res, next)=>{
+        /** récuperation du token génré */
+        const token = res.formToken;
+
+        /** envoie du token */
+        res.status(200).json({
+            token
+        });
+    },
+
+    /**
      * Création d'une nouvelle leçon
      */
     create: async(req, res, next) => {
@@ -84,12 +97,26 @@ const lessonController = {
 
         /**Recuperation de la leçon */
         createLesson = await Lesson.findByPk(id,{
-            include:{
-                model: Tag, as: 'lessonsTags'
-            }
-        }); 
-
-        res.status(201).json(createLesson);
+            include:['lessonsTags',
+                {
+                    association: 'user',
+                    include:['links']        
+                }
+            ]
+        });         
+        res.status(201).json({
+            id: createLesson.id,
+            title: createLesson.title,
+            content: createLesson.content,
+            tags: createLesson.lessonsTags,
+            autor: createLesson.user.login,
+            links: createLesson.user.links,
+            avatarKey: createLesson.user.avatar_key,
+            slug: createLesson.slug,
+            created: createLesson.formatedCreationDate,
+            updated: createLesson.formatedUpdateDate,
+            token: req.body.formToken  
+        });
     },
     
     /**
@@ -193,11 +220,27 @@ const lessonController = {
 
         /**Recuperation de la leçon */
         updateLesson = await Lesson.findByPk(lessonId,{
-            include:{
-                model: Tag, as: 'lessonsTags'
-            }
+            include:['lessonsTags',
+                {
+                    association: 'user',
+                    include:['links']        
+                }
+            ]
+        });   
+
+        return res.status(200).json({     
+            id: updateLesson.id,       
+            title: updateLesson.title,
+            content: updateLesson.content,
+            tags: updateLesson.lessonsTags,
+            autor: updateLesson.user.login,
+            links: updateLesson.user.links,
+            avatarKey: updateLesson.user.avatar_key,
+            slug: updateLesson.slug,
+            created: updateLesson.formatedCreationDate,
+            updated: updateLesson.formatedUpdateDate,            
+            token: res.formToken
         });
-        return res.status(200).json(updateLesson);
     },
    
     /**
@@ -231,6 +274,8 @@ const lessonController = {
         if(!lesson){
             return res.status(204).json({});
         }
+        /** token du formulaire */
+        const token = req.body.formToken;
         
         /**Renvoide la leçon */
         return res.status(200).json({
@@ -242,7 +287,8 @@ const lessonController = {
             avatarKey: lesson.user.avatar_key,
             slug: lesson.slug,
             created: lesson.formatedCreationDate,
-            updated: lesson.formatedUpdateDate            
+            updated: lesson.formatedUpdateDate,
+            token           
         });        
     },
 
@@ -263,19 +309,19 @@ const lessonController = {
 
         //id pas au format numeric
         if(isNaN(lessonId)){
-            throw ({message: 'le format de l\'identifiant de la leçon est incorrect', statusCode:'422'});
+            throw ({message: 'le format de l\'identifiant de la leçon est incorrect', statusCode:'400'});
         }
 
         /** id lecon manquant */
         if(!lessonId){
-            throw ({message: 'l\'identifiant de la leçon est manquant', statusCode:'422'});
+            throw ({message: 'l\'identifiant de la leçon est manquant', statusCode:'400'});
         }
 
         const lesson = await Lesson.findByPk(lessonId);
 
         /** aucun id correspondant  */
         if(!lesson){
-            throw ({message: 'la leçon n\'est pas présente en base de données', statusCode:'422'});
+            throw ({message: 'la leçon n\'est pas présente en base de données', statusCode:'400'});
         }
 
         /** Seule un admin ou le propriétaire de la lecon peut executer cette action */
@@ -284,14 +330,18 @@ const lessonController = {
         }
 
         const deleteLesson = await Lesson.destroy({
-            where:{                   
+            where:{
                 id: lessonId
-            }                                               
+            }            
         });
 
-        return res.status(200).json({
-            lessonId: lesson.id,
-            title: lesson.title
+        /** lecon pas trouvée */
+        if(!deleteLesson){
+            throw ({ message: 'la leçon n\'est pas présente en base de données', statusCode: 404});
+        }
+
+        return res.status(204).json({
+            lessonId: lesson.id
         });
     },
    
