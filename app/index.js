@@ -9,7 +9,7 @@ const router = require('./routers');
 app.set('trust proxy', 1);
 
 const corsOptions = {    
-    credentials:true,
+    credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     origin:process.env.CORS_ORIGIN.split(',')
 };
