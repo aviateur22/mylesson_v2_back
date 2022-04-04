@@ -11,40 +11,60 @@ INSERT INTO "user"("login","email","password","role_id", "avatar_key") VALUES
 ('aviateur22','aviateur22@hotmail.fr','$2b$10$x7U3SPvoeNVTKpLEBTC7UuXmn1BDg9AbeHjqDifDJ7efiTzjEMzq2','2', 'thumbnail-DEFAULT_AVATAR_MEN.png'),
 ('aviateur22','aviateur22@gmail.com','$2b$10$x7U3SPvoeNVTKpLEBTC7UuXmn1BDg9AbeHjqDifDJ7efiTzjEMzq2','3', 'thumbnail-DEFAULT_AVATAR_MEN.png');
 
-INSERT INTO "image" ("path","name") VALUES
-('empty','/images/empty.png'),
-('base de données','/images/database.png'),
-('javascript','/images/javascript.png'),
-('nodejs','/images/nodejs.png'),
-('html','/images/html.png'),
-('css','/images/css.png');
+INSERT INTO "image" ("name") VALUES
+('default.png'),
+('aws.png'),
+('nodejs.png'),
+('azur.png'),
+('express.png'),
+('heroku.png'),
+('react.png'),
+('sequelize.png'),
+('sqitch.png'),
+('vuejs.png'),
+('postgresql.png'),
+('github.png'),
+('git.png'),
+('vsc.png'),
+('bracket.png'),
+('mysql.png'),
+('netlify.png');
 
 INSERT INTO "tag" ("name","image_id") VALUES
-('base de données',2),
-('javascript',3),
-('nodejs',4),
-('html',5),
+('base de données',1),
+('javascript',1),
+('nodejs',3),
+('html',1),
 ('orm',1),
 ('git',1),
 ('github',1),
-('sequelize',1),
-('aws',1),
-('express',1),
-('sqitch',1),
-('vuejs',1),
+('sequelize',8),
+('aws',2),
+('azur',4),
+('microsoft',1),
+('heroku',6),
+('netlify',17),
+('express',5),
+('sqitch',9),
+('vuejs',10),
 ('eslint',1),
 ('sql',1),
-('postgresql',1),
-('mysql',1),
-('react',1),
-('css',6);
-('ejs',6);
-('VSC',6);
-('visual studi code',6);
-('atom',6);
-('bracket',6);
+('postgresql',11),
+('mysql',16),
+('react',7),
+('css',1),
+('ejs',1),
+('vsc',14),
+('atom',1),
+('axios',1),
+('fetch',1),
+('jest',1),
+('poo',1),
+('bracket',15);
+
 
 INSERT INTO "link" ("compagny_name","picture_name") VALUES
 ('github', 'github.png'),
+('facebook', 'facebook.png'),
 ('linkedin','linkedin.png');
 COMMIT;

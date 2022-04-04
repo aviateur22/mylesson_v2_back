@@ -1,10 +1,8 @@
-const Sequelize = require('sequelize');
 const sanitizer = require('sanitizer');
-const {Lesson, Tag, User, lessonTag} = require('../models/index');
+const {Lesson, Tag, User, LessonTag} = require('../models/index');
 const CRYPTO_AES = require('../helpers/security/aes');
 const aes = new CRYPTO_AES();
 const userRole = require('../helpers/userRole');
-const LessonTag = require('../models/lessonTag');
 
 const lessonController = {
 
@@ -85,7 +83,7 @@ const lessonController = {
             /** stocks les promesses */
             const promises = [];
             tags.forEach((tag)=>{   
-                const query =  lessonTag.create({                    
+                const query =  LessonTag.create({                    
                     lesson_id: id,
                     tag_id: tag                    
                 });         
@@ -190,16 +188,16 @@ const lessonController = {
         if(userId !== parseInt(lesson.user_id, 10) && req.payload.role < userRole.admin){
             throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
         }
-
+        
         /** mise a jour des données */
-        const newLessonData = { ...lesson, ...{ title: titleEscape, content: contentEscape } };
+        const newLessonData = { ...lesson, ...{ title: titleEscape, content } };
 
         let updateLesson = await lesson.update({
             ...newLessonData
         });
 
         /** suppression des anciens tags */
-        await lessonTag.destroy({
+        await LessonTag.destroy({
             where:{                   
                 lesson_id: lessonId
             }                                   
@@ -209,7 +207,7 @@ const lessonController = {
         await (async()=>{
             const promises = [];           
             tags.forEach((tag)=>{   
-                const query =  lessonTag.create({                    
+                const query =  LessonTag.create({                    
                     lesson_id: lessonId,
                     tag_id: tag                    
                 });         
@@ -262,7 +260,12 @@ const lessonController = {
         }
 
         const lesson =await Lesson.findByPk(lessonId, {
-            include:['lessonsTags', 
+            include:[
+                {
+                    association: 'lessonsTags', 
+                    include :'image',
+                    order:['lessonsTags','updated_at', 'DESC']
+                },                
                 {
                     association: 'user',
                     include:['links']        
@@ -274,8 +277,21 @@ const lessonController = {
         if(!lesson){
             return res.status(204).json({});
         }
-        /** token du formulaire */
+
+        /** récuperation du token du formulaire */
         const token = req.body.formToken;
+
+        /** recuperation de l'image associé au tag*/
+        let lessonImageUrl;
+        if(lesson.lessonsTags.length > 0){
+            let tags = lesson.lessonsTags;
+
+            /** filtre les tags par anciennté (le but conserver l'image de la lecon d'origine) */
+            tags = tags.sort((tagA, TagB) => tagA.lesson_has_tag.updated_at - TagB.lesson_has_tag.updated_at);
+            /** nom de l'image */
+            const imageName =lesson.lessonsTags[0].image.name;
+            lessonImageUrl = process.env.FOLDER_LESSON + imageName;
+        }
         
         /**Renvoide la leçon */
         return res.status(200).json({
@@ -288,7 +304,8 @@ const lessonController = {
             slug: lesson.slug,
             created: lesson.formatedCreationDate,
             updated: lesson.formatedUpdateDate,
-            token           
+            token,
+            lessonImageUrl       
         });        
     },
 
@@ -390,33 +407,37 @@ const lessonController = {
         const tags =req.body.tags;  
 
         /** si pas de tags alors on renvoies toutes les lecons */
+        let lessonByTag = null;
         if(tags.length === 0){
-            const lessonByTag = await Lesson.findAll({
-                include:['lessonsTags']
-            });
-
-            return res.status(200).json(lessonByTag);
-        }
-
-        /** récuoerations des id de lecons associés au tags */
-        const lessonIdByTag = await LessonTag.findAll({
-            where:{
-                tag_id: tags
-            },
-            attributes:['lesson_id']
-        });        
-      
-        /** formate les ids des lecons */
-        const lessonsId = lessonIdByTag.map(element => element.lesson_id);
-
-        /** recuperation de toutes les lecons */
-        const lessonByTag = await Lesson.findAll({            
-            where:{
-                id: lessonsId
-            },
-            include:['lessonsTags']
-        });  
+            lessonByTag = await Lesson.findAll({
+                include:['lessonsTags'],
+                order:[
+                    ['updated_at', 'DESC']
+                ]
+            });            
+        } else {
+            /** récuperations des id de lecons associés au tags */
+            const lessonIdByTag = await LessonTag.findAll({
+                where:{
+                    tag_id: tags
+                },
+                attributes:['lesson_id']
+            });        
         
+            /** formate les ids des lecons */
+            const lessonsId = lessonIdByTag.map(element => element.lesson_id);
+
+            /** recuperation de toutes les lecons */
+            lessonByTag = await Lesson.findAll({            
+                where:{
+                    id: lessonsId
+                },
+                include:['lessonsTags'],
+                order:[
+                    ['updated_at', 'DESC']
+                ]                
+            });
+        }
         return res.status(200).json(lessonByTag);
     },
 
