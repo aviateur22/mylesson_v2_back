@@ -42,7 +42,7 @@ const userController={
         const token = await jwtToken({user: user.id, role: user.role_id});
         
         /** Renvoie d'un JWT pour gestion des authorization */
-        res.cookie('authorization', token, { sameSite:'strict', httpOnly: true });       
+        res.cookie('authorization', token, { secure: true, sameSite:'none', httpOnly: true });       
 
         // /** Renvoie un cookie avec ID hashé de l'utilisateur des infos utilisateurs */
         //res.cookie('ident', identTokenEncrypt, {sameSite:'lax', path: '/',expires: new Date(Date.now() + 24 * 60 * 60 *1000), httpOnly: true });       
