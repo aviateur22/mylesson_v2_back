@@ -31,10 +31,10 @@ if(process.env.NODE_ENV === 'production'){
 sequelize
     .authenticate()
     .then(() => {
-        console.log('Connection has been established successfully.');
+        console.log('coonection database ok');
     })
     .catch(err => {
-        console.error('Unable to connect to the database:', err);
+        console.error('erreur connection database: ', err);
     });
 
 module.exports=sequelize;
