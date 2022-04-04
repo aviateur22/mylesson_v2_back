@@ -20,7 +20,6 @@ module.exports = (req,res,next)=>{
     /**recuperation des cookies */
     const cookieHeader = req.headers.cookie;  
     
-    //console.log(cookieHeader);
     /**mise des cookies dans l'objet */
     cookieHeader.split(';').forEach(function(cookie) {
         let [ name, ...rest] = cookie.split('=');

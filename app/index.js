@@ -28,4 +28,6 @@ app.use(express.json());
 //Router middleware
 app.use(router);
 
+const c = process.cwd();
+
 module.exports = app;

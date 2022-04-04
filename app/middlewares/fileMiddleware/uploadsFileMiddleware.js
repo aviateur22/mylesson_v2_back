@@ -12,7 +12,7 @@ const upload = {
         /** verification du format du document et parametrage de uploads path */
         destination: async function(req, file, cb) {                       
             if(file.mimetype === 'image/png' || file.mimetype === 'image/jpeg'){                
-                (null,process.env.UPLOAD_PATH);                
+                (null,path.join(__dirname, process.env.UPLOAD_PATH));                
             } else {
                 /** le format de l'image n'est pas correcte */
                 cb({message: 'seules les images au format JPEG et PNG sont acceptées', statusCode:'400'});

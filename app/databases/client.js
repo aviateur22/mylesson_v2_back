@@ -31,7 +31,7 @@ if(process.env.NODE_ENV === 'production'){
 sequelize
     .authenticate()
     .then(() => {
-        console.log('coonection database ok');
+        console.log('connection database ok');
     })
     .catch(err => {
         console.error('erreur connection database: ', err);
