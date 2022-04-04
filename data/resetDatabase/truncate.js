@@ -5,8 +5,20 @@ const pg = require('pg');
 /**
  * Reset du de la base de données
  */
-module.exports = (async() => {  
-    const client = new pg.Client(process.env.DATABASE_URL);
+module.exports = (async() => {
+    let client;
+    /** connexion en prod */
+    if(process.env.NODE_ENV === 'production'){
+        client = new pg.Client(process.env.DATABASE_URL, {
+            ssl: {
+                rejectUnauthorized: false,
+            }
+        });
+    } else {
+        /** connexion en local */
+        client = new pg.Client(process.env.DATABASE_URL);
+    }
+    
     try {        
         client.connect((err)=>{
             if(err){
