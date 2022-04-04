@@ -1,24 +1,25 @@
 require('dotenv').config();
 const resetDatabaseHelper = require('../../app/helpers/resetDatabase');
-const pg = require('pg');
+const {Client} = require('pg');
 
 /**
  * Reset du de la base de données
  */
 module.exports = (async() => {
     let client;
-    /** connexion en prod */
+    /** connexion en production  */
     if(process.env.NODE_ENV === 'production'){
-        client = new pg.Client(process.env.DATABASE_URL, {
+        client = new Client({
+            connectionString : process.env.DATABASE_URL,
             ssl: {
                 rejectUnauthorized: false,
             }
         });
     } else {
         /** connexion en local */
-        client = new pg.Client(process.env.DATABASE_URL);
+        client = new Client(process.env.DATABASE_URL);
     }
-    
+
     try {        
         client.connect((err)=>{
             if(err){
