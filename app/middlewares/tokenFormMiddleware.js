@@ -45,8 +45,7 @@ module.exports = {
             }
          
             /** token depuis la requete */
-            const reqFormToken = req.body.formToken;
-            console.log(reqFormToken)
+            const reqFormToken = req.body.formToken;          
             /** token de la requete absent */
             if(!reqFormToken){
                 throw ({message: 'oups token du formulaire invalide', statusCode:'403'});
@@ -77,7 +76,7 @@ module.exports = {
         res.formToken = reqToken;
         
         /** Renvoie d'un JWT pour gestion des authorization */
-        res.cookie('form_token', cookieJWT, {sameSite:'lax', httpOnly: true });
+        res.cookie('form_token', cookieJWT, { sameSite:'none', secure: true, httpOnly: true });
 
         return next();
     }
