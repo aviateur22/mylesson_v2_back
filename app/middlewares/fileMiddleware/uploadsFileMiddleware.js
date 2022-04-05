@@ -24,8 +24,8 @@ const upload = {
         filename: function(req, file, cb) {                 
             /** genration d'un uuid pour l'image */
             const uniqueSuffix = uuidGenerator();
-            cb(null, file.fieldname + '-' + uniqueSuffix +'.png');
-            console.log('fffffffff');           
+            console.log(uniqueSuffix);
+            cb(null, file.fieldname + '-' + uniqueSuffix +'.png');                       
         }
     })
 };
