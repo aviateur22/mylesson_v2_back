@@ -13,7 +13,8 @@ const upload = {
         destination: async function(req, file, cb) {                       
             if(file.mimetype === 'image/png' || file.mimetype === 'image/jpeg'){    
                 console.log('ici');                                   
-                (null, path.join(process.cwd(), process.env.UPLOAD_PATH_IMAGE));                
+                (null, path.join(process.cwd(), process.env.UPLOAD_PATH_IMAGE));    
+                console.log('la');                                   
             } else {
                 /** le format de l'image n'est pas correcte */
                 cb({message: 'seules les images au format JPEG et PNG sont acceptées', statusCode:'400'});
