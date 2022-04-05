@@ -37,4 +37,4 @@ sequelize
         console.error('erreur connection database: ', err);
     });
 
-module.exports=sequelize;
+module.exports = sequelize;

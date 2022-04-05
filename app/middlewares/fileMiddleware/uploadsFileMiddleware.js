@@ -11,8 +11,8 @@ const upload = {
     uploadImage : multer.diskStorage({
         /** verification du format du document et parametrage de uploads path */
         destination: async function(req, file, cb) {                       
-            if(file.mimetype === 'image/png' || file.mimetype === 'image/jpeg'){                
-                (null, __dirname + 'files/upload/');                
+            if(file.mimetype === 'image/png' || file.mimetype === 'image/jpeg'){                                      
+                (null, path.join(process.cwd(),process.env.UPLOAD_PATH_IMAGE));                
             } else {
                 /** le format de l'image n'est pas correcte */
                 cb({message: 'seules les images au format JPEG et PNG sont acceptées', statusCode:'400'});
@@ -20,6 +20,7 @@ const upload = {
         },
         /** si le format est validé on génére un identifiant unique est on la stock */
         filename: function(req, file, cb) {
+            console.log('ici');  
             /** genration d'un uuid pour l'image */
             const uniqueSuffix = uuidGenerator();
             cb(null, file.fieldname + '-' + uniqueSuffix +'.png');
