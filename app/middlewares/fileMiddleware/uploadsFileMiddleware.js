@@ -21,7 +21,8 @@ const upload = {
             }        
         },
         /** si le format est validé on génére un identifiant unique est on la stock */
-        filename: function(req, file, cb) {                 
+        filename: function(req, file, cb) { 
+            console.log('uniqueSuffix');                
             /** genration d'un uuid pour l'image */
             const uniqueSuffix = uuidGenerator();
             console.log(uniqueSuffix);
