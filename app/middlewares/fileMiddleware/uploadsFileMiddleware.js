@@ -13,7 +13,7 @@ const upload = {
         destination: async function(req, file, cb) {                       
             if(file.mimetype === 'image/png' || file.mimetype === 'image/jpeg'){    
                 console.log('ici');                                   
-                (null, path.join(process.cwd(), process.env.UPLOAD_PATH_IMAGE));    
+                cb(null, path.join(process.cwd(), process.env.UPLOAD_PATH_IMAGE));    
                 console.log(path.join(process.cwd(), process.env.UPLOAD_PATH_IMAGE));                                   
             } else {
                 /** le format de l'image n'est pas correcte */
