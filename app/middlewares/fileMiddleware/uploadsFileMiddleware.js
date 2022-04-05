@@ -21,10 +21,11 @@ const upload = {
             }        
         },
         /** si le format est validé on génére un identifiant unique est on la stock */
-        filename: function(req, file, cb) {             
+        filename: function(req, file, cb) {                 
             /** genration d'un uuid pour l'image */
             const uniqueSuffix = uuidGenerator();
             cb(null, file.fieldname + '-' + uniqueSuffix +'.png');
+            console.log('fffffffff');           
         }
     })
 };
