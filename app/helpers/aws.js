@@ -10,7 +10,7 @@ const  s3 = new  aws.S3({
 
 /**
  * upload un fichier dans le compartiment S3 AWS
- * @param {*} file 
+ * @param {Object} file 
  * @returns 
  */
 exports.BucketUploadFile = async(file)=>{
