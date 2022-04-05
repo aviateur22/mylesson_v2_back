@@ -14,9 +14,9 @@ module.exports = {
      */
     uploadFolder: async(req, res, next)=>{
         try {
-            console.log(path.join(process.cwd() +process.env.UPLOAD_PATH_IMAGE))
+            console.log(process.env.UPLOAD_PATH_IMAGE);
             /** dossier d'upload */
-            const uploadPath = path.join(process.cwd() +process.env.UPLOAD_PATH_IMAGE);        
+            const uploadPath = process.env.UPLOAD_PATH_IMAGE;        
             /** verification existance du path upload */
             await Fs.access(uploadPath);
             next();
