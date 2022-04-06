@@ -8,7 +8,7 @@ module.exports = Joi.object({
 
     title:Joi.string()
         /**Espace début et fin interdit - lettre et chiffre ok  */
-        .pattern(/^[^ ][a-zA-Z0-9\d*\sçà]+[^ ]$/)
+        .pattern(/^[^ ][a-zA-Z0-9\d*\sçàê]+[^ ]$/)
         .required()
         .messages({            
             'string.pattern.base': 'le titre comporte uniquement des chiffres et des lettres',

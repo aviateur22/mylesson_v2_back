@@ -29,7 +29,7 @@ Content-Type: application/json
 }
 
 ### token pour requete
-@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOjIsImlhdCI6MTY0OTAxNzU1MCwiZXhwIjoxNjQ5MDE5MzUwLCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiZjczOGEyZmItNTk3Ni00YjQ2LWIyODEtNTNlYmRkYmI0NTk4In0.LyB8UOLw8J_LGLxMeUkXPnNtNuhXFP-bDN-k92tTUB4
+@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOjMsImlhdCI6MTY0OTIzODgzMCwiZXhwIjoxNjQ5MjQwNjMwLCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiOTk4YzMwZjAtNTk2NC00ZWYxLWIxODgtMTUxY2EyOTVmMzZhIn0.BhLXdKbWcFfPUoCWP_EYe9hSO6Vn5PlXOQF7N5c5rFE
 
 ### creation d'une lecon
 POST {{uri}}/api/lessons
@@ -95,10 +95,20 @@ Content-Type: application/json
 }
 
 ### suppression d'une lecon par son id
-DELETE   {{uri}}/api/lessons/5
+DELETE   {{uri}}/api/lessons/6
 Cookie: {{jwtToken}}
 Content-Type: application/json
 
 {
-    "userId": 3
+    "userId": 2,
+    "formToken" : "s"
+}
+
+### récuperation lecon par son slug
+GET {{uri}}/api/lessons/slug/dss
+Cookie: {{jwtToken}}
+Content-Type: application/json
+
+{
+
 }

@@ -48,7 +48,7 @@ router.get('/token/:userId',
 
 /** gestion lesson par id */
 router.route('/:lessonId')
-    /** Récuperation d'une leçon */
+    /** Récuperation d'une leçon pour son édition*/
     .get(
         controllerHandler(formTokenMiddleware.setFormToken),
         controllerHandler(lessonController.getById))
@@ -60,6 +60,7 @@ router.route('/:lessonId')
         controllerHandler(roleMiddleware.writer),
         controllerHandler(belongToMiddleware),
         joiValidation(lessonSchemaValidation.lessonDeleteSchema),
+        controllerHandler(formTokenMiddleware.getFormToken), 
         controllerHandler(lessonController.deleteById))
 
     /**Update d'une leçon */
@@ -81,6 +82,10 @@ router.get('/user/:userId',
     controllerHandler(roleMiddleware.writer),
     controllerHandler(belongToMiddleware),
     controllerHandler(lessonController.getByUserId));
+
+/** recuperation d'une lecon par son slug pour une lecture*/
+router.get('/slug/:slug',
+    controllerHandler(lessonController.getLessonBySlug));
 
 /** upload de 1 lesson */
 router.post('/file/upload',controllerHandler(lessonController.upload));

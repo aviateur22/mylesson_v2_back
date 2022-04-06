@@ -3,7 +3,8 @@
  */
 const jsonWebtoken = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
-const tokenGenerator = require('./tokenGenerator');
+const AES = require('../security/aes');
+const base64 = require('../security/base64');
 
 module.exports = async(data)=>{
     /** données de base pour le token*/
@@ -50,11 +51,14 @@ module.exports = async(data)=>{
     else if(data.form){
         /** generztion d'un unique uuid */
         const formTokenGenerator = uuidv4();
-        
+
+        /** crypt le token avec algorythm AES avec chiffrement base64*/
+        const aes = new AES();        
+        let encryptToken = await aes.encrypt(formTokenGenerator);       
 
         /** generzation du token JWT */
         jwtToken = jsonWebtoken.sign({
-            formToken: formTokenGenerator
+            formToken: encryptToken
         }, KEY, {
             algorithm: 'HS256',
             issuer: issuer,
@@ -62,7 +66,8 @@ module.exports = async(data)=>{
             jwtid: jwtid,
             expiresIn: '900s'
         });
-        return {token: jwtToken, formToken: formTokenGenerator };
+        
+        return {token: jwtToken, formToken: encryptToken };
     } else {
         throw ({message: 'les données envoyées ne permettent pas la génération d\'un token', statusCode:'400', resetAuth: true , redirect :'/', error: true});
     }

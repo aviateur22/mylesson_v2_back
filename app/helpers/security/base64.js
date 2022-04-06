@@ -4,9 +4,9 @@ module.exports = {
      * @param {string} string 
      * @returns {string} - chaine encodée en base64
      */
-    encodeStringToBase64:(string)=>{
-        const encodeString= Buffer.from(string,'base64');
-        return encodeString;
+    encodeStringToBase64:(string)=>{        
+        const base64String = Buffer.from(string).toString('base64');
+        return base64String;
     },
 
     /**
@@ -15,7 +15,7 @@ module.exports = {
      * @returns {string} chaine
      */
     decodeBase64ToString:(string)=>{
-        const decode = Buffer.from(string, 'utf-8');
+        const decode = Buffer.from(string,'base64').toString('utf-8');
         return decode;
     }
 };
