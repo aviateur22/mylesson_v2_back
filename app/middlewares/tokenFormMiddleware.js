@@ -35,12 +35,9 @@ module.exports = {
         await jsonwebtoken.verify(formAuthorizationToken, KEY, async function(err, payload) {
             if(err){
                 throw ({message: 'oupsss token invalid', statusCode:'403'});
-            }         
-            console.log('iji', KEY);   
-
+            }                     
             /** token formulaire du JWT */
-            const token = payload;
-            
+            const token = payload;            
 
             /** token absent */
             if(!token.formToken){
@@ -48,7 +45,8 @@ module.exports = {
             }         
             
             /** token depuis la requete */
-            const reqFormToken = req.body.formToken;          
+            const reqFormToken = req.body.formToken;       
+
             /** token de la requete absent */
             if(!reqFormToken){
                 throw ({message: 'oupsss token invalid', statusCode:'403'});
@@ -67,8 +65,6 @@ module.exports = {
 
             /** décodage base64 -> UTF-8 puis décryptage du token cookie  */
             const cookieToken =  await aes.decrypt(token.formToken);
-            
-            console.log(reqBodyToken, cookieToken);
 
             /**verification cohérence token non décrypté */            
             if(reqBodyToken != cookieToken){

@@ -34,7 +34,6 @@ router.post('/',
     controllerHandler(belongToMiddleware),
     joiValidation(lessonSchemaValidation.lessonSaveSchema),    
     controllerHandler(formTokenMiddleware.getFormToken),
-
     controllerHandler(lessonController.create));
 
 /** generation token formulaire */
@@ -49,8 +48,11 @@ router.get('/token/:userId',
 /** gestion lesson par id */
 router.route('/:lessonId')
     /** Récuperation d'une leçon pour son édition*/
-    .get(
-        controllerHandler(formTokenMiddleware.setFormToken),
+    .post(  
+        controllerHandler(cookieMiddleware),
+        controllerHandler(authorization),    
+        controllerHandler(roleMiddleware.writer),
+        controllerHandler(belongToMiddleware),      
         controllerHandler(lessonController.getById))
 
     /** Suppression d'une leçon */
@@ -71,8 +73,7 @@ router.route('/:lessonId')
         controllerHandler(belongToMiddleware),      
         joiValidation(lessonSchemaValidation.lessonSaveSchema), 
         controllerHandler(formTokenMiddleware.getFormToken), 
-        /** generation d'un nouveau token  */       
-        controllerHandler(formTokenMiddleware.setFormToken), 
+        /** generation d'un nouveau token  */               
         controllerHandler(lessonController.updateById));
 
 /** récupération des lessons d'un utilisateur*/

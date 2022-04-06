@@ -257,7 +257,7 @@ const lessonController = {
                 }
             ]
         });   
-        console.log(res.formToken)
+       
         return res.status(200).json({     
             id: updateLesson.id,       
             title: updateLesson.title,
