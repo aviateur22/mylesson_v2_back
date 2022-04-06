@@ -71,7 +71,7 @@ const userController={
             throw ({message: 'les mots de passe ne sont pas identique', statusCode:'400'});
         }
 
-        const user = await User.findOne({
+        let user = await User.findOne({
             where: {
                 email:email 
             }
@@ -81,6 +81,18 @@ const userController={
             throw ({message: 'cet email est déjà existant', statusCode:'409'});
         }
         
+        /** vérification login */
+        user = User.findOne({
+            where: {
+                login: login
+            }
+        });
+
+        /** login utilisé */
+        if(user) {      
+            throw ({message: 'ce login est déjà existant', statusCode:'409'});
+        }
+
         const passwordHash =await bcrypt.hash(password,10);
 
         await User.create({

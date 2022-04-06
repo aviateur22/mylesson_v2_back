@@ -2,3 +2,4 @@
 %project=mylesson
 
 initdb 2022-01-23T14:58:45Z cyrille cadé <aviateur22@hotmail.fr> # init tables
+index 2022-04-06T20:29:18Z cyrille cadé <aviateur22@hotmail.fr> # add index on table

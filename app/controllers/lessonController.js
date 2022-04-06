@@ -81,7 +81,7 @@ const lessonController = {
 
         /** titre ou slug deja referencé */
         if(findLesson){
-            throw ({ message: 'ce titre est déja pris', statusCode:'400' });
+            throw ({ message: 'ce titre est déja pris', statusCode:'409' });
         }
 
         /** Création de le leçon */
@@ -197,7 +197,7 @@ const lessonController = {
 
         /** aucun id de la leçon n'est trouvé  */
         if(!lesson){
-            throw ({message: 'la leçon n\'est pas présente en base de données', statusCode:'400'});
+            throw ({message: 'la leçon n\'est pas présente en base de données', statusCode:'404'});
         }
 
         /** Seule un admin ou le propriétaire de la lecon peut executer cette action */
@@ -218,7 +218,7 @@ const lessonController = {
         });
 
         if(findLesson && findLesson.id !== lessonId){
-            throw ({ message: 'ce titre est déja pris', statusCode:'400' });
+            throw ({ message: 'ce titre est déja pris', statusCode:'409' });
         }
                 
         /** mise a jour des données */
