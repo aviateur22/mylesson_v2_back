@@ -73,7 +73,7 @@ const userController={
 
         let user = await User.findOne({
             where: {
-                email:email 
+                email: email 
             }
         });
 

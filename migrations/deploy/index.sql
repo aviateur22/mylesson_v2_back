@@ -2,8 +2,12 @@
 
 BEGIN;
 
-CREATE INDEX "user_index" ON "user" ("email", "login");
+CREATE INDEX "login_index" ON "user" USING hash ("login");
 
-CREATE INDEX "lesson_index" ON "lesson" ("title", "slug");
+CREATE INDEX "email_index" ON "user" USING hash ("email");
+
+CREATE INDEX "title_index" ON "lesson" USING hash ("title");
+
+CREATE INDEX "slug_index" ON "lesson" USING hash ("slug");
 
 COMMIT;
