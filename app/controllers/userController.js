@@ -82,11 +82,13 @@ const userController={
         }
         
         /** vérification login */
-        user = User.findOne({
+        user = await User.findOne({
             where: {
                 login: login
             }
         });
+
+        console.log(user);
 
         /** login utilisé */
         if(user) {      
