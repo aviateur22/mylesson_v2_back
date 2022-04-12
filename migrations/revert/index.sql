@@ -4,7 +4,7 @@ BEGIN;
 
  DROP INDEX "title_index";
 
- DROP INDEX "slug_sindex";
+ DROP INDEX "slug_index";
 
  DROP INDEX "email_index";
 

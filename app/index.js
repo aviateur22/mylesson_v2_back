@@ -7,7 +7,8 @@ const router = require('./routers');
 //Inclu pour fectionner les cookie sur le navigateur
 app.set('trust proxy', 1);
 
-const corsOptions = {    
+const corsOptions = {   
+     
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     origin:process.env.CORS_ORIGIN.split(',')

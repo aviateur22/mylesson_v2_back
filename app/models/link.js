@@ -5,7 +5,7 @@ class Link extends Model{}
 
 Link.init({
     compagny_name : DataTypes.STRING,
-    picture_name : DataTypes.STRING
+    image_name : DataTypes.STRING
 }, {
     sequelize,
     tableName:'link'

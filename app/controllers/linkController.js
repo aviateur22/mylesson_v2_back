@@ -239,12 +239,12 @@ const linkController = {
         }
 
         /** si le media n'est pas repertirioé */
-        if(!mediaRequest.picture_name){
+        if(!mediaRequest.image_name){
             throw ({message: 'l\'identififiant du media est inconnu', statusCode:'400'});
         }
 
         /** mise en forme de l'url */
-        const url = process.env.FOLDER_MEDIA + mediaRequest.picture_name;
+        const url = process.env.FOLDER_MEDIA + mediaRequest.image_name;
 
         return res.status(200).json({
             pathUrl: url

@@ -59,12 +59,19 @@ INSERT INTO "tag" ("name","image_id") VALUES
 ('axios',1),
 ('fetch',1),
 ('jest',1),
+('cookie',1),
 ('poo',1),
 ('bracket',15);
 
-
-INSERT INTO "link" ("compagny_name","picture_name") VALUES
+INSERT INTO "link" ("compagny_name","image_name") VALUES
 ('github', 'github.png'),
 ('facebook', 'facebook.png'),
-('linkedin','linkedin.png');
+('linkedin','linkedin.png'),
+('defaultLink', 'unknow.png');
+
+INSERT INTO "thematic" ("name", "image_name") VALUES
+('tutorial', 'tutorial.png'),
+('lesson', 'lesson.png'),
+('defaultThematic', 'unknow.png');
+
 COMMIT;

@@ -1,6 +1,7 @@
 /**
  * schéma de validation création d'une nouvelle leçon
  */
+const { number } = require('joi');
 const Joi = require('joi');
 module.exports = Joi.object({
     /** tag - non utilisé */
@@ -24,6 +25,14 @@ module.exports = Joi.object({
             'any.required': 'le contenu de la leçon ne peut pas être vide'  
         }),
 
+    /** résumé de la lecon */
+    summary: Joi.string()
+        .required()  
+        .messages({    
+            'string.empty': 'le résumé de la leçon est obligatoire',
+            'any.required': 'le résumé de la leçon est obligatoire'  
+        }),
+
     /** id des tags */
     tagId: Joi
         .string()
@@ -43,6 +52,14 @@ module.exports = Joi.object({
         .messages({
             'number.base': 'le format de l\'identifiant utilisateur est incorrect',
             'any.required': 'l\'identifiant utilisateur est obligatoire'
+        }),
+    
+    thematicId: Joi
+        .number()
+        .required()
+        .messages({
+            'number.base': 'le format de l\'identifiant de la thématique est incorrect',
+            'any.required': 'la sélection d\'une thématique est obligatoire'
         }),
         
     formToken: Joi

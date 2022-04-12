@@ -5,6 +5,7 @@ const tagRouter = require('./tagRouter');
 const lessonRouter = require('./lessonRouter');
 const userRouter = require('./userRouter');
 const linkRouter = require('./linkRouter');
+const thematicRouter = require('./thematicRouter');
 
 /**Gestion requete client */
 router.use('/users',resHeaderMiddleware, userRouter);
@@ -17,5 +18,8 @@ router.use('/links', linkRouter);
 
 /** tags d'une lecon */
 router.use('/tags', tagRouter);
+
+/** thematcs des lecons */
+router.use('/thematics', thematicRouter);
 
 module.exports = router;

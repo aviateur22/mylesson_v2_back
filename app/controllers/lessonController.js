@@ -1,6 +1,6 @@
 const sanitizer = require('sanitizer');
 const { Op } = require('sequelize');
-const {Lesson, Tag, User, LessonTag} = require('../models/index');
+const {Lesson, Tag, User, LessonTag, Thematic} = require('../models/index');
 const CRYPTO_AES = require('../helpers/security/aes');
 const aes = new CRYPTO_AES();
 const userRole = require('../helpers/userRole');
@@ -40,22 +40,48 @@ const lessonController = {
             throw ({message: 'votre identifiant utilisateur est manquant', statusCode:'400'});
         }
 
-        //recuperation tagId, title, content
-        const {tagId, title, content} = req.body;
+        //recuperation tagId, title, content et résumé
+        const {tagId, title, content, summary} = req.body;
+
+        //récuperation de la thematique
+        const thematicId = parseInt(req.body.thematicId, 10);
+
+        /** format incorrect thématique */
+        if(isNaN(thematicId)){
+            throw ({ message: 'l\'identifiant de la thématique est incorrect', statusCode:'400' });
+        }
+
+        /** thématique absente */
+        if(!thematicId){
+            throw ({ message: 'l\'identifiant de la thématique est incorrect', statusCode:'400' });
+        }
+
+        /** vérification existence thematique */
+        const thematic = await Thematic.findOne({
+            where: {
+                id: thematicId
+            }
+        });
 
         /**titre et content manquant */
-        if(!title, !content){
-            throw ({ message: 'le titre et contenu de la leçon ne peuvent pas être vide', statusCode:'400' });
+        if(!thematic){
+            throw ({ message: 'cette thématique n\'existe pas', statusCode:'400' });
+        }        
+
+        /**titre et content manquant */
+        if(!title, !content, !summary){
+            throw ({ message: 'le titre, résumé et contenu de la leçon ne peuvent pas être vide', statusCode:'400' });
         }
 
         /**id tag manquant */
         if(!tagId){
-            throw ({ message: 'tags id absent', statusCode:'422' });
+            throw ({ message: 'tags id absent', statusCode:'400' });
         }
 
         /**Nettoyage des données utilisateur */
         const contentEscape = sanitizer.escape(content);
         const titleEscape = sanitizer.escape(title);
+        const summaryEscape = sanitizer.escape(summary);
 
         //création d'un tableau tags id
         const tags = tagId.split('/').map(tag => parseInt(tag, 10));
@@ -70,7 +96,9 @@ const lessonController = {
         /** slug de la leçon*/
         let slug = titleEscape.trim().replace(/\s/g,'-');
         /** supprime les accents */
-        slug = slug.normalize('NFD').replace(/[\u0300-\u036f]/g, '');        
+        slug = slug.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        /** écrit en minuscule */        
+        slug = slug.toLowerCase();
 
         /** verification si slug de disponible */
         const findLesson = await Lesson.findOne({
@@ -87,7 +115,9 @@ const lessonController = {
         /** Création de le leçon */
         let createLesson = await Lesson.create({
             title: titleEscape,
-            content : contentEscape,
+            content : content,
+            summary: summaryEscape,
+            thematic_id: thematicId,
             user_id: userId ,
             slug: slug    
         });
@@ -111,7 +141,7 @@ const lessonController = {
 
         /**Recuperation de la leçon */
         createLesson = await Lesson.findByPk(id,{
-            include:['lessonsTags',
+            include:['thematic', 'lessonsTags',
                 {
                     association: 'user',
                     include:['links']        
@@ -122,7 +152,9 @@ const lessonController = {
             id: createLesson.id,
             title: createLesson.title,
             content: createLesson.content,
-            tags: createLesson.lessonsTags,
+            summary: createLesson.summary,
+            tags: createLesson.lessonsTags,      
+            thematic: createLesson.thematic,      
             autor: createLesson.user.login,
             links: createLesson.user.links,
             avatarKey: createLesson.user.avatar_key,
@@ -138,9 +170,7 @@ const lessonController = {
      */
     getAll: async(req, res, next)=>{
         const lessons = await Lesson.findAll({
-            include:{
-                model: Tag, as: 'lessonsTags'
-            }
+            include:['lessonsTags', 'thematic']
         });
         return res.json(lessons);
     },
@@ -149,14 +179,6 @@ const lessonController = {
      * update d'une leçon
      */
     updateById: async(req, res, next)=>{
-        //récupération de l'utilisateur
-        const userId = req.userId;
-
-        /** si pas de userId */
-        if(!userId){
-            throw ({message: 'votre identifiant utilisateur est manquant', statusCode:'400'});
-        }
-
         //recuperation id de la lesson
         const lessonId = parseInt(req.params.lessonId, 10);
 
@@ -169,19 +191,44 @@ const lessonController = {
         if(!lessonId){
             throw ({message: 'l\'identifiant de la leçon est manquant', statusCode:'400'});
         }
+        //récupération de l'utilisateur
+        const userId = req.userId;
+
+        /** si pas de userId */
+        if(!userId){
+            throw ({message: 'votre identifiant utilisateur est manquant', statusCode:'400'});
+        }  
+        
+        //récuperation de la thematique
+        const thematicId = parseInt(req.body.thematicId, 10);
+
+        /** format incorrect thématique */
+        if(isNaN(thematicId)){
+            throw ({ message: 'l\'identifiant de la thématique est incorrect', statusCode:'400' });
+        }
+
+        /** thématique absente */
+        if(!thematicId){
+            throw ({ message: 'l\'identifiant de la thématique est incorrect', statusCode:'400' });
+        }
 
         //recuperation des données du formulaire
-        const { tagId, title, content } = req.body;
+        const { tagId, title, content, summary} = req.body;
         
+        /**id tag manquant */
+        if(!tagId){
+            throw ({ message: 'tags id absent', statusCode:'400' });
+        }
 
         /** données lecon manquantes */
-        if(!tagId || !title || !content){
-            throw ({message: 'le titre, tag et contenu de la leçon sont obligatoire', statusCode:'400'});
+        if(!title || !content || !summary){
+            throw ({message: 'le titre, résumé et contenu de la leçon ne peuvent pas être vide', statusCode:'400'});
         }
 
         /**Nettoyage des données utilisateur */
         const contentEscape = sanitizer.escape(content);
         const titleEscape = sanitizer.escape(title);
+        const summaryEscape = sanitizer.escape(summary);
 
         //création d'un tableau tags id
         const tags = tagId.split('/').map(tag => parseInt(tag, 10));
@@ -208,7 +255,9 @@ const lessonController = {
         /** slug de la leçon*/
         let slug = titleEscape.trim().replace(/\s/g,'-');
         /** supprime les accents */
-        slug = slug.normalize('NFD').replace(/[\u0300-\u036f]/g, '');        
+        slug = slug.normalize('NFD').replace(/[\u0300-\u036f]/g, '');    
+        /** écrit en minuscule */        
+        slug = slug.toLowerCase();    
 
         /** verification si le titre est disponible */
         const findLesson = await Lesson.findOne({
@@ -222,7 +271,7 @@ const lessonController = {
         }
                 
         /** mise a jour des données */
-        const newLessonData = { ...lesson, ...{ title: titleEscape, content, slug: slug } };
+        const newLessonData = { ...lesson, ...{ title: titleEscape, content, slug: slug, summary: summaryEscape, thematic_id: thematicId } };
 
         let updateLesson = await lesson.update({
             ...newLessonData
@@ -250,7 +299,7 @@ const lessonController = {
 
         /**Recuperation de la leçon */
         updateLesson = await Lesson.findByPk(lessonId,{
-            include:['lessonsTags',
+            include:['thematic', 'lessonsTags',
                 {
                     association: 'user',
                     include:['links']        
@@ -259,17 +308,19 @@ const lessonController = {
         });   
        
         return res.status(200).json({     
-            id: updateLesson.id,       
+            id: updateLesson.id,
             title: updateLesson.title,
             content: updateLesson.content,
-            tags: updateLesson.lessonsTags,
+            summary: updateLesson.summary,
+            tags: updateLesson.lessonsTags,      
+            thematic: updateLesson.thematic,      
             autor: updateLesson.user.login,
             links: updateLesson.user.links,
             avatarKey: updateLesson.user.avatar_key,
             slug: updateLesson.slug,
             created: updateLesson.formatedCreationDate,
-            updated: updateLesson.formatedUpdateDate,            
-            token: res.formToken
+            updated: updateLesson.formatedUpdateDate,
+            token: req.body.formToken  
         });
     },
    
@@ -294,13 +345,16 @@ const lessonController = {
         const lesson =await Lesson.findByPk(lessonId, {
             include:[
                 {
-                    association: 'lessonsTags', 
+                    association:'lessonsTags', 
                     include :'image',
                     order:['lessonsTags','updated_at', 'DESC']
                 },                
                 {
                     association: 'user',
                     include:['links']        
+                },
+                {
+                    association: 'thematic'
                 }
             ]
         });
@@ -324,12 +378,16 @@ const lessonController = {
             const imageName =lesson.lessonsTags[0].image.name;
             lessonImageUrl = process.env.FOLDER_LESSON + imageName;
         }
+
+        console.log(lesson.thematic)
         
         /**Renvoide la leçon */
         return res.status(200).json({
             title: lesson.title,
             content: lesson.content,
             tags: lesson.lessonsTags,
+            summary: lesson.summary,
+            thematic: lesson.thematic,
             autor: lesson.user.login,
             links: lesson.user.links,
             avatarKey: lesson.user.avatar_key,
@@ -478,22 +536,24 @@ const lessonController = {
             where:{
                 user_id: userId 
             },
-            include: ['lessonsTags', 'user']
+            include: ['lessonsTags', 'user', 'thematic']
         });
         
-        /**
-         * Filtrage des informations 
-         */
-        const lessons = resultsLessons.map(element => {
-            const lesson = {};
-            lesson.id = element.id;                        
-            lesson.title = element.title;
-            lesson.lessonsTags = element.lessonsTags;
-            lesson.slug = element.slug;
-            lesson.content = element.content,
-            lesson.created_at =  element.formatedCreationDate;  
-            return lesson;
+        /** ajout de l'url de l'image de la thématique */
+        const lessons = resultsLessons.map(lesson => {
+            let lessonMap = {};
+            lessonMap.id = lesson.id;                        
+            lessonMap.title = lesson.title;
+            lessonMap.lessonsTags = lesson.lessonsTags;
+            lessonMap.slug = lesson.slug;
+            lessonMap.content = lesson.content,
+            lessonMap.created_at =  lesson.formatedCreationDate;  
+            lessonMap.summary =  lesson.summary; 
+            lessonMap.thematicImageUrl = process.env.FOLDER_THEMATIC + lesson.thematic.image_name;
+            
+            return lessonMap;
         });
+           
         return res.json(lessons);  
     },
 
@@ -509,7 +569,7 @@ const lessonController = {
         if(tags.length === 0){
             //return res.redirect('/');
             lessonByTag = await Lesson.findAll({
-                include:['lessonsTags'],
+                include:['lessonsTags', 'thematic'],
                 order:[
                     ['updated_at', 'DESC']
                 ]
@@ -531,13 +591,29 @@ const lessonController = {
                 where:{
                     id: lessonsId
                 },
-                include:['lessonsTags'],
+                include:['lessonsTags', 'thematic'],
                 order:[
                     ['updated_at', 'DESC']
                 ]                
             });
         }
-        return res.status(200).json(lessonByTag);
+
+        /** ajout de l'url de l'image de la thématique */
+        const lessons = lessonByTag.map(lesson => {
+            let lessonMap = {};
+            lessonMap.id = lesson.id;                        
+            lessonMap.title = lesson.title;
+            lessonMap.lessonsTags = lesson.lessonsTags;
+            lessonMap.slug = lesson.slug;
+            lessonMap.content = lesson.content,
+            lessonMap.created_at =  lesson.formatedCreationDate;  
+            lessonMap.summary =  lesson.summary; 
+            lessonMap.thematicImageUrl = process.env.FOLDER_THEMATIC + lesson.thematic.image_name;
+            
+            return lessonMap;
+        });
+       
+        return res.status(200).json(lessons);
     },
 
 };

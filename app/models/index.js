@@ -6,6 +6,8 @@ const LessonTag = require('./lessonTag');
 const Link = require('./link');
 const UserLink = require('./userLink');
 const Image = require('./image');
+const Thematic = require('./thematic');
+const { hasMany } = require('./user');
 
 User.belongsTo(Role,{
     foreignKey:'role_id',
@@ -47,4 +49,14 @@ Link.belongsToMany(User,{
     through: UserLink
 });
 
-module.exports = { User, Role, Tag, Lesson, LessonTag, Link, UserLink, Image};
+Lesson.belongsTo(Thematic,{
+    foreignKey: 'thematic_id',
+    as: 'thematic'
+});
+
+Thematic.hasMany(Lesson,{
+    foreignKey: 'thematic_id',
+    as: 'thematics'
+});
+
+module.exports = { User, Role, Tag, Lesson, LessonTag, Link, UserLink, Image, Thematic};
