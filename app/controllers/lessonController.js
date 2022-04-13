@@ -159,6 +159,7 @@ const lessonController = {
             links: createLesson.user.links,
             avatarKey: createLesson.user.avatar_key,
             slug: createLesson.slug,
+            created_at: createLesson.created_at,
             created: createLesson.formatedCreationDate,
             updated: createLesson.formatedUpdateDate,
             token: req.body.formToken  
@@ -331,7 +332,6 @@ const lessonController = {
     getById: async(req, res, next)=>{        
         /**Vérification id */
         const lessonId =parseInt(req.params.lessonId, 10);
-        
         /** mauvais format de lecon id */
         if(isNaN(lessonId)){
             throw ({message: 'le format de l\'identifiant de la leçon est incorrect', statusCode:'400'});
@@ -369,18 +369,15 @@ const lessonController = {
 
         /** recuperation de l'image associé au tag*/
         let lessonImageUrl;
+
         if(lesson.lessonsTags.length > 0){
             let tags = lesson.lessonsTags;
-
             /** filtre les tags par anciennté (le but conserver l'image de la lecon d'origine) */
             tags = tags.sort((tagA, TagB) => tagA.lesson_has_tag.updated_at - TagB.lesson_has_tag.updated_at);
             /** nom de l'image */
             const imageName =lesson.lessonsTags[0].image.name;
             lessonImageUrl = process.env.FOLDER_LESSON + imageName;
-        }
-
-        console.log(lesson.thematic)
-        
+        }        
         /**Renvoide la leçon */
         return res.status(200).json({
             title: lesson.title,
@@ -442,7 +439,7 @@ const lessonController = {
         let lessonImageUrl;
         if(lesson.lessonsTags.length > 0){
             let tags = lesson.lessonsTags;
-
+            
             /** filtre les tags par anciennté (le but conserver l'image de la lecon d'origine) */
             tags = tags.sort((tagA, TagB) => tagA.lesson_has_tag.updated_at - TagB.lesson_has_tag.updated_at);
             /** nom de l'image */
@@ -536,7 +533,10 @@ const lessonController = {
             where:{
                 user_id: userId 
             },
-            include: ['lessonsTags', 'user', 'thematic']
+            include: ['lessonsTags', 'user', 'thematic'],
+            order:[
+                ['updated_at', 'DESC']
+            ] 
         });
         
         /** ajout de l'url de l'image de la thématique */

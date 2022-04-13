@@ -21,6 +21,7 @@ if(process.env.NODE_ENV === 'production'){
 } else {
     /** connection en local */
     sequelize = new Sequelize(process.env.DATABASE_URL,{
+        logging: false,
         define:{
             underscored:true,
             updatedAt: 'updated_at',
