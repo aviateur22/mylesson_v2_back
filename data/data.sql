@@ -67,11 +67,9 @@ INSERT INTO "link" ("compagny_name","image_name") VALUES
 ('github', 'github.png'),
 ('facebook', 'facebook.png'),
 ('linkedin','linkedin.png'),
-('defaultLink', 'unknow.png');
 
 INSERT INTO "thematic" ("name", "image_name") VALUES
 ('tutorial', 'tutorial.png'),
 ('lesson', 'lesson.png'),
-('defaultThematic', 'unknow.png');
 
 COMMIT;
