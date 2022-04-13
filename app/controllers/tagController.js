@@ -29,9 +29,11 @@ const tagController = {
                 }
             });
             if(findTag){
-                res.status(200).json(findTag); 
+                return res.status(200).json(findTag); 
             }
         }
+        /** plus de 10 caractere */
+        res.status(204).json();
     },
 
     /**ajout d'un nouveau tag */
