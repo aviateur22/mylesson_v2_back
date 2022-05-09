@@ -3,3 +3,4 @@
 
 initdb 2022-01-23T14:58:45Z cyrille cadé <aviateur22@hotmail.fr> # init tables
 index 2022-04-06T20:29:18Z cyrille cadé <aviateur22@hotmail.fr> # add index on table
+updateUserRole 2022-05-09T13:51:58Z cyrille cadé <aviateur22@hotmail.fr> # remplacement token par updateRole

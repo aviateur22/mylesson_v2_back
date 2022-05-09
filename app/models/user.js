@@ -7,7 +7,7 @@ User.init({
     login : DataTypes.STRING,
     email :  DataTypes.STRING,
     password : DataTypes.STRING,
-    token: DataTypes.STRING,
+    request_upgrade_role: DataTypes.BOOLEAN,
     sex: DataTypes.STRING,
     avatar_key: DataTypes.STRING
 },{

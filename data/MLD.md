@@ -1,4 +1,4 @@
-user(id, email, login, password, avatar_url, token, #role_id)
+user(id, email, login, password, avatar_url, upgrade_role, #role_id)
 role(id, name)
 link(id, compagnie_name, picture_name,)
 lesson(id, title, content, summary, #thematic_id, #user_id)
