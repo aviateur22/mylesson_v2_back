@@ -62,6 +62,7 @@ INSERT INTO "tag" ("name","image_id") VALUES
 ('cookie',1),
 ('poo',1),
 ('bracket',15);
+('hook',1);
 
 INSERT INTO "link" ("compagny_name","image_name") VALUES
 ('github', 'github.png'),
@@ -71,5 +72,7 @@ INSERT INTO "link" ("compagny_name","image_name") VALUES
 INSERT INTO "thematic" ("name", "image_name") VALUES
 ('tutorial', 'tutorial.png'),
 ('lesson', 'lesson.png');
+('conseil', 'lesson.png');
+('astuce', 'lesson.png');
 
 COMMIT;
