@@ -96,5 +96,12 @@ router.post('/filter/tags',
     joiValidation(lessonSchemaValidation.lessonFilterByTagShema),
     controllerHandler(lessonController.getLessonByTag));
 
+router.get('/admin-request/:lessonId', 
+    controllerHandler(cookieMiddleware),
+    controllerHandler(authorization),
+    controllerHandler(roleMiddleware.user), 
+    controllerHandler(lessonController.adminRequest)
+);
+
 module.exports = router;
 

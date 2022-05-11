@@ -151,6 +151,7 @@ const userController={
             sex: user.sex,
             avatarKey: user.avatar_key,
             links: user.links,
+            token: token,
             requestRoleUpgrade: user.request_upgrade_role
         });
     },
@@ -239,6 +240,7 @@ const userController={
             avatarKey: userData.avatar_key,
             sex: userData.sex,
             usersLinks: userData.usersLinks,
+            requestRoleUpgrade: userData.request_upgrade_role,
             token: req.body.formToken
         });
     },
@@ -286,6 +288,7 @@ const userController={
             avatarKey: updateUser.avatar_key,
             sex: updateUser.sex,
             usersLinks: updateUser.usersLinks,
+            requestRoleUpgrade: updateUser.request_upgrade_role,
             token: req.body.formToken
         });
     },
@@ -374,6 +377,7 @@ const userController={
             avatarKey: updateUser.avatar_key,
             sex: updateUser.sex,
             usersLinks: updateUser.usersLinks,
+            requestRoleUpgrade: updateUser.request_upgrade_role,
             token: req.body.formToken
         });
     },
@@ -437,10 +441,17 @@ const userController={
         const newData = { ...user, ...{request_upgrade_role: true}};
 
         /**demande de devenir éditeur */
-        const upgradeRole = await user.update(newData);
+        const upgradeUserRole = await user.update(newData);
 
-        return res.status(200).json({
-            id: upgradeRole.id
+        return res.status(200).json({            
+            id: upgradeUserRole.id,
+            login: upgradeUserRole.login,
+            email: upgradeUserRole.email,
+            avatarKey: upgradeUserRole.avatar_key,
+            sex: upgradeUserRole.sex,
+            usersLinks: upgradeUserRole.usersLinks,
+            requestRoleUpgrade: upgradeUserRole.request_upgrade_role,
+            token: req.body.formToken
         });
     }
 

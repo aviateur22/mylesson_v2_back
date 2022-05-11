@@ -19,8 +19,8 @@ Lesson.init({
     title : DataTypes.STRING,
     content:DataTypes.STRING,
     slug: DataTypes.STRING,
-    summary: DataTypes.STRING
-
+    summary: DataTypes.STRING,
+    admin_request: DataTypes.BOOLEAN
 },{
     sequelize,
     tableName:'lesson'

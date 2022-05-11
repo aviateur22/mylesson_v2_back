@@ -449,6 +449,7 @@ const lessonController = {
         
         /**Renvoide la leçon */
         return res.status(200).json({
+            id: lesson.id,
             title: lesson.title,
             content: lesson.content,
             tags: lesson.lessonsTags,
@@ -456,6 +457,7 @@ const lessonController = {
             links: lesson.user.links,
             avatarKey: lesson.user.avatar_key,
             slug: lesson.slug,
+            adminRequest: lesson.admin_request,
             created: lesson.formatedCreationDate,
             updated: lesson.formatedUpdateDate,
             lessonImageUrl 
@@ -569,6 +571,9 @@ const lessonController = {
         if(tags.length === 0){
             //return res.redirect('/');
             lessonByTag = await Lesson.findAll({
+                where:{
+                    admin_request: false
+                },
                 include:['lessonsTags', 'thematic'],
                 order:[
                     ['updated_at', 'DESC']
@@ -589,7 +594,8 @@ const lessonController = {
             /** recuperation de toutes les lecons */
             lessonByTag = await Lesson.findAll({            
                 where:{
-                    id: lessonsId
+                    id: lessonsId,
+                    admin_request: false
                 },
                 include:['lessonsTags', 'thematic'],
                 order:[
@@ -615,6 +621,38 @@ const lessonController = {
        
         return res.status(200).json(lessons);
     },
+
+    adminRequest: async(req, res, next)=>{
+        //recuperation id de la lesson
+        const lessonId = parseInt(req.params.lessonId, 10);
+
+        //id pas au format numeric
+        if(isNaN(lessonId)){
+            throw ({message: 'le format de l\'identifiant de la leçon est incorrect', statusCode:'400'});
+        }
+
+        /** id lecon manquant */
+        if(!lessonId){
+            throw ({message: 'l\'identifiant de la leçon est manquant', statusCode:'400'});
+        }
+
+        /**récupération de la lecon */
+        const findLesson = await Lesson.findByPk(lessonId);
+
+        if(!findLesson){
+            throw ({message: 'la leçon n\'est pas présente en base de données', statusCode:'404'});
+        }
+
+        const newData = {...findLesson, ...{admin_request: !findLesson.admin_request}};
+
+        /**mise a jour du status request admin */
+        const adminRequest = await findLesson.update(newData);
+
+        res.status(200).json({
+            id: adminRequest.id,
+            adminRequest: adminRequest.admin_request
+        });
+    }
 
 };
 module.exports = lessonController;

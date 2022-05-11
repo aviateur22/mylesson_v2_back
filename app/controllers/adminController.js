@@ -62,7 +62,8 @@ const adminController={
             /**objet pour contenir les sonnées à renvoyer */
             const userData = {};
             userData.id = user.id;
-            userData.email = user.login;
+            userData.login = user.login;
+            userData.avatar = user.avatar_key;
             return userData;
         });
 

@@ -29,7 +29,7 @@ Content-Type: application/json
 }
 
 ### token pour requete
-@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOjMsImlhdCI6MTY0OTc2OTA1NSwiZXhwIjoxNjQ5NzcwODU1LCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiNDVlMDRjMGMtYmI0NS00MWY5LWE4MTgtZDQ3MGJiM2Y5ZTViIn0.LbtlpWp4Ul6tK7D4PJb6_hhiVycMgozt10Fvn_cUIf4
+@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOjIsImlhdCI6MTY1MjMwMjI5OCwiZXhwIjoxNjUyMzA0MDk4LCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiYmE2MGMyMGItOTJhNS00NWVhLTg0MTAtNDhmZThkYWNmMGIyIn0.uHTYwACk09c20lUeSBljAznTiNdxjdAc6Cs8wfBSd1o
 
 ### creation d'une lecon
 POST {{uri}}/api/lessons
@@ -110,6 +110,15 @@ Content-Type: application/json
 
 ### récuperation lecon par son slug
 GET {{uri}}/api/lessons/slug/dss
+Cookie: {{jwtToken}}
+Content-Type: application/json
+
+{
+
+}
+
+### admin reuqtes
+GET {{uri}}/api/lessons/admin-request/11
 Cookie: {{jwtToken}}
 Content-Type: application/json
 
