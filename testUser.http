@@ -18,7 +18,7 @@ Content-Type: application/json
 
 {
     "email":"aaa@gmail.com",
-    "password":"Affirmer2010@"
+    "password":"Affirmer2011@"
 }
 
 ### connexion user avec droit en écriture
@@ -40,7 +40,7 @@ Content-Type: application/json
 }
 
 ### token pour requete
-@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOjMsImlhdCI6MTY0ODg4MjM4NCwiZXhwIjoxNjQ4ODg0MTg0LCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiN2YzMzMxZDAtNDVjYS00OGJiLThmYjAtMDY3ZWIyOTFjYWVhIn0.xy6DFxLnl3Xq1C1r2xo_WqpqS6K5xJFCcQJSNNAEZoM
+@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOjMsImlhdCI6MTY1MjI2OTU3OSwiZXhwIjoxNjUyMjcxMzc5LCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiYjVjNTVjMDMtMTMyOC00NjE3LWI5MDQtNTY2NmFlOTZlM2IxIn0.RhvJzK25wT5NHfJ9NORH11e_oHTHuH8BYGMe7BHcRpc
 
 
 ### modification d'utilisateur par son id
@@ -102,6 +102,15 @@ Content-Type: application/json
 
 ### recuperer image media
 POST {{uri}}/api/users/logout
+Content-Type: application/json
+
+{
+
+}
+
+### demande de modification des privilege utilisateur
+GET  {{uri}}/api/users/request-upgrade-privilege/4
+Cookie: {{jwtToken}}
 Content-Type: application/json
 
 {

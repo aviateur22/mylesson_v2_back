@@ -124,4 +124,10 @@ router.patch('/image/:userId',
 router.get('/image/autor/:key',
     controllerHandler(userController.getAvatarByKey));
 
+router.get('/request-upgrade-privilege/:userId',
+    controllerHandler(cookieMiddleware),
+    controllerHandler(authorizationMiddleware),
+    controllerHandler(roleMiddleware.user),    
+    controllerHandler(belongToMiddleware),
+    controllerHandler(userController.userUpgradeRoleRequest));
 module.exports=router;

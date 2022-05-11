@@ -1,0 +1,61 @@
+# uribase
+@uri = http://localhost:{{$dotenv PORT}}
+
+### inscription
+POST {{uri}}/api/users
+Content-Type: application/json
+
+{
+    "login":"aaa",
+    "email":"aaa@gmail.com",
+    "password":"Affirmer2011@",
+    "confirmPassword":"Affirmer2011@"
+}
+
+### connexion user avec droit en lecture
+POST {{uri}}/api/users/login
+Content-Type: application/json
+
+{
+    "email":"aaa@gmail.com",
+    "password":"Affirmer2011@"
+}
+
+### connexion user avec droit en écriture
+POST {{uri}}/api/users/login
+Content-Type: application/json
+
+{
+    "email":"aviateur22@hotmail.fr",
+    "password":"aaaa"
+}
+
+### connexion user avec droit admin
+POST {{uri}}/api/users/login
+Content-Type: application/json
+
+{
+    "email":"aviateur22@gmail.com",
+    "password":"aaaa"
+}
+
+### token pour requete
+@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOjMsImlhdCI6MTY1MjI3MTM3OSwiZXhwIjoxNjUyMjczMTc5LCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiYjlkNWNhNGMtOWFiZi00NDRmLTk5MWQtMGQwODgyMWI3NmE3In0.SEYRv5GhmScuG_j1wa6XGR68-qc7TnpEzCxKYuDy1y0
+
+
+### modification role utilisateur
+patch {{uri}}/api/admin/upgrade-user/2
+Cookie: {{jwtToken}}
+Content-Type: application/json
+
+{
+}
+
+### liste  des utilisateur voulant editer
+GET {{uri}}/api/admin/upgrade-request
+Cookie: {{jwtToken}}
+Content-Type: application/json
+
+{
+
+}

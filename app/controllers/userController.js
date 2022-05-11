@@ -139,7 +139,7 @@ const userController={
 
         /** Pas de données */
         if(!user){
-            return res.status(204).json({});
+            throw ({message: 'utilisateur absent de la base de données', statusCode:'404'});
         }
 
         const token = res.formToken;
@@ -151,7 +151,7 @@ const userController={
             sex: user.sex,
             avatarKey: user.avatar_key,
             links: user.links,
-            token
+            requestRoleUpgrade: user.request_upgrade_role
         });
     },
 
@@ -306,13 +306,13 @@ const userController={
 
         /** utilisateur absent de la base de données */
         if(!deleteUser){
-            return res.status(204).json({});
+            return res.status(404).json({});
         }
 
         /** suppression utilisatzur */
         await deleteUser.destroy();       
 
-        return res.status(200).json(deleteUser);
+        return res.status(204).json();
     },
 
     /**
@@ -404,6 +404,44 @@ const userController={
             return mapUsers;
         });
         return res.json(users);  
+    },
+
+    /**
+     * demande pour devenir éditeur
+     */
+    userUpgradeRoleRequest: async(req, res, next)=>{
+        //récupération de l'utilisateur
+        const userId = req.userId;
+
+        /** si pas de id */
+        if(!userId){
+            throw ({message: 'votre identifiant utilisateur est manquant', statusCode:'400'});            
+        }
+
+        /** recherche utilisateur */
+        const user = await User.findByPk(userId);
+
+        if(!user){
+            throw ({message: 'utilisateur abasent de la base de données', statusCode:'404'});
+        }
+
+        if(user.request_upgrade_role===true){
+            return res.status(200).json({      
+                id: user.id,
+                message: 'demande en cours de traitement'         
+            });
+        }
+
+
+        /** nouvelles données utilisateurs */
+        const newData = { ...user, ...{request_upgrade_role: true}};
+
+        /**demande de devenir éditeur */
+        const upgradeRole = await user.update(newData);
+
+        return res.status(200).json({
+            id: upgradeRole.id
+        });
     }
 
 };
