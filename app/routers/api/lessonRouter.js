@@ -40,7 +40,7 @@ router.post('/',
 router.get('/token/:userId', 
     controllerHandler(cookieMiddleware),
     controllerHandler(authorization),
-    controllerHandler(roleMiddleware.writer),
+    controllerHandler(roleMiddleware.user),
     controllerHandler(belongToMiddleware),
     controllerHandler(formTokenMiddleware.setFormToken),
     controllerHandler(lessonController.getTokenByUserId));
@@ -96,10 +96,13 @@ router.post('/filter/tags',
     joiValidation(lessonSchemaValidation.lessonFilterByTagShema),
     controllerHandler(lessonController.getLessonByTag));
 
-router.get('/admin-request/:lessonId', 
+/** demande un admin pour controller une lecon*/
+router.post('/admin-request/:lessonId', 
     controllerHandler(cookieMiddleware),
     controllerHandler(authorization),
     controllerHandler(roleMiddleware.user), 
+    joiValidation(lessonSchemaValidation.requestLessonAdminCheck),
+    controllerHandler(formTokenMiddleware.getFormToken),
     controllerHandler(lessonController.adminRequest)
 );
 

@@ -18,7 +18,7 @@ Content-Type: application/json
 
 {
     "email":"aaa@gmail.com",
-    "password":"Affirmer2011@"
+    "password":"Affirmer2010@"
 }
 
 ### connexion user avec droit en écriture
@@ -40,7 +40,7 @@ Content-Type: application/json
 }
 
 ### token pour requete
-@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOjMsImlhdCI6MTY1MjI3MTM3OSwiZXhwIjoxNjUyMjczMTc5LCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiYjlkNWNhNGMtOWFiZi00NDRmLTk5MWQtMGQwODgyMWI3NmE3In0.SEYRv5GhmScuG_j1wa6XGR68-qc7TnpEzCxKYuDy1y0
+@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOjMsImlhdCI6MTY1MjM4OTU1OCwiZXhwIjoxNjUyMzkxMzU4LCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiMzBiNjJlNDUtNWExNi00OWIyLTkyNTQtYmIyODEzYTBmZjMwIn0.f16lepw5Wz8tOg6_l6bNiZLnPA-CrOu6M4wpXpen_2s
 
 
 ### modification role utilisateur
@@ -53,6 +53,15 @@ Content-Type: application/json
 
 ### liste  des utilisateur voulant editer
 GET {{uri}}/api/admin/upgrade-request
+Cookie: {{jwtToken}}
+Content-Type: application/json
+
+{
+
+}
+
+### suppression utilisater
+POST {{uri}}/api/admin/delete-user/aaa
 Cookie: {{jwtToken}}
 Content-Type: application/json
 

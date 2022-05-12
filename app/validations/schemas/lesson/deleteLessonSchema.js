@@ -17,7 +17,5 @@ module.exports = Joi.object({
         .messages({
             'string.empty': 'token du formulaire invalide',
             'any.required': 'token du formulaire invalide'  
-        })
-
-    
+        })    
 });
