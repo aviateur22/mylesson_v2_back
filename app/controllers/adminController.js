@@ -4,6 +4,7 @@ const {User, Lesson} = require('../models');
 
 /**role utilisateur */
 const userRole = require('../helpers/userRole');
+const { boolean } = require('joi');
 
 const adminController={
 
@@ -12,6 +13,13 @@ const adminController={
      */
     upgradeUserPrivilige: async(req, res, next)=> {
         const userId = parseInt(req.params.userId, 10);
+
+        /** réponse TRUE ou FALSE */
+        const value =req.body.value;
+
+        if(!value){
+            throw ({message: 'format de réponse incorrect', statusCode:'400'});
+        }
 
         /** id utilisateur absent */
         if(!userId){
@@ -35,8 +43,16 @@ const adminController={
             throw ({message: 'utilisateur absent de la base de données', statusCode:'404'});
         }
 
+        console.log(value)
         /** nouvelles données utilisateurs */
-        const newData = { ...user, ...{role_id: userRole.writer, request_upgrade_role: false}};
+        let newData;
+        if(value === 'true'){
+            newData = { ...user, ...{role_id: userRole.writer, request_upgrade_role: false}};
+        } else if(value === 'false'){
+            newData = { ...user, ...{role_id: userRole.user, request_upgrade_role: false}};
+        } else {
+            throw ({message: 'format de réponse incorrect', statusCode:'400'});
+        }
 
         const updateUserRole = await user.update({
             ...newData
@@ -44,8 +60,7 @@ const adminController={
 
         return res.status(200).json({
             id: updateUserRole.id,
-            login: updateUserRole.login,
-            role: updateUserRole.role_id
+            value: value
         });
     },
 
@@ -116,9 +131,18 @@ const adminController={
         });
     },
 
-    /**
-     * récupération des lecon a caractere abusif 
-     */
+    /** Renvoie le nombre de utilisateur */
+    countUpgradeRequest: async(req, res, next)=>{
+        const users = await User.count({
+            where: {
+                request_upgrade_role: true
+            }
+        });
+
+        return res.status(200).json(users);
+    },
+
+    /** récupération des lecon a caractere abusif */
     getAllAbusiveContent: async(req, res, next)=>{
         const lessons = await Lesson.findAll({
             where:{
@@ -136,6 +160,17 @@ const adminController={
             return data;
         });
         return res.json(lessonMap);
+    },
+
+    /** Renvoie le nombre de contenu abusif */
+    countAbusiveContent: async(req, res, next)=>{
+        const lessons = await Lesson.count({
+            where:{
+                admin_request: true
+            }
+        });
+
+        return res.status(200).json(lessons);
     },
 
     /**

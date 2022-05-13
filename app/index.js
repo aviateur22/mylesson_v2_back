@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const path = require('path');
 const router = require('./routers');
 
 //Inclu pour fectionner les cookie sur le navigateur
@@ -10,7 +9,7 @@ app.set('trust proxy', 1);
 const corsOptions = {   
      
     credentials: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    methods: 'GET,PUT,PATCH,POST,DELETE',
     origin:process.env.CORS_ORIGIN.split(',')
 };
 
@@ -28,7 +27,5 @@ app.use(express.json());
 
 //Router middleware
 app.use(router);
-
-const c = process.cwd();
 
 module.exports = app;

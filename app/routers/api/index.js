@@ -9,10 +9,10 @@ const thematicRouter = require('./thematicRouter');
 const adminRouter = require('./adminRouter');
 
 /**Gestion requete client */
-router.use('/users',resHeaderMiddleware, userRouter);
+router.use('/users', userRouter);
 
 /**Gestion lessons */
-router.use('/lessons',resHeaderMiddleware, lessonRouter);
+router.use('/lessons', lessonRouter);
 
 /** gestion des links utilisateurs */
 router.use('/links', linkRouter);

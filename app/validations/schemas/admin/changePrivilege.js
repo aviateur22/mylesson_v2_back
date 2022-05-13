@@ -9,5 +9,11 @@ module.exports = Joi.object({
         .messages({
             'string.empty': 'token du formulaire invalide',
             'any.required': 'token du formulaire invalide'  
+        }),
+    value: Joi
+        .boolean()
+        .messages({
+            'string.empty': 'format de la réponse incorrect',
+            'any.required': 'format de la réponse incorrect'  
         })
 });

@@ -60,6 +60,22 @@ router.get('/abusive-content',
     controllerHandler(adminController.getAllAbusiveContent)
 );
 
+/**nombre de lecons abusif */
+router.get('/count/abusive-content',
+    controllerHandler(cookieMiddleware),
+    controllerHandler(authorizationMiddleware),    
+    controllerHandler(roleMiddleware.admin),
+    controllerHandler(adminController.countAbusiveContent)
+);
+
+/** nombre de d'upgrade request */
+router.get('/count/upgrade-request',
+    controllerHandler(cookieMiddleware),
+    controllerHandler(authorizationMiddleware),    
+    controllerHandler(roleMiddleware.admin),
+    controllerHandler(adminController.countUpgradeRequest)
+);
+
 /**suppréssion utilisateur */
 router.post('/delete-user/:userLogin',
     controllerHandler(cookieMiddleware),
