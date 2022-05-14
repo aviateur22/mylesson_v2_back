@@ -17,8 +17,8 @@ POST {{uri}}/api/users/login
 Content-Type: application/json
 
 {
-    "email":"aaa@gmail.com",
-    "password":"Affirmer2010@"
+    "email":"aviateur22@hotmail.fr",
+    "password":"aaaa"
 }
 
 ### connexion user avec droit en écriture
@@ -40,20 +40,29 @@ Content-Type: application/json
 }
 
 ### token pour requete
-@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOjMsImlhdCI6MTY1MjUyMTUxNywiZXhwIjoxNjUyNTIzMzE3LCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiYTZlMDEwYjItM2E1MS00ZWNmLThiZTItODIyNDkyOGRjZWE3In0.QRg0U2Wh3V2Ej9u2DviMV426kkyLjY69qdxhRdWhzZ8
+@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOjEsImlhdCI6MTY1MjU1MjQ4OCwiZXhwIjoxNjUyNTU0Mjg4LCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiMzRhZWYyZTItNjRlZi00ZDJjLTlhYWEtYzI2ZjU3Njg5YTYxIn0.Z8vOcPv-ssJL3yn9_rbTP7dS0cNVu_qQsk88siSg6SQ
 
 
-### modification role utilisateur
-patch {{uri}}/api/admin/upgrade-user/2
+### suppression notif
+DELETE  {{uri}}/api/notifications/2
 Cookie: {{jwtToken}}
 Content-Type: application/json
 
 {
-    "value": "false"
+    "userId": 2    
 }
 
-### liste  des utilisateur voulant editer
-GET {{uri}}/api/admin/upgrade-request
+### liste  de tous les notifi de 1 utilisateur
+GET {{uri}}/api/notifications/notification-by-user/2
+Cookie: {{jwtToken}}
+Content-Type: application/json
+
+{
+ 
+}
+
+### count notification
+GET {{uri}}/api/notifications/notification-by-user/count/2
 Cookie: {{jwtToken}}
 Content-Type: application/json
 
@@ -61,11 +70,11 @@ Content-Type: application/json
 
 }
 
-### suppression utilisater
-POST {{uri}}/api/admin/delete-user/aaa
+### lecture notification
+PATCH  {{uri}}/api/notifications/read/2
 Cookie: {{jwtToken}}
 Content-Type: application/json
 
 {
-
+    "userId": 2
 }

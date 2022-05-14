@@ -4,4 +4,5 @@ const user = require('./userController');
 const tag  = require('./tagController');
 const admin = require('./adminController');
 const thematic = require('./thematicController');
-module.exports = { lesson, markdown, user, tag, thematic, admin};
+const notification = require('./notificationController');
+module.exports = { lesson, markdown, user, tag, thematic, admin, notification };

@@ -31,7 +31,7 @@ router.patch('/upgrade-user/:userId',
     controllerHandler(belongToMiddleware),
     joiValidation(adminSchemaValidation.changePrivilege),
     controllerHandler(formTokenMiddleware.getFormToken), 
-    controllerHandler(adminController.upgradeUserPrivilige)
+    controllerHandler(adminController.upgradeUserPriviligeByUserId)
 );
 
 /**récupere ltous les utilisateurs voulant pouvoir editer */
@@ -42,6 +42,16 @@ router.get('/upgrade-request',
     controllerHandler(adminController.getUserUpgradeRequest)
 );
 
+/**supprime le privilege d'edition par userId */
+router.post('/remove-privilege/:userId(\\d+)',
+    controllerHandler(cookieMiddleware),
+    controllerHandler(authorizationMiddleware),    
+    controllerHandler(roleMiddleware.admin),
+    joiValidation(adminSchemaValidation.changePrivilege),
+    controllerHandler(formTokenMiddleware.getFormToken), 
+    controllerHandler(adminController.removeUserPrivilegeByUserId)
+);
+
 /**supprime le privilege d'edition par logind'un user */
 router.post('/remove-privilege/:userLogin',
     controllerHandler(cookieMiddleware),
@@ -49,7 +59,7 @@ router.post('/remove-privilege/:userLogin',
     controllerHandler(roleMiddleware.admin),
     joiValidation(adminSchemaValidation.changePrivilege),
     controllerHandler(formTokenMiddleware.getFormToken), 
-    controllerHandler(adminController.removeUserPrivilege)
+    controllerHandler(adminController.removeUserPrivilegeByUserLogin)
 );
 
 /**récupéere toutes les lecons ayant un contenu abusif */

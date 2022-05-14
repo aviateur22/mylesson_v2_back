@@ -7,7 +7,8 @@ const Link = require('./link');
 const UserLink = require('./userLink');
 const Image = require('./image');
 const Thematic = require('./thematic');
-const { hasMany } = require('./user');
+const Notification = require('./notification');
+const UserNotification = require('./userNotification');
 
 User.belongsTo(Role,{
     foreignKey:'role_id',
@@ -34,6 +35,7 @@ Lesson.belongsToMany(Tag,{
     as:'lessonsTags',
     through:'lesson_has_tag'
 });
+
 Tag.belongsToMany(Lesson,{
     as:'tagsLessons',
     through:'lesson_has_tag'
@@ -49,6 +51,16 @@ Link.belongsToMany(User,{
     through: UserLink
 });
 
+User.belongsToMany(Notification, {
+    as: 'notifications',
+    through: UserNotification
+});
+
+Notification.belongsToMany(User, {
+    as: 'users',
+    through: UserNotification
+});
+
 Lesson.belongsTo(Thematic,{
     foreignKey: 'thematic_id',
     as: 'thematic'
@@ -59,4 +71,4 @@ Thematic.hasMany(Lesson,{
     as: 'thematics'
 });
 
-module.exports = { User, Role, Tag, Lesson, LessonTag, Link, UserLink, Image, Thematic};
+module.exports = { User, Role, Tag, Lesson, LessonTag, Link, UserLink, Image, Thematic, Notification, UserNotification };

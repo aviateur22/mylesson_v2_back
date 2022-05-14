@@ -1,8 +1,5 @@
 const sanitizer = require('sanitizer');
-const { Op } = require('sequelize');
 const {Lesson, Tag, User, LessonTag, Thematic} = require('../models/index');
-const CRYPTO_AES = require('../helpers/security/aes');
-const aes = new CRYPTO_AES();
 const userRole = require('../helpers/userRole');
 
 

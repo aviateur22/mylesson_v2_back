@@ -1,25 +1,16 @@
-const bcrypt = require('bcrypt');
-
-const {User, Lesson} = require('../models');
+const {User, Lesson, Notification } = require('../models');
 
 /**role utilisateur */
 const userRole = require('../helpers/userRole');
-const { boolean } = require('joi');
+const notificationController = require('./notificationController')
 
 const adminController={
 
     /**
      * Donne à un utilisateur des priviléges d'éditeur de contenu"
      */
-    upgradeUserPrivilige: async(req, res, next)=> {
+    upgradeUserPriviligeByUserId: async(req, res, next)=> {
         const userId = parseInt(req.params.userId, 10);
-
-        /** réponse TRUE ou FALSE */
-        const value =req.body.value;
-
-        if(!value){
-            throw ({message: 'format de réponse incorrect', statusCode:'400'});
-        }
 
         /** id utilisateur absent */
         if(!userId){
@@ -43,31 +34,77 @@ const adminController={
             throw ({message: 'utilisateur absent de la base de données', statusCode:'404'});
         }
 
-        console.log(value)
         /** nouvelles données utilisateurs */
-        let newData;
-        if(value === 'true'){
-            newData = { ...user, ...{role_id: userRole.writer, request_upgrade_role: false}};
-        } else if(value === 'false'){
-            newData = { ...user, ...{role_id: userRole.user, request_upgrade_role: false}};
-        } else {
-            throw ({message: 'format de réponse incorrect', statusCode:'400'});
-        }
+        const newData = { ...user, ...{role_id: userRole.writer, request_upgrade_role: false}};            
 
         const updateUserRole = await user.update({
             ...newData
         });
+        
 
-        return res.status(200).json({
-            id: updateUserRole.id,
-            value: value
-        });
+        const message = 'droit d\'édition accordé';
+
+        /** donnée admin */
+        const adminData = {
+            id: req.payload.userId,
+            roleId: req.payload.role
+        };
+
+        /** génération d'un notification pour l'utilisateur */
+        return notificationController.createNotification(adminData, user)(req, res, message);
     },
 
     /**
-     * supprerssion des priviléges
+     * supprerssion des priviléges par userId
      */
-    removeUserPrivilege: async(req, res, next)=>{
+    removeUserPrivilegeByUserId: async(req, res, next)=>{
+        const userId = req.params.userId;
+
+        /** id utilisateur absent */
+        if(!userId){
+            throw ({message: 'Identifiant utilisateur est manquant', statusCode:'400'});
+        }
+
+        /** id utilisateur pas au format numérique */
+        if(isNaN(userId)){
+            throw ({message: 'le format de l\'identifiant utilisateur est incorrecte', statusCode:'400'});
+        }
+
+        /** Seule un admin peut executer cette action */
+        if(req.payload.role < userRole.admin){
+            throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
+        }
+
+        /** recherche de l'utilisateur a upgradé*/
+        const user = await User.findByPk(userId);
+
+        if(!user){
+            throw ({message: 'utilisateur absent de la base de données', statusCode:'404'});
+        }
+
+        /** nouvelles données utilisateurs */
+        const newData = { ...user, ...{role_id: userRole.user, request_upgrade_role: false}};
+
+        const updateUserRole = await user.update({
+            ...newData
+        });        
+        
+        const message = 'droit d\'édition refusé';
+
+        /** donnée admin */
+        const adminData = {
+            id: req.payload.userId,
+            roleId: req.payload.role
+        };
+
+        /** génération d'un notification pour l'utilisateur */
+        return notificationController.createNotification(adminData, user)(req, res, message);
+    },
+
+    /**
+     * supprerssion des priviléges par login utilisateur
+     */
+    removeUserPrivilegeByUserLogin: async(req, res, next)=>{
         const userLogin = req.params.userLogin;
 
         /** id utilisateur absent */
@@ -96,19 +133,31 @@ const adminController={
             throw ({message: 'utilisateur absent de la base de données', statusCode:'404'});
         }
 
+        /**vérifie que l'utilisateur n'est pas déja perdu ses droit d'édition */        
+        if(parseInt(user.role_id, 10) === parseInt(userRole.user, 10)){
+            throw ({message: `l'utilisateur ${user.login} à déja perdu ses droits d'édition`, statusCode:'400'});
+        }
+
         /** nouvelles données utilisateurs */
         const newData = { ...user, ...{role_id: userRole.user, request_upgrade_role: false}};
 
         const updateUserRole = await user.update({
             ...newData
         });
+        
+        const message = 'droit d\'édition supprimé';
 
-        return res.status(200).json({
-            id: updateUserRole.id,
-        });
-    },
+        /** donnée admin */
+        const adminData = {
+            id: req.payload.userId,
+            roleId: req.payload.role
+        };
 
-    /**Recupératon de tou sles user voulant editer des lecons */
+        /** génération d'un notification pour l'utilisateur */
+        return notificationController.createNotification(adminData, user)(req, res, message);
+    },    
+
+    /**Recupératon de tou les user voulant editer des lecons */
     getUserUpgradeRequest: async(req, res, next)=>{
         const users = await User.findAll({
             where: {
