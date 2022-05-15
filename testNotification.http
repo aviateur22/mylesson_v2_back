@@ -17,8 +17,8 @@ POST {{uri}}/api/users/login
 Content-Type: application/json
 
 {
-    "email":"aviateur22@hotmail.fr",
-    "password":"aaaa"
+    "email":"aaa@gmail.com",
+    "password":"Affirmer2011@"
 }
 
 ### connexion user avec droit en écriture
@@ -40,11 +40,11 @@ Content-Type: application/json
 }
 
 ### token pour requete
-@jwtToken = authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOjEsImlhdCI6MTY1MjU1MjQ4OCwiZXhwIjoxNjUyNTU0Mjg4LCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiMzRhZWYyZTItNjRlZi00ZDJjLTlhYWEtYzI2ZjU3Njg5YTYxIn0.Z8vOcPv-ssJL3yn9_rbTP7dS0cNVu_qQsk88siSg6SQ
+@jwtToken =  authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOjIsImlhdCI6MTY1MjYwMTM3NSwiZXhwIjoxNjUyNjAzMTc1LCJpc3MiOiJiYWNrLWF1dGgtbXlMZXNzb24iLCJzdWIiOiJhdXRob3JpemF0aW9uIiwianRpIjoiMGZmYmRjOWItODc3ZS00MTlmLThkNjItMGMwZmRjOGIwYTQ3In0.e4mkS1JsrJrJkkVayAHBfeJ1zjP6oJP6Sn6Op9KBgLs
 
 
 ### suppression notif
-DELETE  {{uri}}/api/notifications/2
+DELETE  {{uri}}/api/notifications/4
 Cookie: {{jwtToken}}
 Content-Type: application/json
 
@@ -71,10 +71,10 @@ Content-Type: application/json
 }
 
 ### lecture notification
-PATCH  {{uri}}/api/notifications/read/2
+PATCH  {{uri}}/api/notifications/read/1
 Cookie: {{jwtToken}}
 Content-Type: application/json
 
 {
-    "userId": 2
+    "userId": 150
 }

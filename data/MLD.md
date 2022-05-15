@@ -7,7 +7,7 @@ thematic(id, name, image_name)
 image(id, name)
 lesson_has_tag(id, #lesson_id, #tag_id)
 user_has_link(id, link_url, #link_id, #user_id)
-notification(id, text, priority)
-user_has_notification(id, admin, #user_id, #notification_id)
+notification(id, text, new)
+user_has_notification(id, #user_source_id, #user_id, #notification_id)
 
 

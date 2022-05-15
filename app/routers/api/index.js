@@ -27,6 +27,6 @@ router.use('/thematics', thematicRouter);
 router.use('/admin', adminRouter);
 
 /** notification */
-router.use('/notifications/', notificationRouter);
+router.use('/notifications', notificationRouter);
 
 module.exports = router;

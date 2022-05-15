@@ -72,14 +72,29 @@ const notificationController = {
         }
 
         /**recherche de la notifiaction */
-        const notification = await Notification.findByPk(notificationId);
+        const notification = await Notification.findByPk(notificationId,{
+            include: ['users']
+        });
 
         if(!notification){
             throw ({message: 'aucune notification ne correspond à cet identifiant', statusCode:'400'});  
         }
 
+        //pas d'utilisateur associé
+        if(!notification.users || notification.users.length <= 0){
+            throw ({message: 'aucun utilisateur n\'est associé a cette notification', statusCode:'400'});
+        }
+
+        //récupération userId a partir de la notification
+        const userId = notification.users[0].UserNotification?.user_id;
+               
+        //seul le proprietaire de la notification ou un admin peut lire une notification
+        if(parseInt(userId, 10) !== parseInt(req.payload.userId, 10) && parseInt(req.payload.role, 10) < userRole.admin){
+            throw ({message: 'vous n\'êtes pas autorisé à faire cette action', statusCode:'400'});
+        }
+
         /**suppression notif */
-        const deleteNotification = await notification.destroy();
+        await notification.destroy();
 
         res.status(204).json({});
     },
@@ -106,8 +121,7 @@ const notificationController = {
         
         /** tableau de notifications */
         const notifications = findNotification.notifications;
-
-        console.log(notifications.length);
+       
         return res.status(200).json({ 
             notifications
         });
@@ -161,10 +175,25 @@ const notificationController = {
         }
 
         /** recherche de la notification */
-        const findNotification = await Notification.findByPk(notificationId);              
+        const findNotification = await Notification.findByPk(notificationId, {
+            include: ['users']
+        });                      
         
         if(!findNotification){
             throw ({message: 'la notification n\'est pas trouvée en base de données', statusCode:'400'});
+        }
+        
+        //pas d'utilisateur associé
+        if(!findNotification.users  || findNotification.users.length <= 0){
+            throw ({message: 'aucun utilisateur n\'est associé a cette notification', statusCode:'400'});
+        }
+
+        //récupération userId a partir de la notification
+        const userId = findNotification.users[0].UserNotification?.user_id;
+        
+        //seul le proprietaire de la notification ou un admin peut lire une notification
+        if(parseInt(userId, 10) !== parseInt(req.payload.userId, 10) && parseInt(req.payload.role, 10) < userRole.admin){
+            throw ({message: 'vous n\'êtes pas autorisé à faire cette action', statusCode:'400'});
         }
         
         /** on ne change pas si new a false */
@@ -179,7 +208,8 @@ const notificationController = {
         const updateNotification = await findNotification.update(newData);
 
         return res.status(200).json({
-            notification_status: updateNotification.new });
+            notification_status: updateNotification.new
+        });
     }
 };
 

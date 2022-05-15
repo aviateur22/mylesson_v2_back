@@ -1,6 +1,7 @@
 const sanitizer = require('sanitizer');
 const {Lesson, Tag, User, LessonTag, Thematic} = require('../models/index');
 const userRole = require('../helpers/userRole');
+const notificationController = require('./notificationController');
 
 
 const lessonController = {
@@ -486,7 +487,9 @@ const lessonController = {
             throw ({message: 'l\'identifiant de la leçon est manquant', statusCode:'400'});
         }
 
-        const lesson = await Lesson.findByPk(lessonId);
+        const lesson = await Lesson.findByPk(lessonId, {
+            include: ['user']
+        });
 
         /** aucun id correspondant  */
         if(!lesson){
@@ -494,23 +497,34 @@ const lessonController = {
         }
 
         /** Seule un admin ou le propriétaire de la lecon peut executer cette action */
-        if(userId !== parseInt(lesson.user_id, 10) && req.payload.role < userRole.admin){
+        if(parseInt(req.payload.userId, 10) !== parseInt(lesson.user_id, 10) && req.payload.role < userRole.admin){
             throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
         }
 
-        const deleteLesson = await Lesson.destroy({
-            where:{
-                id: lessonId
-            }            
-        });
+        /**suppression de la leçon */
+        await lesson.destroy();
+        
+        /** notification si lecon supprimé par un admin */
+        if(parseInt(req.userId, 10) !== parseInt(lesson.user_id, 10) && parseInt(req.payload.role, 10) >= parseInt(userRole.admin, 10)){
+            /** donnée admin */
+            const adminData = {
+                id: req.payload.userId,
+                roleId: req.payload.role
+            };
 
-        /** lecon pas trouvée */
-        if(!deleteLesson){
-            throw ({ message: 'la leçon n\'est pas présente en base de données', statusCode: 404});
+            /** notification */
+            const message = `la leçon - ${lesson.title} - est supprimée`;
+
+            /** données utilisateur */
+            const user = lesson.user;
+
+            /** génération d'un notification pour l'utilisateur */
+            return notificationController.createNotification(adminData, user)(req, res, message);
         }
-
-        return res.status(200).json({
-            lessonId: lesson.id
+        
+        
+        return res.status(200).json({ 
+            lesson          
         });
     },
    
@@ -634,21 +648,50 @@ const lessonController = {
         }
 
         /**récupération de la lecon */
-        const findLesson = await Lesson.findByPk(lessonId);
+        const findLesson = await Lesson.findByPk(lessonId,{
+            include:['user']
+        });
 
         if(!findLesson){
             throw ({message: 'la leçon n\'est pas présente en base de données', statusCode:'404'});
         }
 
-        const newData = {...findLesson, ...{admin_request: !findLesson.admin_request}};
+        /** valeur de admin_request */
+        const request = !findLesson.admin_request;
+
+        const newData = {...findLesson, ...{admin_request: request}};
 
         /**mise a jour du status request admin */
         const adminRequest = await findLesson.update(newData);
 
-        res.status(200).json({
-            id: adminRequest.id,
-            adminRequest: adminRequest.admin_request
-        });
+        /**personne déclenchant la demande */
+        const userSource = {
+            id: req.payload.userId,
+            roleId: req.payload.role
+        };
+
+        /** titre de la lecon */
+        const lessonTitle = findLesson.title;
+
+        /** message de notification */
+        let message;
+       
+        /** demande de controle */
+        if(request === true){
+            message = `la leçon - ${lessonTitle} - est suspendue, son contenu nous a été signalé`;
+        } else {
+            /** annulation demande de controle */
+            message = `la leçon - ${lessonTitle} - est de nouveau disponible`;
+        }
+
+        const user = findLesson.user;
+
+        /** génération d'un notification pour l'utilisateur */
+        return notificationController.createNotification(userSource, user)(req, res, message);
+
+        // res.status(200).json({
+        //     findLesson
+        // });
     }
 
 };

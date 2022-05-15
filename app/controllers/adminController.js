@@ -2,7 +2,7 @@ const {User, Lesson, Notification } = require('../models');
 
 /**role utilisateur */
 const userRole = require('../helpers/userRole');
-const notificationController = require('./notificationController')
+const notificationController = require('./notificationController');
 
 const adminController={
 

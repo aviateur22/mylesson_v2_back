@@ -49,15 +49,6 @@ router.get('/notification-by-user/:userId',
     controllerHandler(notificationController.findNotificationByUserId)
 );
 
-router.get('/notification-by-user/:userId',
-    controllerHandler(cookieMiddleware),
-    controllerHandler(authorizationMiddleware),
-    controllerHandler(belongToMiddleware),
-    controllerHandler(roleMiddleware.user),
-    //controllerHandler(formTokenMiddleware.getFormToken),
-    controllerHandler(notificationController.findNotificationByUserId)
-);
-
 router.get('/notification-by-user/count/:userId',
     controllerHandler(cookieMiddleware),
     controllerHandler(authorizationMiddleware),
