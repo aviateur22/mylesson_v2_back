@@ -7,6 +7,7 @@ const linkRouter = require('./linkRouter');
 const thematicRouter = require('./thematicRouter');
 const adminRouter = require('./adminRouter');
 const notificationRouter = require('./notificationRouter');
+const mailRouter = require('./mailRouter');
 
 /**Gestion requete client */
 router.use('/users', userRouter);
@@ -28,5 +29,8 @@ router.use('/admin', adminRouter);
 
 /** notification */
 router.use('/notifications', notificationRouter);
+
+/** email */
+router.use('/mails', mailRouter);
 
 module.exports = router;

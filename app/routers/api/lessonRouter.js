@@ -61,8 +61,8 @@ router.route('/:lessonId')
         controllerHandler(authorization),    
         controllerHandler(roleMiddleware.writer),
         controllerHandler(belongToMiddleware),
-        // joiValidation(lessonSchemaValidation.lessonDeleteSchema),
-        // controllerHandler(formTokenMiddleware.getFormToken), 
+        joiValidation(lessonSchemaValidation.lessonDeleteSchema),
+        controllerHandler(formTokenMiddleware.getFormToken), 
         controllerHandler(lessonController.deleteById))
 
     /**Update d'une leçon */
@@ -101,8 +101,8 @@ router.post('/admin-request/:lessonId',
     controllerHandler(cookieMiddleware),
     controllerHandler(authorization),
     controllerHandler(roleMiddleware.user), 
-    // joiValidation(lessonSchemaValidation.requestLessonAdminCheck),
-    // controllerHandler(formTokenMiddleware.getFormToken),
+    joiValidation(lessonSchemaValidation.requestLessonAdminCheck),
+    controllerHandler(formTokenMiddleware.getFormToken),
     controllerHandler(lessonController.adminRequest)
 );
 

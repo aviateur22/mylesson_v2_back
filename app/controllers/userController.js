@@ -1,6 +1,10 @@
 const bcrypt = require('bcrypt');
 const { User, Link, UserLink } = require('../models/index');
 const sanitizer = require('sanitizer');
+const fileReader = require('../helpers/fileReader');
+
+const AES = require('../helpers/security/aes');
+const jsonwebtoken = require('jsonwebtoken');
 
 /**role utilisateur */
 const userRole = require('../helpers/userRole');
@@ -10,6 +14,8 @@ const jwtToken = require('../helpers/security/jwt');
 
 /** aws pour le download */
 const awsManager = require('../helpers/aws');
+
+const nodeMailer = require('../helpers/mailer/nodeMailer');
 
 const userController={
     /**
@@ -453,7 +459,128 @@ const userController={
             requestRoleUpgrade: upgradeUserRole.request_upgrade_role,
             token: req.body.formToken
         });
+    },
+
+    /**envoie reset mot de passe */    
+    sendEmailPasswordLost: async(req, res, next)=>{
+        /**email */
+        const email = req.params.email;
+        
+        if(!email || !isNaN(email)){
+            throw ({message: 'vérifier votre email', statusCode:'400'});
+        }
+
+        /** recherche utilisateur */
+        const findUser = await User.findOne({
+            where: {
+                email: email
+            }
+        });
+
+        if(!findUser){
+            throw ({message: 'aucune personne ne correspond à votre adresse email', statusCode:'400'});
+        }
+
+        /**génération token  */       
+        const resultToken = await jwtToken({mail: true});
+
+        /** récupération JWT valide 48h avec le token chiffré pour la database */
+        const jwt = resultToken.token;
+
+        /** récupération Token chiffré pour l'envoie email il sera contenu dans le link */
+        const tokenMail = resultToken.formToken;        
+
+        /**mise a jour du jwt dans la database */
+        const newData = { ...findUser, ...{reset_email_token: jwt }};
+
+        /**mise a jour du jwt */
+        const updateUser = await findUser.update(newData);
+
+        if(!updateUser){
+            throw ({message: 'echec initialisation', statusCode:'400'});
+        }
+
+        /** uri de la requete */
+        let baseUri;
+
+        /**link a envoyer par email */
+        if(process.env.NODE_ENV ==='DEV'){
+            baseUri = 'http://localhost:8080';
+        } else {
+            baseUri = 'https://www.mydevlesson.com';
+        }
+
+        const link = baseUri +'/users/' + findUser.id + '/lost-password/token/'+ tokenMail;
+
+        /** transporter pour l'email*/
+        const transporter = nodeMailer.transporterConfig();
+
+        /** ficheir template html */
+        const templateHtml = await fileReader('app/static/template/email.html');
+
+        /** template mise a jour avec le link  */
+        const templateHtmlLink = templateHtml.replace(':xxxx', link);
+
+        /** envoie de l'email */
+        await nodeMailer.passwordLostMail(transporter, findUser.email, templateHtmlLink);
+
+        res.status(200).json({
+            link: link
+        });
+    },
+
+    resetPasswordByUserId: async(req, res, next)=>{
+        const token = req.body.token;
+        const userId = req.params.userId;
+        const password = req.body.password;
+        const cfmPassword = req.body.cfmPassword;        
+
+        const user = await User.findByPk(userId);
+       
+        if(!user){
+            throw ({message: 'utilisateur absent de la base de données', statusCode:'400'});
+        }
+
+        const userJWT =  user.reset_email_token;
+
+
+        //clé secrete
+        const KEY = process.env.JWT_PRIVATE_KEY;
+
+        await jsonwebtoken.verify(userJWT, KEY, async function(err, payload) {
+            if(err){
+                throw ({message: 'oupsss token invalid', statusCode:'403'});
+            }     
+            
+            /** token formulaire du JWT */
+            const tokenDatabase = payload.formToken;  
+
+            /** token absent */
+            if(!tokenDatabase){
+                throw ({message: 'oupsss token invalid', statusCode:'403'});
+            }           
+            
+            /** decryptage des token */
+            const aes = new AES();
+
+            /** décodage base64 -> UTF-8 puis décryptage du token req.body */
+            const tokenDatabaseDecrypt =  await aes.decrypt(tokenDatabase);
+
+            /** décodage base64 -> UTF-8 puis décryptage du token cookie  */
+            const tokenDecrypt =  await aes.decrypt(token);
+            console.log(tokenDecrypt, tokenDatabaseDecrypt)
+            /**verification cohérence token non décrypté */            
+            if(tokenDatabaseDecrypt != tokenDecrypt){
+                throw ({message: 'oupsss token invalid', statusCode:'403'});
+            }
+
+            res.status(200).json({
+                message: 'ok'
+            })
+        });
     }
+
+
 
 };
 

@@ -9,7 +9,8 @@ User.init({
     password : DataTypes.STRING,
     request_upgrade_role: DataTypes.BOOLEAN,
     sex: DataTypes.STRING,
-    avatar_key: DataTypes.STRING
+    avatar_key: DataTypes.STRING,
+    reset_email_token: DataTypes.STRING
 },{
     sequelize,
     tableName:'user'

@@ -124,6 +124,7 @@ router.patch('/image/:userId',
 router.get('/image/autor/:key',
     controllerHandler(userController.getAvatarByKey));
 
+/**update privilege éditeur */
 router.post('/request-upgrade-privilege/:userId',
     controllerHandler(cookieMiddleware),
     controllerHandler(authorizationMiddleware),
@@ -132,4 +133,13 @@ router.post('/request-upgrade-privilege/:userId',
     controllerHandler(belongToMiddleware),
     joiValidation(userSchemaValidation.requestUpgradeRole),
     controllerHandler(userController.userUpgradeRoleRequest));
+
+/** envoie email mot de passe perdu */
+router.post('/lost-password/:email',    
+    controllerHandler(userController.sendEmailPasswordLost)
+);
+
+/**reset mot de passe */
+router.post('/reset-password/:userId',
+    controllerHandler(userController.resetPasswordByUserId));
 module.exports=router;

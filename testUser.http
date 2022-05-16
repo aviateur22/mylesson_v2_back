@@ -116,3 +116,11 @@ Content-Type: application/json
 {
 
 }
+
+### lostpassword
+POST  {{uri}}/api/users/lost-password/aviateur22@hotmail.fr
+Content-Type: application/json
+
+{
+
+}

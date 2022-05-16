@@ -30,8 +30,6 @@ module.exports = {
             throw ({message: 'KEY token absente', statusCode:'500'});
         }
 
-       
-
         await jsonwebtoken.verify(formAuthorizationToken, KEY, async function(err, payload) {
             if(err){
                 throw ({message: 'oupsss token invalid', statusCode:'403'});
