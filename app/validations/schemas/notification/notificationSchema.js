@@ -1,5 +1,5 @@
 /** 
- * Schéma supp  utilisateur
+ * Schéma access notification
  */
 const Joi = require('joi');
 module.exports = Joi.object({
@@ -9,5 +9,7 @@ module.exports = Joi.object({
         .messages({
             'string.empty': 'token du formulaire invalide',
             'any.required': 'token du formulaire invalide'  
-        })
+        }),
+    userId: Joi
+        .number()
 });

@@ -15,6 +15,7 @@ const belongToMiddleware = require('../../middlewares/belongToMiddleware');
 
 /**Schéma de validation JOI */
 const joiValidation = require('../../validations');
+const notificationSchema = require('../../validations/schemas/notification');
 
 /**middleware pour token formulaire */
 const formTokenMiddleware = require('../../middlewares/tokenFormMiddleware');
@@ -27,43 +28,51 @@ router.post('/',
     controllerHandler(cookieMiddleware),
     controllerHandler(authorizationMiddleware),
     controllerHandler(roleMiddleware.user),
-    controllerHandler(formTokenMiddleware),
+    joiValidation(notificationSchema.notificationAcces),
+    controllerHandler(formTokenMiddleware.getFormToken),
     controllerHandler(notificationController.createNotification));
 
-/** suppression notififcation */
+/** suppression notification */
 router.delete('/:notificationId',
     controllerHandler(cookieMiddleware),
     controllerHandler(authorizationMiddleware),
     controllerHandler(belongToMiddleware),
     controllerHandler(roleMiddleware.user),
-    //controllerHandler(formTokenMiddleware.getFormToken),
+    joiValidation(notificationSchema.notificationAcces),
+    controllerHandler(formTokenMiddleware.getFormToken),
     controllerHandler(notificationController.deleteNotification)
 );
 
-router.get('/notification-by-user/:userId',
+/** liste de notifications par id utilisateur */
+router.post('/notification-by-user/:userId',
     controllerHandler(cookieMiddleware),
     controllerHandler(authorizationMiddleware),
     controllerHandler(belongToMiddleware),
     controllerHandler(roleMiddleware.user),
-    //controllerHandler(formTokenMiddleware.getFormToken),
+    joiValidation(notificationSchema.notificationAcces),
+    controllerHandler(formTokenMiddleware.getFormToken),
     controllerHandler(notificationController.findNotificationByUserId)
 );
 
-router.get('/notification-by-user/count/:userId',
+/** count notification non lu par id utilisateur */
+router.post('/notification-by-user/count/:userId',
     controllerHandler(cookieMiddleware),
     controllerHandler(authorizationMiddleware),
     controllerHandler(belongToMiddleware),
     controllerHandler(roleMiddleware.user),
-    //controllerHandler(formTokenMiddleware.getFormToken),
+    joiValidation(notificationSchema.notificationAcces),
+    controllerHandler(formTokenMiddleware.getFormToken),
     controllerHandler(notificationController.countUnreadNotificationByUserId)
 );
 
+/** lecture notification par id */
 router.patch('/read/:notificationId',
     controllerHandler(cookieMiddleware),
     controllerHandler(authorizationMiddleware),
     controllerHandler(belongToMiddleware),
     controllerHandler(roleMiddleware.user),
-    //controllerHandler(formTokenMiddleware.getFormToken),
+    joiValidation(notificationSchema.updateNotification),
+    controllerHandler(formTokenMiddleware.getFormToken),
     controllerHandler(notificationController.readNotificationById)
 );
 
