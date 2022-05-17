@@ -4,7 +4,6 @@
 const jsonWebtoken = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const AES = require('../security/aes');
-const base64 = require('../security/base64');
 
 module.exports = async(data)=>{
     /** données de base pour le token*/

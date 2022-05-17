@@ -33,6 +33,9 @@ const controllerHandler = require('../../helpers/controllerHelper/controllerHand
 /**Schéma de validation JOI */
 const joiValidation = require('../../validations');
 const userSchemaValidation = require('../../validations/schemas/user');
+
+/** midlleware reset mot de passe ou activation du compte */
+const urlMiddleware = require('../../middlewares/urlMiddlware');
   
 
 
@@ -140,6 +143,8 @@ router.post('/lost-password/:email',
 );
 
 /**reset mot de passe */
-router.post('/reset-password/:userId',
+router.post('/reset-password',
+    joiValidation(userSchemaValidation.resetPasswordSchema),
+    controllerHandler(urlMiddleware.getUrlParameter),
     controllerHandler(userController.resetPasswordByUserId));
 module.exports=router;

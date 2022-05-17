@@ -1,6 +1,4 @@
-
-const jsonwebtoken = require('jsonwebtoken');
-const AES = require('../helpers/security/aes');
+const compareToken = require('../helpers/security/tokenCompare');
 
 /**token JWT */
 const jwtToken = require('../helpers/security/jwt');
@@ -20,61 +18,27 @@ module.exports = {
             throw ({message: 'oupsss token invalid', statusCode:'403'});
         }    
 
-        /** récupération cookie authorisation formulaire */
-        const formAuthorizationToken = req.cookie.form_token;  
-        
-        //clé secrete
-        const KEY = process.env.JWT_PRIVATE_KEY;
+        /** token depuis la requete */
+        const reqFormToken = req.body.formToken;       
 
-        if(!KEY){
-            throw ({message: 'KEY token absente', statusCode:'500'});
+        /** token de la requete absent */
+        if(!reqFormToken){
+            throw ({message: 'oupsss token invalid', statusCode:'403'});
         }
 
-        await jsonwebtoken.verify(formAuthorizationToken, KEY, async function(err, payload) {
-            if(err){
-                throw ({message: 'oupsss token invalid', statusCode:'403'});
-            }                     
-            /** token formulaire du JWT */
-            const token = payload;            
+        /** récupération cookie authorisation formulaire */
+        const formAuthorizationToken = req.cookie.form_token;  
 
-            /** token absent */
-            if(!token.formToken){
-                throw ({message: 'oupsss token invalid', statusCode:'403'});
-            }         
-            
-            /** token depuis la requete */
-            const reqFormToken = req.body.formToken;       
+        const compare = compareToken.compareToken(formAuthorizationToken, reqFormToken);
 
-            /** token de la requete absent */
-            if(!reqFormToken){
-                throw ({message: 'oupsss token invalid', statusCode:'403'});
-            }
-
-            /**verification cohérence token non décrypté */            
-            if(reqFormToken != token.formToken){
-                throw ({message: 'oupsss token invalid', statusCode:'403'});
-            }
-            
-            /** decryptage des token */
-            const aes = new AES();
-
-            /** décodage base64 -> UTF-8 puis décryptage du token req.body */
-            const reqBodyToken =  await aes.decrypt(reqFormToken);
-
-            /** décodage base64 -> UTF-8 puis décryptage du token cookie  */
-            const cookieToken =  await aes.decrypt(token.formToken);
-
-            /**verification cohérence token non décrypté */            
-            if(reqBodyToken != cookieToken){
-                throw ({message: 'oupsss token invalid', statusCode:'403'});
-            }
-            
-            return next();
-        });
+        if(!compare){
+            throw ({message: 'oupsss token invalid', statusCode:'403'});
+        }
+        return next();
     },
 
     /**
-     * création d'un token pour un formulaire
+     * création d'un token
      */
     setFormToken: async(req, res, next)=>{             
         /** génération token pour un formulaire*/

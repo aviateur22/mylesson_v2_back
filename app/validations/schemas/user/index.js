@@ -3,5 +3,6 @@ const updateUserSchema = require('./updateUserSchema');
 const loginUserSchema = require('./loginUserSchema');
 const updatePasswordSchema = require('./updatePasswordSchema');
 const requestUpgradeRole = require('./requestUpgradeRole');
+const resetPasswordSchema = require('./resetPasswordSchema');
 
-module.exports = { registerUserSchema, updatePasswordSchema, loginUserSchema, updateUserSchema, requestUpgradeRole };
+module.exports = { registerUserSchema, updatePasswordSchema, loginUserSchema, updateUserSchema, requestUpgradeRole, resetPasswordSchema };
