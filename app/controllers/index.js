@@ -5,5 +5,4 @@ const tag  = require('./tagController');
 const admin = require('./adminController');
 const thematic = require('./thematicController');
 const notification = require('./notificationController');
-const mailer = require('./mailController');
-module.exports = { lesson, markdown, user, tag, thematic, admin, notification, mailer };
+module.exports = { lesson, markdown, user, tag, thematic, admin, notification};
