@@ -61,7 +61,7 @@ const userController={
             'message':`Bienvenu sur votre compte ${user.login}`,            
             'user' : user.login,
             'role' : user.role_id,
-            'id' : user.id
+            'id' : user.id,
         });        
     },
     

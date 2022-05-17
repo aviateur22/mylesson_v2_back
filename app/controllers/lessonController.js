@@ -478,18 +478,11 @@ const lessonController = {
         const lessonId = parseInt(req.params.lessonId, 10);
 
         //id pas au format numeric
-        if(isNaN(lessonId)){
+        if(!lessonId || isNaN(lessonId)){
             throw ({message: 'le format de l\'identifiant de la leçon est incorrect', statusCode:'400'});
         }
 
-        /** id lecon manquant */
-        if(!lessonId){
-            throw ({message: 'l\'identifiant de la leçon est manquant', statusCode:'400'});
-        }
-
-        const lesson = await Lesson.findByPk(lessonId, {
-            include: ['user']
-        });
+        const lesson = await Lesson.findByPk(lessonId);
 
         /** aucun id correspondant  */
         if(!lesson){
@@ -497,35 +490,14 @@ const lessonController = {
         }
 
         /** Seule un admin ou le propriétaire de la lecon peut executer cette action */
-        if(parseInt(req.payload.userId, 10) !== parseInt(lesson.user_id, 10) && req.payload.role < userRole.admin){
+        if(userId !== parseInt(lesson.user_id, 10) && req.payload.role < userRole.admin){
             throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
         }
 
         /**suppression de la leçon */
         await lesson.destroy();
-        
-        /** notification si lecon supprimé par un admin */
-        if(parseInt(req.userId, 10) !== parseInt(lesson.user_id, 10) && parseInt(req.payload.role, 10) >= parseInt(userRole.admin, 10)){
-            /** donnée admin */
-            const adminData = {
-                id: req.payload.userId,
-                roleId: req.payload.role
-            };
 
-            /** notification */
-            const message = `la leçon - ${lesson.title} - est supprimée`;
-
-            /** données utilisateur */
-            const user = lesson.user;
-
-            /** génération d'un notification pour l'utilisateur */
-            return notificationController.createNotification(adminData, user)(req, res, message);
-        }
-        
-        
-        return res.status(200).json({ 
-            lesson          
-        });
+        return res.status(204).json({});
     },
    
     /**
@@ -684,14 +656,15 @@ const lessonController = {
             message = `la leçon - ${lessonTitle} - est de nouveau disponible`;
         }
 
+        /** recupération de propriétaire de la lecon */
         const user = findLesson.user;
 
         /** génération d'un notification pour l'utilisateur */
-        return notificationController.createNotification(userSource, user)(req, res, message);
-
-        // res.status(200).json({
-        //     findLesson
-        // });
+        return notificationController.createNotification(userSource, user, message)(req, res, ()=>{
+            return res.status(200).json({
+                request: request
+            });
+        });
     }
 
 };

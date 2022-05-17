@@ -95,4 +95,14 @@ router.post('/delete-user/:userLogin',
     controllerHandler(formTokenMiddleware.getFormToken), 
     controllerHandler(adminController.deleteUserByLogin)
 );
+
+/**suppréssion d'une lecon par son id */
+router.delete('/delete-lesson/:lessonId',
+    controllerHandler(cookieMiddleware),
+    controllerHandler(authorizationMiddleware),
+    controllerHandler(roleMiddleware.admin),
+    joiValidation(adminSchemaValidation.deleteLessonSchema),
+    controllerHandler(formTokenMiddleware.getFormToken), 
+    controllerHandler(adminController.deleteLessonByLessonId)
+);
 module.exports=router;

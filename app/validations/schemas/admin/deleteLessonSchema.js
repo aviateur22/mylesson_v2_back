@@ -1,5 +1,5 @@
 /** 
- * Schéma modification privilege utilisateur 
+ * Schéma supp  lecon
  */
 const Joi = require('joi');
 module.exports = Joi.object({
@@ -10,10 +10,12 @@ module.exports = Joi.object({
             'string.empty': 'token du formulaire invalide',
             'any.required': 'token du formulaire invalide'  
         }),
-    value: Joi
-        .boolean()
+
+    userId: Joi
+        .number()
+        .required()
         .messages({
-            'string.empty': 'format de la réponse incorrect',
-            'any.required': 'format de la réponse incorrect'  
-        })
+            'number.base': 'le format de l\'identifiant utilisateur est incorrect',
+            'any.required': 'l\'identifiant utilisateur est manquant'
+        }),
 });

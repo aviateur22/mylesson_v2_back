@@ -12,7 +12,7 @@ const notificationController = {
      * @param {Object} user - Instance Sequelize - utilisateur recevant la notification
      * @returns 
      */
-    createNotification:(userSource, user) => async(req, res, message) => { 
+    createNotification:(userSource, user, message) => async(req, res, callback) => { 
         /**vérification des données */
         if(!userSource.id){
             throw ({message: 'données manquantes pour générer la notification', statusCode:'400'});             
@@ -49,11 +49,9 @@ const notificationController = {
 
         if(!userNotification){
             throw ({message: 'erreur remplissage table de liaison user-notification', statusCode:'500'});
-        }
-        
-        return res.status(200).json({               
-            id: user.id,                   
-        });
+        }       
+    
+        return callback();
     },
 
     /**

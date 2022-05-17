@@ -51,7 +51,11 @@ const adminController={
         };
 
         /** génération d'un notification pour l'utilisateur */
-        return notificationController.createNotification(adminData, user)(req, res, message);
+        return notificationController.createNotification(adminData, user, message)(req, res, ()=>{
+            return res.status(200).json({
+                user: user.id
+            });
+        });
     },
 
     /**
@@ -98,7 +102,11 @@ const adminController={
         };
 
         /** génération d'un notification pour l'utilisateur */
-        return notificationController.createNotification(adminData, user)(req, res, message);
+        return notificationController.createNotification(adminData, user, message)(req, res, ()=>{
+            return res.status(200).json({
+                user: user.id
+            });
+        });
     },
 
     /**
@@ -152,9 +160,13 @@ const adminController={
             id: req.payload.userId,
             roleId: req.payload.role
         };
-
+        
         /** génération d'un notification pour l'utilisateur */
-        return notificationController.createNotification(adminData, user)(req, res, message);
+        return notificationController.createNotification(adminData, user, message)(req, res, ()=>{
+            return res.status(200).json({
+                user: user.id
+            });
+        });
     },    
 
     /**Recupératon de tou les user voulant editer des lecons */
@@ -264,8 +276,52 @@ const adminController={
         });
     },
 
-    deleteContent: (req, res, next)=>{
+    deleteLessonByLessonId: async(req, res, next)=>{
+        //récupération id de la lesson
+        const lessonId = req.params.lessonId;
 
+        //id pas au format numeric
+        if(!lessonId || isNaN(parseInt(lessonId,10))){
+            throw ({message: 'le format de l\'identifiant de la leçon est incorrect', statusCode:'400'});
+        }
+
+        const lesson = await Lesson.findByPk(lessonId, {
+            include: ['user']
+        });
+
+        /** aucun id correspondant  */
+        if(!lesson){
+            throw ({message: 'la leçon n\'est pas présente en base de données', statusCode:'400'});
+        }
+
+        /** Seule un admin peut executer cette action */
+        if(req.payload.role < userRole.admin){
+            throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
+        }
+
+        /**suppression de la leçon */
+        await lesson.destroy();
+        
+        /** notification si lecon supprimé par un admin */
+        if(parseInt(req.payload.role, 10) >= parseInt(userRole.admin, 10)){
+            /** donnée admin */
+            const adminData = {
+                id: req.payload.userId,
+                roleId: req.payload.role
+            };
+
+            /** notification */
+            const message = `la leçon - ${lesson.title} - est supprimée`;
+
+            /** données utilisateur */
+            const user = lesson.user;
+            
+            /** génération d'un notification pour l'utilisateur */
+            return notificationController.createNotification(adminData, user, message)(req, res, ()=>{
+                return res.status(204).json({
+                });
+            });
+        }
     }
 
 };
