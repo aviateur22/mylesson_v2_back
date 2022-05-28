@@ -12,7 +12,7 @@ const notificationController = {
      * @param {Object} user - Instance Sequelize - utilisateur recevant la notification
      * @returns 
      */
-    createNotification:(userSource, user, message) => async(req, res, callback) => { 
+    createNotification:(userSource, user, message) => async(req, res, callback) => {         
         /**vérification des données */
         if(!userSource.id){
             throw ({message: 'données manquantes pour générer la notification', statusCode:'400'});             
@@ -51,7 +51,7 @@ const notificationController = {
             throw ({message: 'erreur remplissage table de liaison user-notification', statusCode:'500'});
         }       
     
-        return callback();
+        callback();
     },
 
     /**
@@ -162,14 +162,11 @@ const notificationController = {
 
     readNotificationById: async(req, res, next) => {
         /** utilisateur id */
-        const notificationId = req.params.notificationId;
+        const notificationId = parseInt(req.params.notificationId, 10);
 
-        if(!notificationId){
-            throw ({message: 'le format de l\'identifiant de la notification est incorrect', statusCode:'400'});  
-        }
-
-        if(isNaN(notificationId)){
-            throw ({message: 'le format de l\'identifiant de la notification est incorrect', statusCode:'400'});
+        if(!notificationId || isNaN(notificationId)){
+            throw ({message: 'le format de l\'identifiant de la notification est incorrect',
+                statusCode:'400'});
         }
 
         /** recherche de la notification */
@@ -189,17 +186,19 @@ const notificationController = {
         //récupération userId a partir de la notification
         const userId = findNotification.users[0].UserNotification?.user_id;
         
-        //seul le proprietaire de la notification ou un admin peut lire une notification
-        if(parseInt(userId, 10) !== parseInt(req.payload.userId, 10) && parseInt(req.payload.role, 10) < userRole.admin){
-            throw ({message: 'vous n\'êtes pas autorisé à faire cette action', statusCode:'400'});
-        }
-        
         /** on ne change pas si new a false */
         if(findNotification.new === false){
             return res.status(200).json({
                 notification_status: findNotification.new
             });
         }
+
+        //seul le proprietaire de la notification ou un admin peut éxecuter l'action
+        if(parseInt(userId, 10) !== parseInt(req.payload.userId, 10) 
+        && parseInt(req.payload.role, 10) < userRole.admin){
+            throw ({message: 'vous n\'êtes pas autorisé à faire cette action', statusCode:'400'});
+        }
+    
         /**update notification */
         const newData = {...findNotification, ...{new: false}};
 

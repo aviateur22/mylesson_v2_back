@@ -14,7 +14,7 @@ const authorizationMiddleware = require('../../middlewares/authorizationMiddlewa
 const belongToMiddleware = require('../../middlewares/belongToMiddleware');
 
 /** middleware pour le token formulaire */
-const formTokenMiddleware = require('../../middlewares/tokenFormMiddleware');
+const formTokenMiddleware = require('../../middlewares/tokenMiddleware');
 
 /**controller user */
 const linkController = require('../../controllers/linkController');
@@ -49,6 +49,7 @@ router.route('/user/:userId')
         controllerHandler(belongToMiddleware),
         joiValidation(linkSchemaValidation.deleteLinkSchema),
         controllerHandler(formTokenMiddleware.getFormToken),  
+        controllerHandler(formTokenMiddleware.setFormToken), 
         controllerHandler(linkController.deleteLinkByUserId))
     /** ajout d'un nouveau link pour 1 utilsateur */
     .post(
@@ -58,6 +59,7 @@ router.route('/user/:userId')
         controllerHandler(belongToMiddleware),
         joiValidation(linkSchemaValidation.saveUserLinkSchema),
         controllerHandler(formTokenMiddleware.getFormToken),    
+        controllerHandler(formTokenMiddleware.setFormToken), 
         controllerHandler(linkController.saveLinkByUserId))
     /** récuperation de tous les links d'un utilisateur */
     .get(

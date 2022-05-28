@@ -86,7 +86,7 @@ class Mailer{
         let secretURLCode = process.env.SECRET_URL_WORD;
 
         /**ajout du userID */
-        secretURLCode = secretURLCode.replace(':userId', this.userId);
+        secretURLCode = secretURLCode.replace(':USER_ID', this.userId);
 
         /**chiffrage */
         this.secretURLCodeEncrypt = await this.aes().encrypt(secretURLCode);
@@ -124,7 +124,7 @@ class Mailer{
             if(this.templateHtml != null){  
                 /**mise a jour du lien dans le template */              
                 this.templateHtml = this.templateHtml.replace(':xxxx',
-                    baseUri +'/users/' + this.userIdEncrypt +'/reset/' + this.secretURLCodeEncrypt + '/lost-password/token/'+ this.tokenMail); 
+                    baseUri +'/users/reset-password/user/' + this.userIdEncrypt +'/data/' + this.secretURLCodeEncrypt + '/param/'+ this.tokenMail); 
                 return;
             }            
             throw ({message: 'données manquante pour configurer l\'email', statusCode:'400'});

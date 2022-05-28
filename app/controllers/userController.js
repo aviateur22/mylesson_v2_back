@@ -9,7 +9,9 @@ const jsonwebtoken = require('jsonwebtoken');
 const userRole = require('../helpers/userRole');
 
 /**token JWT */
-const jwtToken = require('../helpers/security/jwt');
+const JWT = require('../helpers/security/jwt');
+const jwtExpire = require('../helpers/jwtExpire');
+
 
 /** aws pour le download */
 const awsManager = require('../helpers/aws');
@@ -19,6 +21,7 @@ const nodeMailer = require('../helpers/mailer/nodeMailer');
 
 /** comparaions de token */
 const tokenCompare = require('../helpers/security/tokenCompare');
+
 
 const userController={
     /**
@@ -31,7 +34,7 @@ const userController={
 
         const user = await User.findOne({
             where: {
-                email:req.body.email 
+                email:sanitizer.escape(req.body.email) 
             }
         });       
         
@@ -46,18 +49,26 @@ const userController={
         if(!comparePassword){
             throw ({message: 'email ou mot de passe invalide', statusCode:'400'}); 
         }
+
+        /**suppression du JWT de réinitialisation de mot de passe */
+        if(user.reset_email_token){
+            /**nouvelles données */
+            const newData = {...user,...{reset_email_token: null}};
+
+            /**mise a jour de la base de données */
+            await user.update(newData);
+        }
        
         /** génération token */
-        const token = await jwtToken({user: user.id, role: user.role_id});
+        const jwt = new JWT(jwtExpire.login.expiresIn);
+
+        const jwtGen = await jwt.generateJwt({user: user.id, role: user.role_id});
+
         
         /** Renvoie d'un JWT pour gestion des authorization */
-        res.cookie('authorization', token, { secure: true, sameSite:'none', httpOnly: true });       
+        res.cookie('authorization', jwtGen, { secure: true, sameSite:'none', httpOnly: true });       
 
-        // /** Renvoie un cookie avec ID hashé de l'utilisateur des infos utilisateurs */
-        //res.cookie('ident', identTokenEncrypt, {sameSite:'lax', path: '/',expires: new Date(Date.now() + 24 * 60 * 60 *1000), httpOnly: true });       
-
-        //res.cookie('nom','cyrille',{path: '/',expires: new Date(Date.now() + 24 * 60 * 60 *1000), httpOnly: true })
-        res.status(200).json({
+        return res.status(200).json({
             'message':`Bienvenu sur votre compte ${user.login}`,            
             'user' : user.login,
             'role' : user.role_id,
@@ -69,11 +80,15 @@ const userController={
      * Inscription
      */
     register: async(req, res ,_)=> {       
-        const {login, email, password, confirmPassword} = req.body;
+        const {login, email, password, confirmPassword, checkboxCgu} = req.body;        
 
         if(!login || !email || !password || !confirmPassword) {    
             throw ({message: 'email, mot de passe et confirmation du mot de passe obligatoire', statusCode:'400'});
-        }    
+        }        
+        
+        if(checkboxCgu !== 'true'){
+            throw ({message: 'Les CGU doivent être accéptés', statusCode:'400'});
+        }
 
         /** Mot de passe et confirmation mot de passe pas identique */
         if(password !== confirmPassword){
@@ -96,8 +111,6 @@ const userController={
                 login: login
             }
         });
-
-        console.log(user);
 
         /** login utilisé */
         if(user) {      
@@ -151,7 +164,7 @@ const userController={
             throw ({message: 'utilisateur absent de la base de données', statusCode:'404'});
         }
 
-        const token = res.formToken;
+        const token = res.dataToken;
        
         return res.status(200).json({
             id: user.id,
@@ -234,6 +247,9 @@ const userController={
             }
         }
 
+        /**recuperation du token */
+        const token = res.dataToken;
+
         /** nouvelles données utilisateur */
         const newUserData = { ...userData, ...{ email: sanitizer.escape(email), login: sanitizer.escape(login), sex: sex ? sanitizer.escape(sex): null }};
        
@@ -250,7 +266,7 @@ const userController={
             sex: userData.sex,
             usersLinks: userData.usersLinks,
             requestRoleUpgrade: userData.request_upgrade_role,
-            token: req.body.formToken
+            token: token
         });
     },
 
@@ -288,7 +304,10 @@ const userController={
         /** mise a jour de l'utilisateur */
         const updateUser = await userData.update({
             ...newUserData            
-        });       
+        });      
+        
+        /**recuperation du token */
+        const token = res.dataToken;
 
         return res.status(200).json({
             id: updateUser.id,
@@ -298,7 +317,7 @@ const userController={
             sex: updateUser.sex,
             usersLinks: updateUser.usersLinks,
             requestRoleUpgrade: updateUser.request_upgrade_role,
-            token: req.body.formToken
+            token: token
         });
     },
     /**
@@ -378,6 +397,9 @@ const userController={
         const updateUser = await user.update({
             password: passwordHash        
         });
+
+        /** recuperation du token */
+        const token = res.dataToken;
        
         return res.status(200).json({
             id: updateUser.id,
@@ -387,7 +409,7 @@ const userController={
             sex: updateUser.sex,
             usersLinks: updateUser.usersLinks,
             requestRoleUpgrade: updateUser.request_upgrade_role,
-            token: req.body.formToken
+            token: token
         });
     },
 
@@ -452,6 +474,9 @@ const userController={
         /**demande de devenir éditeur */
         const upgradeUserRole = await user.update(newData);
 
+        /** recuperation du token */
+        const token = res.dataToken;
+
         return res.status(200).json({            
             id: upgradeUserRole.id,
             login: upgradeUserRole.login,
@@ -460,14 +485,14 @@ const userController={
             sex: upgradeUserRole.sex,
             usersLinks: upgradeUserRole.usersLinks,
             requestRoleUpgrade: upgradeUserRole.request_upgrade_role,
-            token: req.body.formToken
+            token: token
         });
     },
 
     /**envoie reset mot de passe */    
     sendEmailPasswordLost: async(req, res, next)=>{
         /**email */
-        const email = req.params.email;
+        const email = sanitizer.escape(req.params.email);
         
         if(!email || !isNaN(email)){
             throw ({message: 'vérifier votre email', statusCode:'400'});
@@ -484,27 +509,32 @@ const userController={
             throw ({message: 'aucune personne ne correspond à votre adresse email', statusCode:'400'});
         }
 
-        /**génération token  */       
-        const resultToken = await jwtToken({mail: true});
+        /** création dun token et jwt */
+        const jwt = new JWT(jwtExpire.reinitializePassword.expiresIn);
+
+        const data = await jwt.generateToken();        
 
         /** récupération JWT valide 48h avec le token chiffré pour la database */
-        const jwt = resultToken.token;
+        const jwtDatabase = data.jwt;
 
         /** récupération Token chiffré pour l'envoie email il sera contenu dans le link */
-        const tokenMail = resultToken.formToken;        
+        const tokenMail = data.token;
 
         /**mise a jour du jwt dans la database */
-        const newData = { ...findUser, ...{reset_email_token: jwt }};
+        const newData = { ...findUser, ...{reset_email_token: jwtDatabase }};
 
-        /**mise a jour du jwt */
+        /**mise a jour données utilisateur avec le jwt */
         const updateUser = await findUser.update(newData);
 
         if(!updateUser){
             throw ({message: 'echec initialisation reset du mot de passe', statusCode:'400'});
         }
        
-        /** envoie de l'email */
-        const mailer = new nodeMailer('resetPassword', findUser.email, findUser.id, tokenMail).sendEmail();
+        /** instanciation nodemailer */
+        const mailer = new nodeMailer('resetPassword', findUser.email, findUser.id, tokenMail);
+
+        /**envoie de l'email */
+        await mailer.sendEmail();
 
         res.status(200).json({
             userId: findUser.id
@@ -515,7 +545,7 @@ const userController={
      * réinitialisation mote de passe
      */
     resetPasswordByUserId: async(req, res, next)=>{
-        const token = req.body.token;
+        const param = req.body.param;
         const password = req.body.password;
         const cfmPassword = req.body.confirmPassword;
 
@@ -523,7 +553,7 @@ const userController={
             throw ({message: 'les mots de passe ne sont pas identique', statusCode:'400'});
         }
 
-        if(!token ){
+        if(!param ){
             throw ({message: 'données manquantes pour valider l\'action', statusCode:'400'});
         }
 
@@ -548,8 +578,8 @@ const userController={
         if(!userJWT){
             throw ({message: 'données manquantes pour valider l\'action', statusCode:'400'});
         }
-
-        const checkToken = await tokenCompare.compareToken(userJWT, token);
+        
+        const checkToken = await tokenCompare.compareTokenWithoutSecret(userJWT, param);
 
         if(!checkToken){
             throw ({message:'oupsss token invalid', statusCode:'403'});
@@ -570,9 +600,6 @@ const userController={
             user: updateUser.id
         });     
     }
-
-
-
 };
 
 module.exports = userController;

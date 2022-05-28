@@ -4,14 +4,31 @@
 const Joi = require('joi');
 module.exports = Joi.object({        
     /** code secret pour reset chiffré*/
-    midToken: Joi
+    data: Joi
         .string()
         .required()
         .messages({    
-            'string.empty': 'reset token obligatoire',
-            'any.required': 'reset token obligatoire'  
+            'string.empty': 'données manquante pour réinitialiser votre mot de passe',
+            'any.required': 'données manquante pour réinitialiser votre mot de passe'  
         }),
 
+    /** token pour le JWT présent en base de données*/
+    param: Joi
+        .string()
+        .required()
+        .messages({    
+            'string.empty': 'données manquante pour réinitialiser votre mot de passe',
+            'any.required': 'données manquante pour réinitialiser votre mot de passe'  
+        }),
+    
+    /** id utilisateur chiffré*/
+    userId: Joi
+        .string()
+        .required()
+        .messages({
+            'string.empty': 'données manquante pour réinitialiser votre mot de passe',
+            'any.required': 'données manquante pour réinitialiser votre mot de passe'  
+        }),    
     /** token pour le JWT présent en base de données*/
     token: Joi
         .string()
@@ -20,16 +37,6 @@ module.exports = Joi.object({
             'string.empty': 'token obligatoire',
             'any.required': 'token obligatoire'  
         }),
-    
-    /** id utilisateur chiffré*/
-    userId: Joi
-        .string()
-        .required()
-        .messages({
-            'string.empty': 'userId  obligatoire',
-            'any.required': 'userId obligatoire'  
-        }),
-
     /* password: 8 charac, uppercase, number,pas d'espace et liste de special char */
     password: Joi
         .string()
@@ -43,7 +50,7 @@ module.exports = Joi.object({
             1 majiscule minimum\n
             1 chiffre minimum\n
             1 charactere parmis #?!@$%^&*-`
-        }),  
+        }),         
     
     confirmPassword: Joi.string()
         .required()

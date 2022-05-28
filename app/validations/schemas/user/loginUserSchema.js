@@ -19,5 +19,13 @@ module.exports = Joi.object({
         .messages({
             'string.empty': 'le mot de passe est manquant',
             'any.required': 'le login ne peut pas être vide'            
-        })
+        }),
+    /** token pour le JWT présent en base de données*/
+    token: Joi
+        .string()
+        .required()
+        .messages({    
+            'string.empty': 'token obligatoire',
+            'any.required': 'token obligatoire'  
+        }),        
 });

@@ -14,19 +14,6 @@ const lessonController = {
     },
 
     /**
-     * envoie d'un token de formulaire pour une nouvelle lecon
-     */
-    getTokenByUserId: (req, res, next)=>{
-        /** récuperation du token génré */
-        const token = res.formToken;
-
-        /** envoie du token */
-        res.status(200).json({
-            token
-        });
-    },
-
-    /**
      * Création d'une nouvelle leçon
      */
     create: async(req, res, next) => {
@@ -305,6 +292,9 @@ const lessonController = {
                 }
             ]
         });   
+
+        /**récuperation du token */
+        const token = res.dataToken;
        
         return res.status(200).json({     
             id: updateLesson.id,
@@ -319,7 +309,7 @@ const lessonController = {
             slug: updateLesson.slug,
             created: updateLesson.formatedCreationDate,
             updated: updateLesson.formatedUpdateDate,
-            token: req.body.formToken  
+            token: token  
         });
     },
    
@@ -497,7 +487,9 @@ const lessonController = {
         /**suppression de la leçon */
         await lesson.destroy();
 
-        return res.status(204).json({});
+        return res.status(200).json({
+            lesson: lesson.id
+        });
     },
    
     /**
@@ -638,8 +630,8 @@ const lessonController = {
 
         /**personne déclenchant la demande */
         const userSource = {
-            id: req.payload.userId,
-            roleId: req.payload.role
+            id: req.payload.data.user,
+            roleId: req.payload.data.role
         };
 
         /** titre de la lecon */

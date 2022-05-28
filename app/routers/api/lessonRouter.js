@@ -17,7 +17,7 @@ const authorization = require('../../middlewares/authorizationMiddleware');
 const belongToMiddleware =  require('../../middlewares/belongToMiddleware');
 
 /**middleware pour token formulaire */
-const formTokenMiddleware = require('../../middlewares/tokenFormMiddleware');
+const formTokenMiddleware = require('../../middlewares/tokenMiddleware');
 
 /**controller lesson */
 const controllerHandler = require('../../helpers/controllerHelper/controllerHandler');
@@ -35,15 +35,6 @@ router.post('/',
     joiValidation(lessonSchemaValidation.lessonSaveSchema),    
     controllerHandler(formTokenMiddleware.getFormToken),
     controllerHandler(lessonController.create));
-
-/** generation token formulaire */
-router.get('/token/:userId', 
-    controllerHandler(cookieMiddleware),
-    controllerHandler(authorization),
-    controllerHandler(roleMiddleware.user),
-    controllerHandler(belongToMiddleware),
-    controllerHandler(formTokenMiddleware.setFormToken),
-    controllerHandler(lessonController.getTokenByUserId));
 
 /** gestion lesson par id */
 router.route('/:lessonId')
@@ -73,7 +64,7 @@ router.route('/:lessonId')
         controllerHandler(belongToMiddleware),      
         joiValidation(lessonSchemaValidation.lessonSaveSchema), 
         controllerHandler(formTokenMiddleware.getFormToken), 
-        /** generation d'un nouveau token  */               
+        controllerHandler(formTokenMiddleware.setFormToken),          
         controllerHandler(lessonController.updateById));
 
 /** récupération des lessons d'un utilisateur*/

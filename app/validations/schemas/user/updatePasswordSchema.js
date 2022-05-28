@@ -35,10 +35,19 @@ module.exports = Joi.object({
             'any.only': 'la confirmation du mot de passe, ne correspond pas au nouveau mot de passe '
         }),
 
-    formToken: Joi
+    /**secret token */
+    secret: Joi
         .string()
         .required()
-        .messages({    
+        .messages({
+            'string.empty': 'token du formulaire invalide',
+            'any.required': 'token du formulaire invalide'  
+        }),
+    /**token aléatoire*/
+    token: Joi
+        .string()
+        .required()
+        .messages({
             'string.empty': 'token du formulaire invalide',
             'any.required': 'token du formulaire invalide'  
         }),

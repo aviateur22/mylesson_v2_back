@@ -39,7 +39,6 @@ class CRYPTO_AES{
             /** dechriffement données */
             data = JSON.parse(DataDecode);         
             if(!data?.content){
-                console.log('bcrypt - invalid data.content');
                 throw 'bcrypt - invalid data.content';
             }
             let encryptedText = Buffer.from(data.content, this.bufferEncryption);    

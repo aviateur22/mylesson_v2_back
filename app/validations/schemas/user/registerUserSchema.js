@@ -41,7 +41,21 @@ module.exports = Joi.object({
             'string.empty': 'la confirmation du mot de passe est obligatoire',
             'any.required' : 'la confirmation du mot de passe est obligatoire',
             'any.only': 'le mot de passe et confirmation de mot de passe ne corresponde pas'
-        })      
+        }),
+    /** token pour le JWT présent en base de données*/
+    token: Joi
+        .string()
+        .required()
+        .messages({    
+            'string.empty': 'token obligatoire',
+            'any.required': 'token obligatoire'  
+        }),
+    /**CGU */
+    checkboxCgu: Joi.boolean().required().messages({
+        'string.empty': 'Valider les CGU',
+        'any.required' : 'Valider les CGU',
+        'any.invalid' : 'Valider les CGU'
+    })
         
 });
 

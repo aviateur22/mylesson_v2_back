@@ -18,7 +18,7 @@ const joiValidation = require('../../validations');
 const adminSchemaValidation = require('../../validations/schemas/admin');
 
 /**middleware pour token formulaire */
-const formTokenMiddleware = require('../../middlewares/tokenFormMiddleware');
+const formTokenMiddleware = require('../../middlewares/tokenMiddleware');
 
 const controllerHandler = require('../../helpers/controllerHelper/controllerHandler');
 const adminController = require('../../controllers/adminController');
@@ -43,7 +43,7 @@ router.get('/upgrade-request',
 );
 
 /**supprime le privilege d'edition par userId */
-router.post('/remove-privilege/:userId(\\d+)',
+router.post('/remove-privilege/by-user-id/:userId(\\d+)',
     controllerHandler(cookieMiddleware),
     controllerHandler(authorizationMiddleware),    
     controllerHandler(roleMiddleware.admin),
@@ -53,7 +53,7 @@ router.post('/remove-privilege/:userId(\\d+)',
 );
 
 /**supprime le privilege d'edition par logind'un user */
-router.post('/remove-privilege/:userLogin',
+router.post('/remove-privilege/by-user-login/:userLogin',
     controllerHandler(cookieMiddleware),
     controllerHandler(authorizationMiddleware),    
     controllerHandler(roleMiddleware.admin),

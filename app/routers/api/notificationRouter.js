@@ -18,7 +18,7 @@ const joiValidation = require('../../validations');
 const notificationSchema = require('../../validations/schemas/notification');
 
 /**middleware pour token formulaire */
-const formTokenMiddleware = require('../../middlewares/tokenFormMiddleware');
+const formTokenMiddleware = require('../../middlewares/tokenMiddleware');
 
 const controllerHandler = require('../../helpers/controllerHelper/controllerHandler');
 const notificationController = require('../../controllers/notificationController');
@@ -69,10 +69,10 @@ router.post('/notification-by-user/count/:userId',
 router.patch('/read/:notificationId',
     controllerHandler(cookieMiddleware),
     controllerHandler(authorizationMiddleware),
+    controllerHandler(formTokenMiddleware.getFormToken),
     controllerHandler(belongToMiddleware),
     controllerHandler(roleMiddleware.user),
-    joiValidation(notificationSchema.updateNotification),
-    controllerHandler(formTokenMiddleware.getFormToken),
+    joiValidation(notificationSchema.updateNotification),    
     controllerHandler(notificationController.readNotificationById)
 );
 

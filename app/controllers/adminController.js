@@ -23,7 +23,7 @@ const adminController={
         }
 
         /** Seule un admin peut executer cette action */
-        if(req.payload.role < userRole.admin){
+        if(isNaN(parseInt(req.payload.data.role, 10)) || parseInt(req.payload.data.role, 10) < Number(userRole.admin)){
             throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
         }
 
@@ -46,18 +46,18 @@ const adminController={
 
         /** donnée admin */
         const adminData = {
-            id: req.payload.userId,
-            roleId: req.payload.role
+            id: req.payload.data.user,
+            roleId: req.payload.data.role
         };
 
         /** génération d'un notification pour l'utilisateur */
-        return notificationController.createNotification(adminData, user, message)(req, res, ()=>{
+        notificationController.createNotification(adminData, user, message)(req, res, ()=>{
             return res.status(200).json({
                 user: user.id
             });
         });
     },
-
+ 
     /**
      * supprerssion des priviléges par userId
      */
@@ -73,12 +73,12 @@ const adminController={
         if(isNaN(userId)){
             throw ({message: 'le format de l\'identifiant utilisateur est incorrecte', statusCode:'400'});
         }
-
+       
         /** Seule un admin peut executer cette action */
-        if(req.payload.role < userRole.admin){
+        if(isNaN(parseInt(req.payload.data.role, 10)) || parseInt(req.payload.data.role, 10) < parseInt(userRole.admin,10)){
             throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
         }
-
+        
         /** recherche de l'utilisateur a upgradé*/
         const user = await User.findByPk(userId);
 
@@ -89,20 +89,18 @@ const adminController={
         /** nouvelles données utilisateurs */
         const newData = { ...user, ...{role_id: userRole.user, request_upgrade_role: false}};
 
-        const updateUserRole = await user.update({
-            ...newData
-        });        
+        const updateUserRole = await user.update(newData);        
         
         const message = 'droit d\'édition refusé';
 
         /** donnée admin */
         const adminData = {
-            id: req.payload.userId,
-            roleId: req.payload.role
+            id: req.payload.data.user,
+            roleId: req.payload.data.role
         };
 
         /** génération d'un notification pour l'utilisateur */
-        return notificationController.createNotification(adminData, user, message)(req, res, ()=>{
+        notificationController.createNotification(adminData, user, message)(req, res, ()=>{
             return res.status(200).json({
                 user: user.id
             });
@@ -126,7 +124,7 @@ const adminController={
         }
 
         /** Seule un admin peut executer cette action */
-        if(req.payload.role < userRole.admin){
+        if(isNaN(parseInt(req.payload.data.role, 10)) || parseInt(req.payload.data.role, 10) < Number(userRole.admin)){
             throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
         }
 
@@ -149,16 +147,14 @@ const adminController={
         /** nouvelles données utilisateurs */
         const newData = { ...user, ...{role_id: userRole.user, request_upgrade_role: false}};
 
-        const updateUserRole = await user.update({
-            ...newData
-        });
+        const updateUserRole = await user.update(newData);
         
         const message = 'droit d\'édition supprimé';
 
         /** donnée admin */
         const adminData = {
-            id: req.payload.userId,
-            roleId: req.payload.role
+            id: req.payload.data.user,
+            roleId: req.payload.data.role
         };
         
         /** génération d'un notification pour l'utilisateur */
@@ -252,7 +248,7 @@ const adminController={
         }
 
         /** Seule un admin peut executer cette action */
-        if(req.payload.role < userRole.admin){
+        if(isNaN(parseInt(req.payload.data.role, 10)) || parseInt(req.payload.data.role, 10) < Number(userRole.admin)){
             throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
         }
 
@@ -272,14 +268,16 @@ const adminController={
         await deleteUser.destroy();       
 
         return res.status(204).json({
-            message: 'utilisateur supprimé'
         });
     },
 
+    /**
+     *Suppression d'une leçon
+     */
     deleteLessonByLessonId: async(req, res, next)=>{
         //récupération id de la lesson
         const lessonId = req.params.lessonId;
-
+        
         //id pas au format numeric
         if(!lessonId || isNaN(parseInt(lessonId,10))){
             throw ({message: 'le format de l\'identifiant de la leçon est incorrect', statusCode:'400'});
@@ -295,19 +293,19 @@ const adminController={
         }
 
         /** Seule un admin peut executer cette action */
-        if(req.payload.role < userRole.admin){
+        if(isNaN(parseInt(req.payload.data.role, 10)) || parseInt(req.payload.data.role, 10) < Number(userRole.admin)){
             throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
         }
 
         /**suppression de la leçon */
         await lesson.destroy();
-        
+              
         /** notification si lecon supprimé par un admin */
-        if(parseInt(req.payload.role, 10) >= parseInt(userRole.admin, 10)){
+        if(parseInt(req.payload.data.role, 10) >= parseInt(userRole.admin, 10)){
             /** donnée admin */
             const adminData = {
-                id: req.payload.userId,
-                roleId: req.payload.role
+                id: req.payload.data.userId,
+                roleId: req.payload.data.role
             };
 
             /** notification */

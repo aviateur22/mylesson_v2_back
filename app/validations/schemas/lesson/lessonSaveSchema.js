@@ -62,10 +62,19 @@ module.exports = Joi.object({
             'any.required': 'la sélection d\'une thématique est obligatoire'
         }),
         
-    formToken: Joi
+    /**secret token */
+    secret: Joi
         .string()
         .required()
-        .messages({    
+        .messages({
+            'string.empty': 'token du formulaire invalide',
+            'any.required': 'token du formulaire invalide'  
+        }),
+    /**token aléatoire*/
+    token: Joi
+        .string()
+        .required()
+        .messages({
             'string.empty': 'token du formulaire invalide',
             'any.required': 'token du formulaire invalide'  
         }),

@@ -15,7 +15,7 @@ const roleMiddleware = {
         }
 
         /** Pas de données sur le role utilisateur */
-        if(!req.payload.role){
+        if(!req.payload.data.role){
             throw ({ message: 'données manquant pour confirmer les privilèges', statusCode:'400' });
         }
 
@@ -24,7 +24,7 @@ const roleMiddleware = {
             throw ({ message: 'données manquant pour confirmer les privilèges', statusCode:'400' });
         }
 
-        if(req.payload.role < userRole.user){                       
+        if(req.payload.data.role < userRole.user){                       
             throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
         }
         return next();    
@@ -40,7 +40,7 @@ const roleMiddleware = {
         }
 
         /** Pas de données sur le role utilisateur */
-        if(!req.payload.role){
+        if(!req.payload.data.role){
             throw ({ message: 'données manquant pour confirmer les privilèges', statusCode:'400' });
         }
 
@@ -50,7 +50,7 @@ const roleMiddleware = {
         }
         
         /** roleId insuffisant */
-        if(req.payload.role < userRole.writer){
+        if(req.payload.data.role < userRole.writer){
             throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
         }
         return next();  
@@ -66,7 +66,7 @@ const roleMiddleware = {
         }
 
         /** Pas de données sur le role utilisateur */
-        if(!req.payload.role){
+        if(!req.payload.data.role){
             throw ({ message: 'données manquant pour confirmer les privilèges', statusCode:'400' });
         }
 
@@ -75,7 +75,7 @@ const roleMiddleware = {
             throw ({ message: 'données manquant pour confirmer les privilèges', statusCode:'400' });
         }   
         
-        if(req.payload.role < userRole.admin){
+        if(req.payload.data.role < userRole.admin){
             throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
         }
         next();
@@ -91,7 +91,7 @@ const roleMiddleware = {
         }
 
         /** Pas de données sur le role utilisateur */
-        if(!req.payload.role){
+        if(!req.payload.data.role){
             throw ({ message: 'données manquant pour confirmer les privilèges', statusCode:'400' });
         }
 
@@ -100,7 +100,7 @@ const roleMiddleware = {
             throw ({ message: 'données manquant pour confirmer les privilèges', statusCode:'400' });
         }   
           
-        if(req.payload.role < userRole.superAdmin){
+        if(req.payload.data.role < userRole.superAdmin){
             throw ({message: 'vous n\'êtes pas autorisé a executer cette action', statusCode:'403'});
         }
         next();      

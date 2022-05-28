@@ -12,10 +12,19 @@ module.exports = Joi.object({
             'any.required': 'absence de données sur la compagnie',
         }),
         
-    formToken: Joi
+    /**secret token */
+    secret: Joi
         .string()
         .required()
-        .messages({    
+        .messages({
+            'string.empty': 'token du formulaire invalide',
+            'any.required': 'token du formulaire invalide'  
+        }),
+    /**token aléatoire*/
+    token: Joi
+        .string()
+        .required()
+        .messages({
             'string.empty': 'token du formulaire invalide',
             'any.required': 'token du formulaire invalide'  
         }),
