@@ -87,8 +87,7 @@ router.route('/:userId')
         controllerHandler(roleMiddleware.user),
         controllerHandler(belongToMiddleware),        
         joiValidation(userSchemaValidation.updateUserSchema), 
-        controllerHandler(formTokenMiddleware.getFormToken),    
-        controllerHandler(formTokenMiddleware.setFormToken),   
+        controllerHandler(formTokenMiddleware.getFormToken), 
         controllerHandler(userController.updateUserById))
 
     /** suppression utilisateur */
@@ -107,7 +106,6 @@ router.patch('/password/:userId',
     controllerHandler(belongToMiddleware),
     joiValidation(userSchemaValidation.updatePasswordSchema),
     controllerHandler(formTokenMiddleware.getFormToken),
-    controllerHandler(formTokenMiddleware.setFormToken),  
     controllerHandler(userController.updatePassword));
 
 /** recuperation d'une image d'un user authentifié */
@@ -125,8 +123,7 @@ router.patch('/image/:userId',
     controllerHandler(belongToMiddleware),
     controllerHandler(folderExistMiddleware.uploadFolder),
     uploadImageMiddleware.single('image'), 
-    controllerHandler(formTokenMiddleware.getFormToken),                     
-    controllerHandler(formTokenMiddleware.setFormToken),  
+    controllerHandler(formTokenMiddleware.getFormToken),  
     controllerHandler(thumbnailMiddleware),
     controllerHandler(awsMiddleware.uploadAWSBucket),  
     controllerHandler(userController.updateImageByUserId));

@@ -48,8 +48,7 @@ router.route('/user/:userId')
         controllerHandler(roleMiddleware.writer),
         controllerHandler(belongToMiddleware),
         joiValidation(linkSchemaValidation.deleteLinkSchema),
-        controllerHandler(formTokenMiddleware.getFormToken),  
-        controllerHandler(formTokenMiddleware.setFormToken), 
+        controllerHandler(formTokenMiddleware.getFormToken), 
         controllerHandler(linkController.deleteLinkByUserId))
     /** ajout d'un nouveau link pour 1 utilsateur */
     .post(
@@ -58,8 +57,7 @@ router.route('/user/:userId')
         controllerHandler(roleMiddleware.writer),
         controllerHandler(belongToMiddleware),
         joiValidation(linkSchemaValidation.saveUserLinkSchema),
-        controllerHandler(formTokenMiddleware.getFormToken),    
-        controllerHandler(formTokenMiddleware.setFormToken), 
+        controllerHandler(formTokenMiddleware.getFormToken), 
         controllerHandler(linkController.saveLinkByUserId))
     /** récuperation de tous les links d'un utilisateur */
     .get(

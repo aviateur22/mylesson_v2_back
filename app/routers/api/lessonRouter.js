@@ -63,8 +63,7 @@ router.route('/:lessonId')
         controllerHandler(roleMiddleware.writer),  
         controllerHandler(belongToMiddleware),      
         joiValidation(lessonSchemaValidation.lessonSaveSchema), 
-        controllerHandler(formTokenMiddleware.getFormToken), 
-        controllerHandler(formTokenMiddleware.setFormToken),          
+        controllerHandler(formTokenMiddleware.getFormToken),          
         controllerHandler(lessonController.updateById));
 
 /** récupération des lessons d'un utilisateur*/

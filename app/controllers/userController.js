@@ -234,7 +234,7 @@ const userController={
 
         /** modification de l'email*/
         if(email){
-            const user = await User.findOne({
+            const findEmail = await User.findOne({
                 where: {
                     email: email 
                 }
@@ -242,13 +242,25 @@ const userController={
             
 
             /** email déja utilisé si id utilisateur different */
-            if(user && Number(user.id) !== Number(userId)) {      
+            if(findEmail && Number(findEmail.id) !== Number(userId)) {      
                 throw ({message: 'cet email est déjà existant', statusCode:'409'});
             }
         }
 
-        /**recuperation du token */
-        const token = res.dataToken;
+        /** modification du login */
+        if(login){
+            const findLogin = await User.findOne({
+                where: {
+                    login: login 
+                }
+            });
+            
+
+            /** login déja utilisé si id utilisateur different */
+            if(findLogin && Number(findLogin.id) !== Number(userId)) {      
+                throw ({message: 'ce login est déjà existant', statusCode:'409'});
+            }
+        }
 
         /** nouvelles données utilisateur */
         const newUserData = { ...userData, ...{ email: sanitizer.escape(email), login: sanitizer.escape(login), sex: sex ? sanitizer.escape(sex): null }};
@@ -266,7 +278,10 @@ const userController={
             sex: userData.sex,
             usersLinks: userData.usersLinks,
             requestRoleUpgrade: userData.request_upgrade_role,
-            token: token
+            token: {
+                token: req.body.token,
+                secret: req.body.secret
+            }
         });
     },
 
@@ -304,10 +319,7 @@ const userController={
         /** mise a jour de l'utilisateur */
         const updateUser = await userData.update({
             ...newUserData            
-        });      
-        
-        /**recuperation du token */
-        const token = res.dataToken;
+        });              
 
         return res.status(200).json({
             id: updateUser.id,
@@ -317,7 +329,10 @@ const userController={
             sex: updateUser.sex,
             usersLinks: updateUser.usersLinks,
             requestRoleUpgrade: updateUser.request_upgrade_role,
-            token: token
+            token: {
+                token: req.body.token,
+                secret: req.body.secret
+            }
         });
     },
     /**
@@ -381,7 +396,7 @@ const userController={
 
         /** echec comparaiosn mot de passe */
         if(!comparePassword){
-            throw ({message: 'echec de la mise à jour de votre mot de passe', statusCode:'403'}); 
+            throw ({message: 'echec de la mise à jour de votre mot de passe', statusCode:'400'}); 
         }
 
         /** erreur de confirmation de mot de passe */
@@ -398,9 +413,6 @@ const userController={
             password: passwordHash        
         });
 
-        /** recuperation du token */
-        const token = res.dataToken;
-       
         return res.status(200).json({
             id: updateUser.id,
             login: updateUser.login,
@@ -409,7 +421,10 @@ const userController={
             sex: updateUser.sex,
             usersLinks: updateUser.usersLinks,
             requestRoleUpgrade: updateUser.request_upgrade_role,
-            token: token
+            token: {
+                token: req.body.token,
+                secret: req.body.secret
+            }
         });
     },
 

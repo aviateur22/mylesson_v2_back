@@ -28,6 +28,14 @@ router.post('/:userId',
     controllerHandler(belongToMiddleware),
     controllerHandler(tokenController.generateToken(jwtExpireIn.std.expiresIn)));
 
+/** generation token pour éditeur de leçon */
+router.post('/lesson-editor/:userId', 
+    controllerHandler(cookieMiddleware),
+    controllerHandler(authorizationMiddleware),
+    controllerHandler(roleMiddleware.writer),
+    controllerHandler(belongToMiddleware),
+    controllerHandler(tokenController.generateToken(jwtExpireIn.lessonEditor.expiresIn)));
+
 /**génration token sans être authentifié */
 router.get('/visitor',
     controllerHandler(tokenController.generateVisitorToken(jwtExpireIn.visitor.expiresIn)));

@@ -147,7 +147,10 @@ const lessonController = {
             created_at: createLesson.created_at,
             created: createLesson.formatedCreationDate,
             updated: createLesson.formatedUpdateDate,
-            token: req.body.formToken  
+            token: {
+                token: req.body.token,
+                secret: req.body.secret
+            }  
         });
     },
     
@@ -291,10 +294,7 @@ const lessonController = {
                     include:['links']        
                 }
             ]
-        });   
-
-        /**récuperation du token */
-        const token = res.dataToken;
+        });
        
         return res.status(200).json({     
             id: updateLesson.id,
@@ -309,7 +309,10 @@ const lessonController = {
             slug: updateLesson.slug,
             created: updateLesson.formatedCreationDate,
             updated: updateLesson.formatedUpdateDate,
-            token: token  
+            token: {
+                token: req.body.token,
+                secret: req.body.secret
+            }  
         });
     },
    

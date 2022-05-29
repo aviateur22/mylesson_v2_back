@@ -56,7 +56,7 @@ module.exports = {
 
             /** décodage base64 -> UTF-8 puis décryptage du secret cookie  */
             const secretDecrypt =  await aes.decrypt(secret);
-
+            
             /**verification cohérence token non décrypté */            
             if(tokenClientDecrypt !== tokenDecrypt || secretClientDecrypt !== secretDecrypt){
                 throw ({message: 'vous n`\'avez pas les droits pour executer l\'action demandée', statusCode:'403'});

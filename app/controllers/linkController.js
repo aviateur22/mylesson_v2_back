@@ -104,9 +104,6 @@ const linkController = {
             include: ['links']
         });
 
-        /** recuperation du token */
-        const token = res.dataToken;
-
         return res.status(statusCode).json({
             id: updateUser.id,
             login: updateUser.login,
@@ -114,7 +111,10 @@ const linkController = {
             sex: updateUser.sex,
             avatarKey: updateUser.avatar_key,
             links: updateUser.links,
-            token: token
+            token: {
+                token: req.body.token,
+                secret: req.body.secret
+            }
         });  
     },
 
@@ -183,9 +183,6 @@ const linkController = {
             include: ['links']
         });
 
-        /** recuperation du token */
-        const token = res.dataToken;
-
         return res.status(200).json({
             id: updateUser.id,
             login: updateUser.login,
@@ -193,7 +190,10 @@ const linkController = {
             sex: updateUser.sex,
             avatarKey: updateUser.avatar_key,
             links: updateUser.links,
-            token: token
+            token: {
+                token: req.body.token,
+                secret: req.body.secret
+            }
         });  
     },
 

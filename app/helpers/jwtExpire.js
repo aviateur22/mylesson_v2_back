@@ -12,5 +12,10 @@ module.exports = {
     std: { expiresIn: '900s'},
 
     /** personne non connecté */
-    visitor: { expiresIn: '900s'}
+    visitor: { expiresIn: '900s'},
+
+    /** edition d'une lecon */
+    lessonEditor: { expiresIn: '18000s' }
+
+
 };

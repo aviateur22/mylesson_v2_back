@@ -304,7 +304,7 @@ const adminController={
         if(parseInt(req.payload.data.role, 10) >= parseInt(userRole.admin, 10)){
             /** donnée admin */
             const adminData = {
-                id: req.payload.data.userId,
+                id: req.payload.data.user,
                 roleId: req.payload.data.role
             };
 

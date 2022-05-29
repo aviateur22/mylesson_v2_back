@@ -114,7 +114,9 @@ const notificationController = {
 
         /** recherche des notifications associés */
         const findNotification = await User.findByPk(userId,  {
-            include: ['notifications']
+            
+            include: ['notifications'],
+            order: [['notifications', 'updated_at','desc']]
         });      
         
         /** tableau de notifications */
