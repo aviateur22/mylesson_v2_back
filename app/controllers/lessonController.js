@@ -146,11 +146,7 @@ const lessonController = {
             slug: createLesson.slug,
             created_at: createLesson.created_at,
             created: createLesson.formatedCreationDate,
-            updated: createLesson.formatedUpdateDate,
-            token: {
-                token: req.body.token,
-                secret: req.body.secret
-            }  
+            updated: createLesson.formatedUpdateDate
         });
     },
     
@@ -308,11 +304,7 @@ const lessonController = {
             avatarKey: updateLesson.user.avatar_key,
             slug: updateLesson.slug,
             created: updateLesson.formatedCreationDate,
-            updated: updateLesson.formatedUpdateDate,
-            token: {
-                token: req.body.token,
-                secret: req.body.secret
-            }  
+            updated: updateLesson.formatedUpdateDate
         });
     },
    

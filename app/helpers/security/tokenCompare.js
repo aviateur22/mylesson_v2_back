@@ -8,7 +8,7 @@ module.exports = {
      * @param {Object} jwt - jwt possédant le token 
      * @param {Object} tokenClient - token coté client a comparer 
      */
-    compareToken: async(jwt, tokenClient, secretClient) => {
+    compareToken: async(jwt, tokenClient) => {
         //clé secrete
         const KEY = process.env.JWT_PRIVATE_KEY;
 
@@ -17,7 +17,7 @@ module.exports = {
         }
        
         /** token injecté */
-        if(!tokenClient || !secretClient){
+        if(!tokenClient){
             throw ({message: 'vous n\'avez pas les droits pour executer l\'action demandée', statusCode:'403'});
         }
 
@@ -32,33 +32,25 @@ module.exports = {
             }                     
 
             /** token absent */
-            if(!payload.data?.token || !payload.data?.secret){
+            if(!payload.data?.token){
                 throw ({message: 'vous n`\'avez pas les droits pour executer l\'action demandée', statusCode:'403'});
             } 
 
             /** token du jwt */
-            const token = payload.data.token;
-
-            /** secret du jwt */
-            const secret = payload.data.secret;
+            const token = payload.data.token;          
 
             /** decryptage des token */
             const aes = new AES();
 
             /** décodage base64 -> UTF-8 puis décryptage du token req.body */
-            const tokenClientDecrypt =  await aes.decrypt(tokenClient);
-
-            /** décodage base64 -> UTF-8 puis décryptage du secret req.body */
-            const secretClientDecrypt =  await aes.decrypt(secretClient);
+            const tokenClientDecrypt =  await aes.decrypt(tokenClient);            
 
             /** décodage base64 -> UTF-8 puis décryptage du token cookie  */
             const tokenDecrypt =  await aes.decrypt(token);
 
-            /** décodage base64 -> UTF-8 puis décryptage du secret cookie  */
-            const secretDecrypt =  await aes.decrypt(secret);
             
             /**verification cohérence token non décrypté */            
-            if(tokenClientDecrypt !== tokenDecrypt || secretClientDecrypt !== secretDecrypt){
+            if(tokenClientDecrypt !== tokenDecrypt){
                 throw ({message: 'vous n`\'avez pas les droits pour executer l\'action demandée', statusCode:'403'});
             }
             return true;

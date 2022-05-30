@@ -22,15 +22,7 @@ module.exports = Joi.object({
         }),
     
     
-    sex: Joi.any(),
-    /**secret token */
-    secret: Joi
-        .string()
-        .required()
-        .messages({
-            'string.empty': 'token du formulaire invalide',
-            'any.required': 'token du formulaire invalide'  
-        }),
+    sex: Joi.any(),    
     /**token aléatoire*/
     token: Joi
         .string()

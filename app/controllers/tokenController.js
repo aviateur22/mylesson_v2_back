@@ -16,24 +16,17 @@ const tokenController = {
         /** récuperation d'un JWT + token chiffré */
         const data = await jwt.generateToken();
 
+        /**vérification de la présence des token */
+        if(!data){
+            throw ({ message: 'erreur génération token', statusCode:'500' });
+        }
+        
         /** Renvoie d'un JWT pour gestion des authorization */
-        res.cookie('auth_token', data.jwt, { sameSite:'none', secure: true, httpOnly: true });   
-
-        //clé secrete
-        const KEY = process.env.JWT_PRIVATE_KEY;
-
-        jsonwebtoken.verify(data.jwt, KEY, function(err, payload) {        
-            if(err){
-                throw ({message: 'votre session a expirée', statusCode:'401'});
-            }
-            req.payload = payload;
-        });
+        res.cookie('auth_token', data.jwt, { sameSite:'none', secure: true, httpOnly: true });
 
         return res.status(201).json({
             dataToken: {
-                secret: data.secret,
                 token: data.token
-
             } 
         });
     },
@@ -49,6 +42,11 @@ const tokenController = {
 
         /** récuperation d'un JWT + token chiffré */
         const data = await jwt.generateTokenWithSecretWord();
+
+        /**vérification de la présence des token */
+        if(!data){
+            throw ({ message: 'erreur génération token', statusCode:'500' });
+        }
 
         /** Renvoie d'un JWT pour gestion des authorization */
         res.cookie('visitor_auth', data.jwt, { sameSite:'none', secure: true, httpOnly: true });   

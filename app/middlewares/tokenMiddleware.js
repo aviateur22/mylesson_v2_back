@@ -26,18 +26,17 @@ module.exports = {
         }   
         
         /** token depuis la requete */
-        const reqToken = req.body.token;       
-        const reqSecret = req.body.secret;  
-
+        const reqToken = req.body.token;
+        
         /** token de la requete absent */
-        if(!reqToken || !reqSecret){
+        if(!reqToken){
             throw ({message: 'oupsss token invalid', statusCode:'403'});
         }
 
         /** récupération cookie authorisation formulaire */
         const cookieToken = req.cookie.auth_token;  
 
-        const compare =  await compareToken.compareToken(cookieToken, reqToken, reqSecret);
+        const compare =  await compareToken.compareToken(cookieToken, reqToken);
 
         if(!compare){
             throw ({message: 'oupsss token invalid', statusCode:'403'});
@@ -95,14 +94,13 @@ module.exports = {
         const jwtGen = data.jwt;
 
         /** vérification présence token et secret token our le formulaire */
-        if(!data.token || !data.secret){           
+        if(!data.token){           
             throw ({message: 'erreur dans la création des tokens', statusCode:'400'});
         }
 
         /** transfert des tokens dans la réponse */
         res.dataToken = {
             token: data.token,
-            secret: data.secret
         };
         
         /** Renvoie d'un JWT pour gestion des authorization */

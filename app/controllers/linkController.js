@@ -110,11 +110,7 @@ const linkController = {
             email: updateUser.email,
             sex: updateUser.sex,
             avatarKey: updateUser.avatar_key,
-            links: updateUser.links,
-            token: {
-                token: req.body.token,
-                secret: req.body.secret
-            }
+            links: updateUser.links
         });  
     },
 
@@ -189,11 +185,7 @@ const linkController = {
             email: updateUser.email,
             sex: updateUser.sex,
             avatarKey: updateUser.avatar_key,
-            links: updateUser.links,
-            token: {
-                token: req.body.token,
-                secret: req.body.secret
-            }
+            links: updateUser.links
         });  
     },
 

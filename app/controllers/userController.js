@@ -163,8 +163,6 @@ const userController={
         if(!user){
             throw ({message: 'utilisateur absent de la base de données', statusCode:'404'});
         }
-
-        const token = res.dataToken;
        
         return res.status(200).json({
             id: user.id,
@@ -173,7 +171,6 @@ const userController={
             sex: user.sex,
             avatarKey: user.avatar_key,
             links: user.links,
-            token: token,
             requestRoleUpgrade: user.request_upgrade_role
         });
     },
@@ -277,11 +274,7 @@ const userController={
             avatarKey: userData.avatar_key,
             sex: userData.sex,
             usersLinks: userData.usersLinks,
-            requestRoleUpgrade: userData.request_upgrade_role,
-            token: {
-                token: req.body.token,
-                secret: req.body.secret
-            }
+            requestRoleUpgrade: userData.request_upgrade_role
         });
     },
 
@@ -328,11 +321,7 @@ const userController={
             avatarKey: updateUser.avatar_key,
             sex: updateUser.sex,
             usersLinks: updateUser.usersLinks,
-            requestRoleUpgrade: updateUser.request_upgrade_role,
-            token: {
-                token: req.body.token,
-                secret: req.body.secret
-            }
+            requestRoleUpgrade: updateUser.request_upgrade_role
         });
     },
     /**
@@ -420,11 +409,7 @@ const userController={
             avatarKey: updateUser.avatar_key,
             sex: updateUser.sex,
             usersLinks: updateUser.usersLinks,
-            requestRoleUpgrade: updateUser.request_upgrade_role,
-            token: {
-                token: req.body.token,
-                secret: req.body.secret
-            }
+            requestRoleUpgrade: updateUser.request_upgrade_role
         });
     },
 
@@ -487,10 +472,7 @@ const userController={
         const newData = { ...user, ...{request_upgrade_role: true}};
 
         /**demande de devenir éditeur */
-        const upgradeUserRole = await user.update(newData);
-
-        /** recuperation du token */
-        const token = res.dataToken;
+        const upgradeUserRole = await user.update(newData);      
 
         return res.status(200).json({            
             id: upgradeUserRole.id,
@@ -499,8 +481,7 @@ const userController={
             avatarKey: upgradeUserRole.avatar_key,
             sex: upgradeUserRole.sex,
             usersLinks: upgradeUserRole.usersLinks,
-            requestRoleUpgrade: upgradeUserRole.request_upgrade_role,
-            token: token
+            requestRoleUpgrade: upgradeUserRole.request_upgrade_role
         });
     },
 

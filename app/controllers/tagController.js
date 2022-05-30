@@ -16,7 +16,7 @@ const tagController = {
         const tag =sanitizer.escape(req.params.name);
 
         if(!tag){
-            throw ({ message: 'le nom du tag ne peut pas être vide', statusCode:'422' });
+            throw ({ message: 'le nom du tag ne peut pas être vide', statusCode:'400' });
         }
         
         //recherche limité a 10 caractères

@@ -61,12 +61,12 @@ class JWT{
         const token = await aes.encrypt(uuidv4());
 
         /**secret  */
-        const secret = await aes.encrypt(process.env.SECRET_APP_WORD);
+        //const secret = await aes.encrypt(process.env.SECRET_APP_WORD);
 
         /**génération d'un jwt avec payload */
-        const jwt = this.generateJwt({ token, secret });
+        const jwt = this.generateJwt({ token});
 
-        return ({jwt, token, secret});     
+        return ({jwt, token});     
     }
 
     /**

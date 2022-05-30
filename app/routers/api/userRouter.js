@@ -77,7 +77,7 @@ router.route('/:userId')
         controllerHandler(authorizationMiddleware),
         controllerHandler(roleMiddleware.user),
         controllerHandler(belongToMiddleware),
-        controllerHandler(formTokenMiddleware.setFormToken),
+        //controllerHandler(formTokenMiddleware.setFormToken),
         controllerHandler(userController.getUserById))
 
     /** update info utilisateur */
@@ -137,7 +137,6 @@ router.post('/request-upgrade-privilege/:userId',
     controllerHandler(cookieMiddleware),
     controllerHandler(authorizationMiddleware),
     controllerHandler(formTokenMiddleware.getFormToken),
-    controllerHandler(formTokenMiddleware.setFormToken),
     controllerHandler(roleMiddleware.user),    
     controllerHandler(belongToMiddleware),
     joiValidation(userSchemaValidation.requestUpgradeRole),

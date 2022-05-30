@@ -60,16 +60,8 @@ module.exports = Joi.object({
         .messages({
             'number.base': 'le format de l\'identifiant de la thématique est incorrect',
             'any.required': 'la sélection d\'une thématique est obligatoire'
-        }),
-        
-    /**secret token */
-    secret: Joi
-        .string()
-        .required()
-        .messages({
-            'string.empty': 'token du formulaire invalide',
-            'any.required': 'token du formulaire invalide'  
-        }),
+        }),       
+    
     /**token aléatoire*/
     token: Joi
         .string()
