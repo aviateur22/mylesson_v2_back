@@ -86,7 +86,7 @@ class Mailer{
         let secretURLCode = process.env.SECRET_URL_WORD;
 
         /**ajout du userID */
-        secretURLCode = secretURLCode.replace(':USER_ID', this.userId);
+        secretURLCode =this.userId +'|'+ secretURLCode;
 
         /**chiffrage */
         this.secretURLCodeEncrypt = await this.aes().encrypt(secretURLCode);

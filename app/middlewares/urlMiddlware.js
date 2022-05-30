@@ -28,13 +28,7 @@ module.exports = {
         /**recuperation secret code */
         const secret = process.env.SECRET_URL_WORD;
 
-        const secretCode = secret.split('|');
-
-        if(secretCode.length !== 2){
-            throw ({message: 'vous n\'êtes pas autorisé à éxecuter cette action', statusCode:'403'});
-        }
-
-        if((parseInt(userId,10) !== parseInt(userToken[0],10)) || (userToken[1] !== secretCode[1])){
+        if((parseInt(userId,10) !== parseInt(userToken[0],10)) || (userToken[1] !== secret)){
             throw ({message: 'vous n\'êtes pas autorisé à éxecuter cette action', statusCode:'403'});
         }
         req.userId = parseInt(userId,10);
