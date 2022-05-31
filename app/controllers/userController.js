@@ -1,9 +1,7 @@
 const bcrypt = require('bcrypt');
-const { User, Link, UserLink } = require('../models/index');
+const { User } = require('../models/index');
 const sanitizer = require('sanitizer');
-
-const AES = require('../helpers/security/aes');
-const jsonwebtoken = require('jsonwebtoken');
+const xss = require('xss');
 
 /**role utilisateur */
 const userRole = require('../helpers/userRole');
@@ -66,7 +64,10 @@ const userController={
 
         
         /** Renvoie d'un JWT pour gestion des authorization */
-        res.cookie('authorization', jwtGen, { secure: true, sameSite:'none', httpOnly: true });       
+        res.cookie('authorization', jwtGen, { secure: true, sameSite:'none', httpOnly: true });   
+
+        /**suppression du cookie visteur */
+        res.clearCookie('visitor_auth');    
 
         return res.status(200).json({
             'message':`Bienvenu sur votre compte ${user.login}`,            
@@ -120,8 +121,8 @@ const userController={
         const passwordHash =await bcrypt.hash(password,10);
 
         await User.create({
-            login,
-            email,
+            login: sanitizer.escape(xss(login)),
+            email: sanitizer.escape(xss(email)),
             password : passwordHash,
             avatar_key: process.env.DEFAULT_AVATAR
         });            
@@ -134,8 +135,12 @@ const userController={
     /**
      * Déconnexion
      */
-    logout:  async(req, res ,_)=> {        
-        //const comparePassword = await bcrypt.compare(req.session.user);
+    logout:  async(req, res ,_)=> {     
+        /** suppression des cookie */
+        res.clearCookie('auth_token');
+        res.clearCookie('visitor_auth');
+        res.clearCookie('authorization');
+
         return res.status(200).json({
             'message':'A bientot'
         });            
@@ -260,7 +265,7 @@ const userController={
         }
 
         /** nouvelles données utilisateur */
-        const newUserData = { ...userData, ...{ email: sanitizer.escape(email), login: sanitizer.escape(login), sex: sex ? sanitizer.escape(sex): null }};
+        const newUserData = { ...userData, ...{ email: sanitizer.escape(xss(email)), login: sanitizer.escape(xss(login)), sex: sex ? sanitizer.escape(sex): null }};
        
         /** mise a jour de l'utilisateur */
         await userData.update({

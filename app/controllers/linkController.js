@@ -1,5 +1,6 @@
 const { Link, UserLink, User } = require('../models/index');
 const sanitize = require('sanitizer');
+const xss =  require('xss');
 const userRole = require('../helpers/userRole');
 
 
@@ -64,8 +65,9 @@ const linkController = {
          * update 200
          */
         let statusCode;
+        
         /**nettoyage de l'entrée utilisateur */
-        const sanitizeUrlLink = sanitize.escape(linkUrl);
+        const sanitizeUrlLink = sanitize.escape(xss(linkUrl));
         
         if(userLinkMedia){
             /** mise a jour des données links utilisateur */

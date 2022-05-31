@@ -117,7 +117,14 @@ const notificationController = {
             
             include: ['notifications'],
             order: [['notifications', 'updated_at','desc']]
-        });      
+        });    
+        
+        /**aucun utilisateur */
+        if(!findNotification){
+            return res.status(404).json({ 
+                message: 'aucun utilisateur utilisateur',                
+            });
+        }
         
         /** tableau de notifications */
         const notifications = findNotification.notifications;
@@ -154,6 +161,14 @@ const notificationController = {
             }]
         });              
         
+        /**aucun utilisateur */
+        if(!findNotification){
+            return res.status(404).json({ 
+                message: 'aucun utilisateur utilisateur',
+                notificationCount: 0
+            });
+        }
+
         /** tableau de notifications */
         const notifications = findNotification.notifications;
 

@@ -2,6 +2,8 @@ const sanitizer = require('sanitizer');
 const {Lesson, Tag, User, LessonTag, Thematic} = require('../models/index');
 const userRole = require('../helpers/userRole');
 const notificationController = require('./notificationController');
+const showdown = require('showdown');
+const xss = require('xss');
 
 
 const lessonController = {
@@ -63,10 +65,9 @@ const lessonController = {
             throw ({ message: 'tags id absent', statusCode:'400' });
         }
 
-        /**Nettoyage des données utilisateur */
-        const contentEscape = sanitizer.escape(content);
-        const titleEscape = sanitizer.escape(title);
-        const summaryEscape = sanitizer.escape(summary);
+        /**Nettoyage des données utilisateur */        
+        const titleEscape = sanitizer.sanitize(xss(title));
+        const summaryEscape = sanitizer.sanitize(xss(summary));
 
         //création d'un tableau tags id
         const tags = tagId.split('/').map(tag => parseInt(tag, 10));
@@ -211,9 +212,8 @@ const lessonController = {
         }
 
         /**Nettoyage des données utilisateur */
-        const contentEscape = sanitizer.escape(content);
-        const titleEscape = sanitizer.escape(title);
-        const summaryEscape = sanitizer.escape(summary);
+        const titleEscape = sanitizer.sanitize(xss(title));
+        const summaryEscape = sanitizer.sanitize(xss(summary));
 
         //création d'un tableau tags id
         const tags = tagId.split('/').map(tag => parseInt(tag, 10));
@@ -404,7 +404,8 @@ const lessonController = {
             include:[
                 {
                     association: 'lessonsTags', 
-                    include :'image',                    
+                    include :'image',    
+                    order:['lessonsTags','updated_at', 'DESC']                
                 },                
                 {
                     association: 'user',
@@ -429,12 +430,28 @@ const lessonController = {
             const imageName =lesson.lessonsTags[0].image.name;
             lessonImageUrl = process.env.FOLDER_LESSON + imageName;
         }
-        
+
+        /** showdown */        
+        const converter = new showdown.Converter();
+        converter.setOption('tables', 'true');
+        converter.setOption('emoji', 'true');
+        converter.setOption('tasklists', 'true');
+        converter.setFlavor('github');
+
+        /** convertion html */
+        let html = converter.makeHtml(lesson.content);
+
+        /**nettoyage données */
+        html = xss(html);
+        html = sanitizer.sanitize(html);
+
+      
+
         /**Renvoide la leçon */
         return res.status(200).json({
             id: lesson.id,
             title: lesson.title,
-            content: lesson.content,
+            html: html,
             tags: lesson.lessonsTags,
             autor: lesson.user.login,
             links: lesson.user.links,
@@ -592,6 +609,7 @@ const lessonController = {
         return res.status(200).json(lessons);
     },
 
+    /**Demande intervention admin */
     adminRequest: async(req, res, next)=>{
         //recuperation id de la lesson
         const lessonId = parseInt(req.params.lessonId, 10);
@@ -651,6 +669,26 @@ const lessonController = {
             return res.status(200).json({
                 request: request
             });
+        });
+    },
+
+    /**affichage html depuis un text markdown*/
+    lessonHtmlFromMarkdown: async(req, res, next)=>{
+        const markdownText = req.body.markdownText; 
+        /** showdown */        
+        const converter = new showdown.Converter();
+        converter.setOption('tables', 'true');
+        converter.setOption('emoji', 'true');
+        converter.setOption('tasklists', 'true');
+        converter.setFlavor('github');
+
+        /** convertion en html*/
+        let contentHtml = converter.makeHtml(markdownText);
+        contentHtml = xss(contentHtml);
+
+
+        res.status(200).json({
+            content: contentHtml
         });
     }
 

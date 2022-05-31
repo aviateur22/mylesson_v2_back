@@ -7,9 +7,9 @@ INSERT INTO "role" ("name") VALUES
 ('super admin');
 
 INSERT INTO "user"("login","email","password","role_id", "avatar_key") VALUES
-('aviateur22','aviateur22@msn.com','$2b$10$x7U3SPvoeNVTKpLEBTC7UuXmn1BDg9AbeHjqDifDJ7efiTzjEMzq2','1', 'THUMBNAIL-DEFAULT_AVATAR_MEN.png'),
-('aviateur21','aviateur22@hotmail.fr','$2b$10$x7U3SPvoeNVTKpLEBTC7UuXmn1BDg9AbeHjqDifDJ7efiTzjEMzq2','2', 'THUMBNAIL-DEFAULT_AVATAR_MEN.png'),
-('aviateur23','aviateur22@gmail.com','$2b$10$x7U3SPvoeNVTKpLEBTC7UuXmn1BDg9AbeHjqDifDJ7efiTzjEMzq2','3', 'THUMBNAIL-DEFAULT_AVATAR_MEN.png');
+('aviateur22','aviateur22@msn.com','$2b$10$x7U3SPvoeNVTKpLEBTC7UuXmn1BDg9AbeHjqDifDJ7efiTzjEMzq2','1', 'THUMBNAIL_DEFAULT_AVATAR.png'),
+('aviateur21','aviateur22@hotmail.fr','$2b$10$x7U3SPvoeNVTKpLEBTC7UuXmn1BDg9AbeHjqDifDJ7efiTzjEMzq2','2', 'THUMBNAIL_DEFAULT_AVATAR.png'),
+('aviateur23','aviateur22@gmail.com','$2b$10$x7U3SPvoeNVTKpLEBTC7UuXmn1BDg9AbeHjqDifDJ7efiTzjEMzq2','3', 'THUMBNAIL_DEFAULT_AVATAR.png');
 
 INSERT INTO "image" ("name") VALUES
 ('default.png'),

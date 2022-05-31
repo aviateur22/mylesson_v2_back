@@ -86,6 +86,13 @@ router.post('/filter/tags',
     joiValidation(lessonSchemaValidation.lessonFilterByTagShema),
     controllerHandler(lessonController.getLessonByTag));
 
+/**convertion markdwon html */
+router.post('/converter/get-html', 
+    controllerHandler(cookieMiddleware),
+    controllerHandler(authorization),
+    controllerHandler(roleMiddleware.user),
+    controllerHandler(lessonController.lessonHtmlFromMarkdown));
+
 /** demande un admin pour controller une lecon*/
 router.post('/admin-request/:lessonId', 
     controllerHandler(cookieMiddleware),
