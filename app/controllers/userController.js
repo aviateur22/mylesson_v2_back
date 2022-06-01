@@ -15,7 +15,7 @@ const jwtExpire = require('../helpers/jwtExpire');
 const awsManager = require('../helpers/aws');
 
 /**nodemailer */
-const nodeMailer = require('../helpers/mailer/nodeMailer');
+const mailer = require('../helpers/mailer/nodeMailer');
 
 /** comparaions de token */
 const tokenCompare = require('../helpers/security/tokenCompare');
@@ -64,7 +64,7 @@ const userController={
 
         
         /** Renvoie d'un JWT pour gestion des authorization */
-        res.cookie('authorization', jwtGen, { secure: true, sameSite:'none', httpOnly: true });   
+        res.cookie('authorization', jwtGen, { secure: true, sameSite:'Strict', httpOnly: true });   
 
         /**suppression du cookie visteur */
         res.clearCookie('visitor_auth');    
@@ -532,7 +532,12 @@ const userController={
         }
        
         /** instanciation nodemailer */
-        const mailer = new nodeMailer('resetPassword', findUser.email, findUser.id, tokenMail);
+        const mailer = new mailer(
+            'resetPassword', 
+            findUser.email,
+            findUser.id,
+            tokenMail
+        );
 
         /**envoie de l'email */
         await mailer.sendEmail();
@@ -545,7 +550,7 @@ const userController={
     /** 
      * réinitialisation mote de passe
      */
-    resetPasswordByUserId: async(req, res, next)=>{
+    resetPasswordByUserId: async(req, res, next)=>{        
         const param = sanitizer.escape(xss(req.body.param));
         const password = sanitizer.escape(xss(req.body.password));
         const cfmPassword = sanitizer.escape(xss(req.body.confirmPassword));

@@ -33,7 +33,7 @@ const tagController = {
             }
         }
         /** plus de 10 caractere */
-        res.status(204).json();
+        res.status(200).json();
     },
 
     /**ajout d'un nouveau tag */
