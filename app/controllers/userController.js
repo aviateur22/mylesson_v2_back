@@ -64,7 +64,7 @@ const userController={
 
         
         /** Renvoie d'un JWT pour gestion des authorization */
-        res.cookie('authorization', jwtGen, { secure: true, sameSite:'Strict', httpOnly: true });   
+        res.cookie('authorization', jwtGen, { secure: true, httpOnly: true });   
 
         /**suppression du cookie visteur */
         res.clearCookie('visitor_auth');    
