@@ -9,7 +9,7 @@ module.exports = {
         if(!req.body.userId || !req.body.data){
             throw ({message: 'vous n\'êtes pas autorisé à éxecuter cette action', statusCode:'403'});
         }
-
+        
         /** decryptage des token */
         const aes = new AES();
 
@@ -31,6 +31,7 @@ module.exports = {
         if((parseInt(userId,10) !== parseInt(userToken[0],10)) || (userToken[1] !== secret)){
             throw ({message: 'vous n\'êtes pas autorisé à éxecuter cette action', statusCode:'403'});
         }
+
         req.userId = parseInt(userId,10);
         
         next();

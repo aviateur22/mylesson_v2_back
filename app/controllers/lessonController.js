@@ -66,8 +66,8 @@ const lessonController = {
         }
 
         /**Nettoyage des données utilisateur */        
-        const titleEscape = sanitizer.sanitize(xss(title));
-        const summaryEscape = sanitizer.sanitize(xss(summary));
+        const titleEscape = sanitizer.escape(xss(title));
+        const summaryEscape = sanitizer.escape(xss(summary));
 
         //création d'un tableau tags id
         const tags = tagId.split('/').map(tag => parseInt(tag, 10));
@@ -212,8 +212,8 @@ const lessonController = {
         }
 
         /**Nettoyage des données utilisateur */
-        const titleEscape = sanitizer.sanitize(xss(title));
-        const summaryEscape = sanitizer.sanitize(xss(summary));
+        const titleEscape = sanitizer.escape(xss(title));
+        const summaryEscape = sanitizer.escape(xss(summary));
 
         //création d'un tableau tags id
         const tags = tagId.split('/').map(tag => parseInt(tag, 10));
@@ -384,7 +384,7 @@ const lessonController = {
      */
     getLessonBySlug: async(req, res, next)=>{
         /**Vérification id */
-        const slug = req.params.slug;
+        const slug = sanitizer.escape(xss(req.params.slug));
         
         /** mauvais format de lecon id */
         if(!isNaN(slug)){

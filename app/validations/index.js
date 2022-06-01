@@ -4,7 +4,7 @@
  * @returns {object} - next si validation OK ou error
  */
 module.exports = (schema) =>async(req, res, next) =>{
-    try {        
+    try {
         if(req.method ==='GET'){
             await schema.validateAsync(req.query);
         } else {

@@ -32,7 +32,7 @@ const userController={
 
         const user = await User.findOne({
             where: {
-                email:sanitizer.escape(req.body.email) 
+                email:sanitizer.escape(xss(req.body.email)) 
             }
         });       
         
@@ -41,7 +41,7 @@ const userController={
             throw ({message: 'email ou mot de passe invalide', statusCode:'400'});
         }
 
-        const comparePassword = await bcrypt.compare(req.body.password , user.password);
+        const comparePassword = await bcrypt.compare(sanitizer.escape(xss(req.body.password)) , user.password);
 
         /** echec comparaiosn mot de passe */
         if(!comparePassword){
@@ -493,7 +493,7 @@ const userController={
     /**envoie reset mot de passe */    
     sendEmailPasswordLost: async(req, res, next)=>{
         /**email */
-        const email = sanitizer.escape(req.params.email);
+        const email = sanitizer.escape(xss(req.params.email));
         
         if(!email || !isNaN(email)){
             throw ({message: 'vérifier votre email', statusCode:'400'});
@@ -546,9 +546,9 @@ const userController={
      * réinitialisation mote de passe
      */
     resetPasswordByUserId: async(req, res, next)=>{
-        const param = req.body.param;
-        const password = req.body.password;
-        const cfmPassword = req.body.confirmPassword;
+        const param = sanitizer.escape(xss(req.body.param));
+        const password = sanitizer.escape(xss(req.body.password));
+        const cfmPassword = sanitizer.escape(xss(req.body.confirmPassword));
 
         if(password !== cfmPassword){
             throw ({message: 'les mots de passe ne sont pas identique', statusCode:'400'});
@@ -556,7 +556,7 @@ const userController={
 
         if(!param ){
             throw ({message: 'données manquantes pour valider l\'action', statusCode:'400'});
-        }
+        }       
 
         /**user id */
         const userId = req.userId;
@@ -577,13 +577,13 @@ const userController={
 
         /**pas de jwt */
         if(!userJWT){
-            throw ({message: 'données manquantes pour valider l\'action', statusCode:'400'});
+            throw ({message: 'données manquantes pour valider l\'action', statusCode:'403'});
         }
-        
+
         const checkToken = await tokenCompare.compareTokenWithoutSecret(userJWT, param);
 
         if(!checkToken){
-            throw ({message:'oupsss token invalid', statusCode:'403'});
+            throw ({message: 'données manquantes pour valider l\'action', statusCode:'403'});
         }  
         
         const passwordHash =await bcrypt.hash(password,10);
