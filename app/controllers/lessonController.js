@@ -684,8 +684,8 @@ const lessonController = {
 
         /** convertion en html*/
         let contentHtml = converter.makeHtml(markdownText);
+        contentHtml = sanitizer.sanitize(contentHtml);
         contentHtml = xss(contentHtml);
-
 
         res.status(200).json({
             content: contentHtml
