@@ -416,7 +416,7 @@ const lessonController = {
 
         /** pas de lecon */
         if(!lesson){
-            return res.status(204).json({});
+            return res.status(404).json({});
         }
 
         /** recuperation de l'image associé au tag*/
@@ -443,7 +443,6 @@ const lessonController = {
 
         /**nettoyage données */
         html = xss(html);
-        html = sanitizer.sanitize(html);
 
       
 
@@ -684,7 +683,7 @@ const lessonController = {
 
         /** convertion en html*/
         let contentHtml = converter.makeHtml(markdownText);
-        contentHtml = sanitizer.sanitize(contentHtml);
+        contentHtml = sanitizer.unescapeEntities(contentHtml);
         contentHtml = xss(contentHtml);
 
         res.status(200).json({
